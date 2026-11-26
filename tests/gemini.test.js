@@ -53,6 +53,20 @@ test('Gemini 가 실패하거나 그림이 없으면 받은 그림 그대로(AI 
   }
 })
 
+test('첫 모델이 한도(429)면 다음 모델로 다시 해 봐요', async () => {
+  process.env.GEMINI_API_KEY = FAKE_KEY
+  /** @type {string[]} */
+  const models = []
+  setGeminiFetch(async (_url, init) => {
+    models.push(JSON.parse(String(init.body)).model)
+    return models.length === 1 ? Response.json({ error: { message: 'limit: 0' } }, { status: 429 }) : Response.json({ output_image: { data: JPEG_B64, mime_type: 'image/jpeg' } })
+  })
+  const data = /** @type {any} */ (await (await send(BODY)).json())
+  assert.equal(data.isFallback, false)
+  assert.equal(models.length, 2)
+  assert.notEqual(models[0], models[1])
+})
+
 test('열쇠가 없으면 Gemini 를 부르지 않아요', async () => {
   let called = 0
   setGeminiFetch(async () => { called += 1; return Response.json({}) })

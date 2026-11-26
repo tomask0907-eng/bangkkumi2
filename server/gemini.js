@@ -7,6 +7,11 @@ export const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/inte
 export const GEMINI_API_REVISION = '2026-05-20'
 /** 공식 문서가 새 프로젝트에 권하는 모델. 환경변수 GEMINI_IMAGE_MODEL 로 바꿀 수 있다 */
 export const GEMINI_IMAGE_MODEL_DEFAULT = 'gemini-nano-banana-2.1'
+/** 차례로 시도할 모델(앞의 것이 한도·없음이면 다음). GEMINI_IMAGE_MODEL 을 넣으면 그것을 먼저 쓴다 */
+export function geminiModels() {
+  const list = [process.env.GEMINI_IMAGE_MODEL, GEMINI_IMAGE_MODEL_DEFAULT, 'gemini-3.1-flash-lite-image', 'gemini-3.1-flash-image', 'gemini-2.5-flash-image']
+  return [...new Set(list.filter((m) => typeof m === 'string' && /^[a-z0-9.-]{3,60}$/.test(m)))]
+}
 /** 그림 만드는 데 걸리는 시간 한도. 브라우저는 이보다 조금 더 기다린다(src/lib/api.ts RENDER_TIMEOUT_MS) */
 export const GEMINI_TIMEOUT_MS = 40000
 
@@ -71,21 +76,32 @@ export async function tryGeminiRender(input, request) {
   if (request && !takeAiTurn(request)) { console.warn('[gemini] 기본 답으로 바꿔요:', 'local_rate_limit'); return null }
   const turn = await takeDailyTurn()
   if (!turn.allowed) { console.warn('[gemini] 기본 답으로 바꿔요:', 'daily_cap'); return null }
+  const signal = AbortSignal.timeout(GEMINI_TIMEOUT_MS - turn.waitedMs)
   try {
-    const response = await (fetcher || fetch)(GEMINI_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-goog-api-key': key, 'Api-Revision': GEMINI_API_REVISION },
-      body: JSON.stringify({
-        model: process.env.GEMINI_IMAGE_MODEL || GEMINI_IMAGE_MODEL_DEFAULT,
-        input: [{ type: 'text', text: renderPrompt(input.styleName, input.timeOfDay) }, { type: 'image', mime_type: input.mime, data: input.data }],
-        response_format: { type: 'image', mime_type: 'image/jpeg', aspect_ratio: '16:9', image_size: '1K' },
-      }),
-      signal: AbortSignal.timeout(GEMINI_TIMEOUT_MS - turn.waitedMs),
-    })
-    if (!response.ok) { console.warn('[gemini] 기본 답으로 바꿔요:', 'api_error', response.status); return null }
-    const image = pickImage(await response.json())
-    if (!image) { console.warn('[gemini] 기본 답으로 바꿔요:', 'no_image'); return null }
-    return `data:${image.mime};base64,${image.data}`
+    // 한도(429)·없는 모델(404)이면 다음 모델로 넘어간다. 무료 등급은 모델마다 한도가 다르다
+    for (const model of geminiModels()) {
+      const response = await (fetcher || fetch)(GEMINI_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-goog-api-key': key, 'Api-Revision': GEMINI_API_REVISION },
+        body: JSON.stringify({
+          model,
+          input: [{ type: 'text', text: renderPrompt(input.styleName, input.timeOfDay) }, { type: 'image', mime_type: input.mime, data: input.data }],
+          response_format: { type: 'image', mime_type: 'image/jpeg', aspect_ratio: '16:9', image_size: '1K' },
+        }),
+        signal,
+      })
+      if (!response.ok) {
+        // Google 오류 문구(한도·모델 이름 등)만 짧게 남긴다. 요청 본문·열쇠는 남기지 않는다
+        const why = await response.json().then((/** @type {any} */ j) => String(j?.error?.message ?? '').replace(/key=[^&\s]+/gi, 'key=…').slice(0, 220)).catch(() => '')
+        console.warn('[gemini] 다음 모델로 또는 기본 답으로:', model, 'api_error', response.status, why)
+        if (response.status === 429 || response.status === 404) continue
+        return null
+      }
+      const image = pickImage(await response.json())
+      if (!image) { console.warn('[gemini] 기본 답으로 바꿔요:', model, 'no_image'); return null }
+      return `data:${image.mime};base64,${image.data}`
+    }
+    return null
   } catch (error) {
     console.warn('[gemini] 기본 답으로 바꿔요:', error instanceof Error && error.name === 'TimeoutError' ? 'timeout' : 'network')
     return null
