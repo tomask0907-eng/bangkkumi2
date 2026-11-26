@@ -1,0 +1,26 @@
+/* 한 문항씩 입력 */
+#mh .form.is-step .fgrid{display:block;min-height:188px}
+#mh .form.is-step .fgrid>.f{display:none}
+#mh .form.is-step .fgrid>.f.is-cur{display:block;animation:stIn .28s ease}
+@keyframes stIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+#mh .stp{display:flex;align-items:center;gap:12px;margin:20px 0 28px}
+#mh .stp__bar{flex:1;height:4px;border-radius:4px;background:var(--gray);overflow:hidden}
+#mh .stp__bar i{display:block;height:100%;width:12.5%;background:var(--ink);border-radius:4px;transition:width .3s ease}
+#mh #stpNo{font-size:13px;font-weight:600;color:var(--sub);font-variant-numeric:tabular-nums;min-width:40px;text-align:right}
+#mh .form.is-step .f label,#mh .form.is-step .f .lb{display:flex;flex-direction:column;align-items:flex-start;gap:6px;font-size:22px;font-weight:600;letter-spacing:-.03em;line-height:1.35;margin-bottom:20px}
+#mh .form.is-step .f label small,#mh .form.is-step .f .lb small{font-size:14px;font-weight:400;color:var(--sub);letter-spacing:0}
+#mh .form.is-step .in{position:relative;display:block;width:100%}
+#mh .form.is-step .in input{width:100%;height:64px;padding:0 84px 0 20px;font-size:24px;font-weight:500;border-radius:14px;font-variant-numeric:tabular-nums}
+#mh .form.is-step .in span{position:absolute;right:20px;top:50%;transform:translateY(-50%);font-size:16px;color:var(--sub);pointer-events:none}
+#mh .form.is-step .seg{display:grid;grid-template-columns:1fr 1fr;gap:8px;height:auto;padding:0;background:none}
+#mh .form.is-step .seg button{height:64px;border-radius:14px;border:1px solid var(--card-line);background:#fff;font-size:18px;font-weight:600;color:var(--ink)}
+#mh .form.is-step .seg button.is-on{background:var(--ink);border-color:var(--ink);color:#fff;box-shadow:none}
+#mh .form.is-step .err{margin-top:10px;min-height:20px}
+#mh .form.is-step .form-btns{display:grid;grid-template-columns:1fr 2fr;gap:8px;margin-top:28px}
+#mh .form.is-step .form-btns .btn{height:56px;width:100%;justify-content:center}
+#mh .form.is-step .form-btns .btn:disabled{opacity:.35;pointer-events:none}
+#mh .form-foot{margin-top:16px;text-align:center}
+#mh .form input[type=number]{-moz-appearance:textfield;appearance:textfield}
+#mh .form input[type=number]::-webkit-inner-spin-button,#mh .form input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+#mh .link-btn{font-size:14px;color:var(--sub);text-decoration:underline;text-underline-offset:4px}
+#mh .link-btn:hover{color:var(--ink)}

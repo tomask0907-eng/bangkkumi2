@@ -1093,6 +1093,75 @@ body.card-open #mh .map-hint,#mh .map-hint.is-gone{opacity:0}
   /* 휴대폰에서 왼쪽 카드가 접기 단추(−)와 겹치지 않게 단추 아래에 둔다 */
   #mh .panel-l{top:220px}
 }
+/* ═══════ 홈 풀페이지 ═══════ */
+.hero.fp{max-height:none;height:100svh}
+.hero__stat{margin-top:var(--s5);display:flex;align-items:baseline;flex-wrap:wrap;gap:6px 12px;font-size:14px;color:rgba(255,255,255,.78)}
+.hero__stat b{font-size:22px;font-weight:600;color:#fff;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.hero__stat small{font-size:12px;color:rgba(255,255,255,.55)}
+.fp{position:relative;min-height:100svh;display:flex;align-items:center;padding:calc(var(--nav-h) + 40px) 0 56px}
+.fp--light{background:#f7f6f2}
+.fp--gray{background:var(--gray)}
+.fp--dark{background:#141714;color:#fff}
+.fp__grid{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.25fr);gap:clamp(40px,6vw,96px);align-items:center;width:100%}
+.fp__grid--rev{grid-template-columns:minmax(0,1.25fr) minmax(0,.9fr)}
+.fp__no{font-family:var(--en);font-style:italic;font-size:20px;letter-spacing:0;color:var(--green);margin-bottom:14px}
+.fp--dark .fp__no{color:#8fd3ae}
+.fp__title{font-size:clamp(32px,3.6vw,52px);line-height:1.16;letter-spacing:-.05em;font-weight:600}
+.fp__desc{margin-top:20px;max-width:460px;color:var(--sub);font-size:clamp(15px,1.15vw,17px);line-height:1.7}
+.fp--dark .fp__desc{color:rgba(255,255,255,.7)}
+.fp__text .btn{margin-top:32px}
+.fp__media{position:relative;aspect-ratio:16/10;border-radius:20px;overflow:hidden;background:#d9d6ce;box-shadow:0 30px 60px -30px rgba(20,23,20,.35)}
+.fp--dark .fp__media{background:#262a26;box-shadow:0 30px 80px -30px rgba(0,0,0,.6)}
+.fp__media>video,.fp__media>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.fp__media .ba img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.fp__media .tag-example{position:absolute;top:auto;right:14px;bottom:14px;z-index:4}
+.fp__chips{display:flex;gap:8px;margin-top:24px;list-style:none;padding:0}
+.fp__chips li{height:34px;padding:0 14px;border-radius:999px;border:1px solid var(--line);background:#fff;font-size:14px;font-weight:600;display:inline-flex;align-items:center}
+.fp__hint{display:block;margin-top:18px;font-size:13px;color:var(--sub)}
+.kid{display:flex;align-items:center;gap:14px;margin-top:24px;padding:12px 16px 12px 12px;border-radius:16px;background:#fff;border:1px solid var(--line);max-width:460px}
+.kid__media{position:relative;flex:none;width:96px;aspect-ratio:4/3;border-radius:10px;overflow:hidden;background:#d9d6ce}
+.kid__media video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.kid__text{display:flex;flex-direction:column;gap:2px;font-size:13px;color:var(--sub);line-height:1.5}
+.kid__text b{font-size:15px;color:var(--ink);font-weight:600;letter-spacing:-.02em}
+.lights{list-style:none;padding:0;margin-top:26px;display:grid;gap:12px}
+.lights li{display:flex;align-items:center;gap:12px;font-size:15px;color:rgba(255,255,255,.66)}
+.lights b{color:#fff;font-weight:600;min-width:72px}
+.lights i{width:12px;height:12px;border-radius:50%;flex:none}
+.lights .on{background:#ffc46b;box-shadow:0 0 0 4px rgba(255,196,107,.18),0 0 18px 4px rgba(255,196,107,.55)}
+.lights .dim{background:#ffc46b;opacity:.55;animation:fpBlink 1.6s ease-in-out infinite}
+.lights .off{background:#4a4f4a}
+@keyframes fpBlink{50%{opacity:.15}}
+.fp--plans{display:block;padding-top:calc(var(--nav-h) + 64px)}
+.fp--plans .plans__head{align-items:flex-end}
+.fp--plans .fp__title{font-size:clamp(30px,3.2vw,46px)}
+/* 오른쪽 섹션 점 */
+.fp-dots{position:fixed;right:28px;top:50%;transform:translateY(-50%);z-index:40;display:none;flex-direction:column;gap:14px}
+body.fp-on .fp-dots{display:flex}
+.fp-dots button{position:relative;width:10px;height:10px;border-radius:50%;background:rgba(20,23,20,.22);transition:transform .25s,background .25s}
+.fp-dots button.is-on{background:var(--ink);transform:scale(1.35)}
+.fp-dots.is-light button{background:rgba(255,255,255,.4)}
+.fp-dots.is-light button.is-on{background:#fff}
+.fp-dots button span{position:absolute;right:22px;top:50%;transform:translateY(-50%);white-space:nowrap;font-size:12px;font-weight:600;padding:5px 10px;border-radius:999px;background:var(--ink);color:#fff;opacity:0;pointer-events:none;transition:opacity .2s}
+.fp-dots button:hover span,.fp-dots button:focus-visible span{opacity:1}
+@media (max-width:900px){
+  .fp{min-height:0;padding:72px 0}
+  .hero.fp{min-height:560px;height:calc(100svh - var(--tab-h))}
+  .fp__grid,.fp__grid--rev{grid-template-columns:1fr;gap:32px}
+  .fp__grid--rev .fp__media{order:2}
+  .fp__media{aspect-ratio:4/3}
+  .fp--plans{padding-top:72px}
+  .hero__stat{margin-top:var(--s3)}
+}
+.nav.is-dark{background:rgba(20,23,20,.78);color:#fff;border-bottom-color:rgba(255,255,255,.08)}
+.nav.is-dark .btn:not(.btn--ghost){background:#fff;color:var(--ink)}
+.nav.is-dark .btn--ghost{background:rgba(255,255,255,.12);color:#fff;border-color:rgba(255,255,255,.24)}
+
+.to-top{position:fixed;right:var(--pad-x);bottom:32px;z-index:45;height:48px;padding:0 18px 0 16px;border-radius:999px;background:#fff;color:var(--ink);font-size:14px;font-weight:600;display:inline-flex;align-items:center;gap:6px;box-shadow:0 10px 30px rgba(0,0,0,.22);opacity:0;transform:translateY(12px);pointer-events:none;transition:opacity .25s,transform .25s}
+.to-top.is-on{opacity:1;transform:none;pointer-events:auto}
+.to-top:hover{background:var(--gray)}
+@media (max-width:900px){.to-top{bottom:calc(var(--tab-h) + 16px);right:16px}}
+.footer{padding-bottom:112px}
+@media (max-width:900px){.footer{padding-bottom:calc(var(--s5) + 72px)}}
 
 /* ═════════ 휴대폰 화면: 홈·이용 안내 (build.py가 맨 끝에 붙인다) ═════════ */
 
@@ -1292,13 +1361,13 @@ body.house-mode #mh .fab{display:none}
   #mh .form-head .title{font-size:24px}
   #mh .form-head .lead{margin-top:6px;font-size:15px;line-height:1.5}
   /* 저장·전송 안내는 보내기 직전인 마지막 걸음에서 보여 준다 */
-  #mh .form-head .gets-note{order:3;margin-top:16px;font-size:14px;line-height:1.5}
-  #mh #vInput:not([data-step="3"]) .gets-note{display:none}
+  #mh .form-head .gets-note{order:4;margin-top:16px;font-size:14px;line-height:1.5}
   #mh #form > .persona{order:1;margin-top:14px}
-  #mh #form > .persona > .muted{display:none}
+  #mh #form > .persona > .muted,#mh #form > .persona > .sample{display:none}
+  #mh #form > .stp{order:1;margin:16px 0 4px}
+  #mh #form > .form-foot{order:3;margin-top:12px}
   #mh #form > .persona .chip{height:44px;font-size:15px}
   #mh .fgrid{order:2;grid-template-columns:minmax(0,1fr);gap:12px;margin-top:14px}
-  #mh #vInput[data-step="1"] .f:not([data-step="1"]),#mh #vInput[data-step="2"] .f:not([data-step="2"]),#mh #vInput[data-step="3"] .f:not([data-step="3"]){display:none}
   #mh .f label,#mh .f .lb{font-size:15px;margin-bottom:4px;align-items:baseline}
   #mh .f label small,#mh .f .lb small{font-size:13px;text-align:right}
   #mh .f.full .lb{flex-direction:column;gap:2px}
@@ -1308,11 +1377,9 @@ body.house-mode #mh .fab{display:none}
   #mh #prioChips{gap:8px;margin-top:4px}
   #mh #prioChips .chip{height:44px;padding:0 16px;font-size:15px}
   #mh .err{font-size:13px}
-  #mh .form-btns{order:4;position:sticky;bottom:0;z-index:2;display:flex;flex-wrap:nowrap;gap:8px;margin:auto calc(var(--pad-x) * -1) 0;padding:12px var(--pad-x) calc(12px + env(safe-area-inset-bottom));border-top:1px solid var(--line);background:var(--bg)}
+  #mh .form-btns{order:5;position:sticky;bottom:0;z-index:2;display:flex;flex-wrap:nowrap;gap:8px;margin:auto calc(var(--pad-x) * -1) 0;padding:12px var(--pad-x) calc(12px + env(safe-area-inset-bottom));border-top:1px solid var(--line);background:var(--bg)}
   #mh .form-btns .btn{flex:1 1 0;height:48px;padding:0 12px}
   #mh .form-btns .btn:not(.btn--ghost){flex-grow:1.5}
-  #mh .form-btns .m-only{display:inline-flex}
-  #mh #vInput[data-step="1"] #fPrev,#mh #vInput[data-step="1"] #fSubmit,#mh #vInput[data-step="2"] #formBack,#mh #vInput[data-step="2"] #fSubmit,#mh #vInput[data-step="3"] #formBack,#mh #vInput[data-step="3"] #fNext{display:none}
 
   /* 키가 작은 휴대폰(높이 760px 이하): 첫 걸음의 네 칸과 단추가 한 화면에 들어오게 설명 한 줄을 뺀다 */
   @media (max-height:760px){#mh .form-head .lead{display:none}}
@@ -1450,6 +1517,32 @@ body.house-mode #mh .fab{display:none}
 @media (max-width:820px) and (hover:hover) and (pointer:fine){
   #mh .quick{flex-wrap:wrap}
 }
+/* 한 문항씩 입력 */
+#mh .form.is-step .fgrid{display:block;min-height:188px}
+#mh .form.is-step .fgrid>.f{display:none}
+#mh .form.is-step .fgrid>.f.is-cur{display:block;animation:stIn .28s ease}
+@keyframes stIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+#mh .stp{display:flex;align-items:center;gap:12px;margin:20px 0 28px}
+#mh .stp__bar{flex:1;height:4px;border-radius:4px;background:var(--gray);overflow:hidden}
+#mh .stp__bar i{display:block;height:100%;width:12.5%;background:var(--ink);border-radius:4px;transition:width .3s ease}
+#mh #stpNo{font-size:13px;font-weight:600;color:var(--sub);font-variant-numeric:tabular-nums;min-width:40px;text-align:right}
+#mh .form.is-step .f label,#mh .form.is-step .f .lb{display:flex;flex-direction:column;align-items:flex-start;gap:6px;font-size:22px;font-weight:600;letter-spacing:-.03em;line-height:1.35;margin-bottom:20px}
+#mh .form.is-step .f label small,#mh .form.is-step .f .lb small{font-size:14px;font-weight:400;color:var(--sub);letter-spacing:0}
+#mh .form.is-step .in{position:relative;display:block;width:100%}
+#mh .form.is-step .in input{width:100%;height:64px;padding:0 84px 0 20px;font-size:24px;font-weight:500;border-radius:14px;font-variant-numeric:tabular-nums}
+#mh .form.is-step .in span{position:absolute;right:20px;top:50%;transform:translateY(-50%);font-size:16px;color:var(--sub);pointer-events:none}
+#mh .form.is-step .seg{display:grid;grid-template-columns:1fr 1fr;gap:8px;height:auto;padding:0;background:none}
+#mh .form.is-step .seg button{height:64px;border-radius:14px;border:1px solid var(--card-line);background:#fff;font-size:18px;font-weight:600;color:var(--ink)}
+#mh .form.is-step .seg button.is-on{background:var(--ink);border-color:var(--ink);color:#fff;box-shadow:none}
+#mh .form.is-step .err{margin-top:10px;min-height:20px}
+#mh .form.is-step .form-btns{display:grid;grid-template-columns:1fr 2fr;gap:8px;margin-top:28px}
+#mh .form.is-step .form-btns .btn{height:56px;width:100%;justify-content:center}
+#mh .form.is-step .form-btns .btn:disabled{opacity:.35;pointer-events:none}
+#mh .form-foot{margin-top:16px;text-align:center}
+#mh .form input[type=number]{-moz-appearance:textfield;appearance:textfield}
+#mh .form input[type=number]::-webkit-inner-spin-button,#mh .form input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+#mh .link-btn{font-size:14px;color:var(--sub);text-decoration:underline;text-underline-offset:4px}
+#mh .link-btn:hover{color:var(--ink)}
 
 /* ═════════ 집 보기 · 집 전체 구조: 평면도에서 꾸밀 방 고르기 (build.py 가 맨 끝에 붙인다) ═════════
    #houseView.is-room 이면 방 화면(방꾸미 iframe), 아니면 전체 구조(#hvOver)다. house_view.js 의 mode() 가 붙인다.
@@ -1707,212 +1800,114 @@ body.house-mode .nav{background:var(--bg)}
 <!-- ═══════════════ #home ═══════════════ -->
 <section class="page" id="page-home" data-page="home" aria-label="홈">
 
-  <div class="hero">
+  <div class="hero fp" data-fp="처음">
     <video class="hero__media" autoplay muted playsinline preload="auto" poster="img/hero.jpg" aria-label="새 집 거실을 천천히 둘러보는 예시 영상">
       <source src="vid/hero.mp4" type="video/mp4">
     </video>
     <div class="hero__shade" aria-hidden="true"></div>
     <span class="tag-example">예시 영상</span>
     <div class="container hero__inner">
-      <p class="hero__en">Your furniture, your model house.</p>
-      <h1 class="hero__title"><span>방봄</span></h1>
+      <h1 class="hero__title"><span>가 보기 전에,</span><span class="thin">먼저 살아보는 집</span></h1>
       <p class="hero__desc">대구에 좋은 매물 있는데, 함께 보시겠어요?</p>
       <div class="hero__btns">
         <a href="#input" class="btn btn--white" data-go="input">기본정보 입력하고 더 알아보기 →</a>
         <a href="#map" class="btn btn--ghost" data-go="browse">그냥 둘러보기</a>
       </div>
       <form class="hero__ask" id="homeAsk" role="search"><label for="homeAskIn">어떤 집을 찾으세요?</label><div><input id="homeAskIn" name="preference" placeholder="달서구, 전세 2억 5천 이하" autocomplete="off" maxlength="200"><button class="btn btn--white" type="submit">찾아보기</button></div></form>
-      <div hidden>
-      </div>
     </div>
     <div class="scroll-cue" aria-hidden="true">Scroll<i></i></div>
   </div>
 
-  <!-- 휴대폰(820px 이하)에서만 보이는 카테고리 칩. 고른 묶음(data-catp) 하나만 보여요. PC에서는 숨기고 모든 묶음을 이어서 보여요 -->
-  <div class="cats" id="homeCats" role="tablist" aria-label="홈 내용 고르기">
-    <button class="cat is-on" type="button" role="tab" aria-selected="true" data-cat="num"><span>숫자</span></button>
-    <button class="cat" type="button" role="tab" aria-selected="false" data-cat="plan"><span>평면</span></button>
-    <button class="cat" type="button" role="tab" aria-selected="false" data-cat="help"><span>돕는 방법</span></button>
-    <button class="cat" type="button" role="tab" aria-selected="false" data-cat="story"><span>우리 이야기</span></button>
-  </div>
-
-  <div class="stats is-on" data-catp="num">
-    <div class="container stats__grid">
-      <div class="stat reveal">
-        <div class="stat__num"><span data-count="3077">0</span><small>세대</small></div>
-        <p class="stat__label">대구 준공 후 미분양(전체 미분양 3,889호 중 79.1%), 전국 시·도 중 최다</p>
-        <p class="stat__src">국토교통부 주택통계 · 2026년 9월 말</p>
+  <div class="fp fp--light" data-fp="3D 집 보기">
+    <div class="container fp__grid">
+      <div class="fp__text reveal">
+        <p class="fp__no">01 · 3D Model house</p>
+        <h2 class="fp__title">집 안까지<br>3D로 둘러봐요</h2>
+        <p class="fp__desc">미분양 단지 면적(59㎡·84㎡)에 맞춘 구조예요. 계약하기 전에 방 크기와 동선을 화면으로 먼저 확인할 수 있어요.</p>
+        <ul class="fp__chips" aria-label="볼 수 있는 시점"><li>평면도</li><li>조감도</li><li>방 안</li></ul>
+        <div class="kid">
+          <div class="kid__media">
+            <video muted playsinline preload="none" poster="img/child.jpg" data-autoplay aria-label="아이 눈높이 90cm에서 거실을 걸어보는 예시 영상"><source src="vid/child.mp4" type="video/mp4"></video>
+          </div>
+          <div class="kid__text">
+            <b>아이 시점으로도 볼 수 있어요</b>
+            <span>눈높이를 90cm로 낮추면 탁자 모서리가 어디쯤 오는지 보여요.</span>
+            <a href="#house" class="link" data-eye="child">아이 눈높이로 보기 →</a>
+          </div>
+        </div>
+        <a href="#house" class="btn">3D로 집 보기 →</a>
       </div>
-      <div class="stat reveal">
-        <div class="stat__num"><span data-count="43">0</span><small>시간</small></div>
-        <p class="stat__label">분양 0건이던 990가구 단지가 전세로 나오자 생긴 대기 줄</p>
-        <p class="stat__src">뉴시스·뉴스1 · 2026.9</p>
-      </div>
-      <div class="stat reveal">
-        <div class="stat__num"><span data-count="33.6">0</span><small>%</small></div>
-        <p class="stat__label">대구 청년 주거지원 예산 집행률</p>
-        <p class="stat__src">대구시 시의회 제출 자료 · 2026.10 기준</p>
+      <div class="fp__media reveal">
+        <video muted playsinline preload="none" poster="img/move.jpg" data-autoplay aria-label="새 집 거실 안으로 천천히 들어가는 예시 영상"><source src="vid/move.mp4" type="video/mp4"></video>
+        <span class="tag-example">예시 영상</span>
       </div>
     </div>
   </div>
 
-  <div class="section" data-catp="plan">
+  <div class="fp fp--gray" data-fp="가구 옮기기">
+    <div class="container fp__grid fp__grid--rev">
+      <div class="fp__media reveal">
+        <div class="ba" id="ba">
+          <img src="img/furn_after.jpg" alt="침대, 책상, 원목 수납장, 러그를 놓은 새 집 작은방" loading="lazy">
+          <img class="ba__before" src="img/furn_before.jpg" alt="가구가 하나도 없는 새 집 작은방" loading="lazy">
+          <span class="ba__line" aria-hidden="true"></span>
+          <span class="ba__knob" aria-hidden="true">⟷</span>
+          <input class="ba__range" type="range" min="0" max="100" value="100" aria-label="가구 놓기 전과 놓은 후 비교 위치">
+        </div>
+        <span class="pill-label pill-label--l">가구 놓기 전</span>
+        <span class="pill-label pill-label--r">가구 놓은 후</span>
+        <span class="tag-example">예시 이미지</span>
+      </div>
+      <div class="fp__text reveal">
+        <p class="fp__no">02 · Your furniture</p>
+        <h2 class="fp__title">빈 집에 가구를<br>미리 놓아봐요</h2>
+        <p class="fp__desc">침대, 책상, 수납장을 새 집 방에 놓아 보고 들어가는지 확인해요. 새로 살 가구는 예산에 맞춰 구매 목록으로 정리돼요.</p>
+        <span class="fp__hint">사진을 좌우로 밀어 보세요</span>
+        <a href="#house" class="btn">새 집에 가구 놓아보기 →</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="fp fp--dark" data-fp="불 켜지는 지도">
+    <div class="container fp__grid">
+      <div class="fp__text reveal">
+        <p class="fp__no">03 · Match</p>
+        <h2 class="fp__title">내 조건에 맞는 집에<br>불이 켜져요</h2>
+        <p class="fp__desc">나이, 소득, 모은 돈을 넣으면 대출·지원 요건을 단지마다 따져 봐요. 요건이 맞는 단지는 지도에서 불이 켜져요.</p>
+        <ul class="lights">
+          <li><i class="on"></i><b>요건 충족</b>불이 켜져요</li>
+          <li><i class="dim"></i><b>확인 필요</b>깜빡여요</li>
+          <li><i class="off"></i><b>미충족</b>꺼져요</li>
+        </ul>
+        <a href="#input" class="btn btn--white">내 조건 넣기 →</a>
+      </div>
+      <div class="fp__media reveal">
+        <video muted playsinline preload="none" poster="img/match.jpg" data-autoplay aria-label="불이 켜진 단지를 누르면 다른 단지는 사라지고 주변 시설까지 선이 이어지는 방봄 지도 화면"><source src="vid/match.mp4" type="video/mp4"></video>
+        <span class="tag-example">방봄 화면 · 샘플 데이터</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="fp fp--light fp--plans" data-fp="단지 둘러보기">
     <div class="container">
       <div class="plans__head reveal">
         <div>
-          <span class="eyebrow">Plans</span>
-          <h2 class="title">미분양 단지, 평면부터 둘러보세요</h2>
+          <p class="fp__no">04 · Plans</p>
+          <h2 class="fp__title">대구 미분양 단지,<br>평면부터 둘러봐요</h2>
         </div>
-        <p class="muted small">누르면 평면도·3D로 집 안을 보고 가구를 놓아볼 수 있어요.</p>
+        <a href="#map" class="link" data-go="browse">지도에서 전체 보기 →</a>
       </div>
       <div class="plans__track" id="plansTrack"></div>
       <div class="plans__btns">
-        <button class="round-btn" id="plansPrev" aria-label="이전 구조"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M11 4 6 9l5 5"/></svg></button>
-        <button class="round-btn" id="plansNext" aria-label="다음 구조"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m7 4 5 5-5 5"/></svg></button>
-      </div>
-    </div>
-  </div>
-
-  <div class="section section--gray" data-catp="help">
-    <div class="container">
-      <div class="head-center reveal">
-        <span class="eyebrow">How it helps</span>
-        <h2 class="title">가 보지 않고, 미분양 집을 골라요</h2>
-      </div>
-
-      <div class="zz-tabs" role="tablist" aria-label="방봄이 돕는 방법">
-        <button class="zz-tab is-on" role="tab" data-zz="0"><i>01</i>불 켜지는 지도</button>
-        <button class="zz-tab" role="tab" data-zz="1"><i>02</i>이사 갈래?</button>
-        <span class="zz-tabs__sep" aria-hidden="true">입주 뒤까지 미리</span>
-        <button class="zz-tab" role="tab" data-zz="2"><i>03</i>가구 배치</button>
-        <button class="zz-tab" role="tab" data-zz="3"><i>04</i>아이 눈높이</button>
-      </div>
-      <div class="zz zz--tabbed">
-        <div class="zz__row is-on">
-          <div class="zz__media">
-            <div class="mini-map" aria-hidden="true">
-              <svg viewBox="0 0 600 400" preserveAspectRatio="xMidYMid slice">
-                <style>.mmb{animation:blink 1.2s ease-in-out infinite}</style>
-                <rect width="600" height="400" fill="#20241f"/>
-                <path d="M-10 150 C110 120 180 170 280 120 S470 80 610 110" fill="none" stroke="#33413a" stroke-width="18" stroke-linecap="round"/>
-                <path d="M360 410 C350 330 330 260 320 170 S300 60 290 -10" fill="none" stroke="#33413a" stroke-width="10" stroke-linecap="round"/>
-                <path d="M40 340 L180 270 L300 210 L420 160 L560 120" fill="none" stroke="rgba(255,255,255,.22)" stroke-width="2"/>
-                <path d="M60 220 L200 200 L300 210 L430 240 L570 250" fill="none" stroke="rgba(255,255,255,.22)" stroke-width="2"/>
-                <g fill="#ffe2a8"><circle cx="150" cy="292" r="7"/><circle cx="430" cy="236" r="7"/></g>
-                <g fill="#ffe2a8" opacity=".25"><circle cx="150" cy="292" r="22"/><circle cx="430" cy="236" r="22"/></g>
-                <g fill="#ffe2a8" class="mmb"><circle cx="300" cy="170" r="7"/><circle cx="500" cy="300" r="7"/></g>
-                <g fill="#5b605a"><circle cx="230" cy="110" r="7"/><circle cx="80" cy="360" r="7"/><circle cx="520" cy="150" r="7"/></g>
-                <path d="M150 292 L180 270" stroke="#fff" stroke-dasharray="3 4" stroke-width="1.5"/>
-                <path d="M150 292 L96 250" stroke="#fff" stroke-dasharray="3 4" stroke-width="1.5"/>
-                <path d="M150 292 L205 330" stroke="#fff" stroke-dasharray="3 4" stroke-width="1.5"/>
-              </svg>
-            </div>
-            <span class="tag-example">예시 화면</span>
-          </div>
-          <div class="zz__text">
-            <p class="zz__no">01 · Match</p>
-            <h3 class="zz__title">내 조건에 불이 켜지는 집</h3>
-            <p>나이, 소득, 모은 돈만 넣으면 대출·지원 요건을 따져서 대구 미분양 지도에 들어갈 수 있는 집에만 불을 켜요. 단지를 누르면 역과 병원까지 거리와 실제 월 부담이 같이 보여요.</p>
-            <a href="#input" class="link">내 조건으로 찾아보기 →</a>
-          </div>
-        </div>
-        <div class="zz__row is-rev">
-          <div class="zz__media">
-            <video muted playsinline preload="none" poster="img/move.jpg" data-autoplay aria-label="미분양 새 집에 가구를 옮겨 놓는 예시 영상"><source src="vid/move.mp4" type="video/mp4"></video>
-            <span class="tag-example">예시 영상</span>
-          </div>
-          <div class="zz__text">
-            <p class="zz__no">02 · Move</p>
-            <h3 class="zz__title">이사 갈래?</h3>
-            <p>대구 미분양 단지의 면적에 맞춘 구조에 우리 가구를 그대로 옮겨봐요. 안 들어가는 가구와 새로 사야 할 가구가 먼저 보여요.</p>
-            <a href="#house" class="link">새 집에 가구 놓아보기 →</a>
-          </div>
-        </div>
-
-        <div class="zz__row">
-          <div class="zz__media">
-            <div class="ba" id="ba">
-              <img src="img/furn_after.jpg" alt="침대, 책상, 원목 수납장, 러그를 놓은 새 집 작은방" loading="lazy">
-              <img class="ba__before" src="img/furn_before.jpg" alt="가구가 하나도 없는 새 집 작은방" loading="lazy">
-              <span class="ba__line" aria-hidden="true"></span>
-              <span class="ba__knob" aria-hidden="true">⟷</span>
-              <input class="ba__range" type="range" min="0" max="100" value="100" aria-label="가구 놓기 전과 놓은 후 비교 위치">
-            </div>
-            <span class="pill-label pill-label--l">가구 놓기 전</span>
-            <span class="pill-label pill-label--r">가구 놓은 후</span>
-            <span class="tag-example">예시 이미지</span>
-          </div>
-          <div class="zz__text">
-            <p class="zz__no">03 · 입주 뒤까지 미리</p>
-            <h3 class="zz__title">빈 집에 가구를 미리 놓아봐요</h3>
-            <p>침대, 책상, 수납장을 새 집 방에 놓아 보고 들어가는지 확인해요. 새로 살 가구는 예산에 맞춰 구매 목록으로 정리돼요.</p>
-            <span class="zz__hint">← 사진을 좌우로 밀어서 비교해보세요 →</span>
-            <a href="#house" class="link">가구 배치하러 가기 →</a>
-          </div>
-        </div>
-
-        <div class="zz__row is-rev">
-          <div class="zz__media">
-            <video muted playsinline preload="none" poster="img/child.jpg" data-autoplay aria-label="아이 눈높이 90cm에서 거실을 걸어보는 예시 영상"><source src="vid/child.mp4" type="video/mp4"></video>
-            <div class="media-dim dim dim--v" aria-hidden="true">아이 눈높이</div>
-            <span class="tag-example">예시 영상</span>
-          </div>
-          <div class="zz__text">
-            <p class="zz__no">04 · 입주 뒤까지 미리</p>
-            <h3 class="zz__title">아이 눈높이 90cm</h3>
-            <p>어른 눈에는 무릎 높이였던 탁자 모서리가 아이 시선에서는 바로 얼굴 앞이에요. 얼굴 높이의 가구 모서리를 빨간 점으로 짚어줘요(참고용).</p>
-            <a href="#house" class="link" data-eye="child">아이 눈높이 90cm로 보기 →</a>
-          </div>
-        </div>
-
-      </div>
-      <div class="zz-nav">
-        <button class="round-btn" id="zzPrev" aria-label="이전"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M11 4 6 9l5 5"/></svg></button>
-        <span class="zz-dots" id="zzDots" aria-hidden="true"><i class="is-on"></i><i></i><i></i><i></i></span>
-        <button class="round-btn" id="zzNext" aria-label="다음"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m7 4 5 5-5 5"/></svg></button>
-      </div>
-    </div>
-  </div>
-
-  <div class="section section--white" data-catp="story">
-    <div class="container story">
-      <figure class="story__fig reveal">
-        <div class="story__img">
-          <img src="img/story.jpg" alt="방봄 팀원 네 명이 노트북 앞에서 화면을 함께 보며 이야기하는 모습" loading="lazy">
-          <span class="tag-example">예시 이미지</span>
-        </div>
-        <figcaption>방봄 팀 · 대구 계명문화대학교에서 서로 다른 과 학생 네 명이 모여 만들었어요</figcaption>
-      </figure>
-      <div class="story__body reveal">
-        <span class="eyebrow">Our story</span>
-        <h2 class="title">집을 바꿀지 말지는, 살아보고 정해야 하니까요</h2>
-        <p>낡은 집에 사는 가족은 늘 같은 질문 앞에 서요. 고쳐서 계속 살지, 새 집으로 옮길지. 그런데 그 답을 정하는 도구는 견적서 몇 장과 남이 꾸민 모델하우스뿐이었어요.</p>
-        <p class="story__more" id="storyMoreText">방봄은 대구 계명문화대학교의 서로 다른 과 학생 네 명이 모인 팀이에요. 시작은 아이들 곁에서 일하며 '아이 눈높이에서 공간은 전혀 다르게 보인다'는 걸 알게 된 팀원의 경험이었어요. 그래서 우리 가구, 우리 가족, 90cm 시선까지 넣어서 두 집을 미리 걸어볼 수 있게 만들었어요.</p>
-        <button class="link story__toggle" id="storyToggle" type="button" aria-expanded="false" aria-controls="storyMoreText">팀 이야기 더 보기</button>
-        <ul class="story__list">
-          <li><b>대구의 실제 숫자로 시작해요</b><span>국토교통부·대구시 공공 통계에 출처와 기준일을 함께 적어요</span></li>
-          <li><b>아이 눈높이를 기준에 넣었어요</b><span>유아교육을 공부하는 팀원이 90cm 시선과 모서리 체크를 설계했어요</span></li>
-          <li><b>남의 도면을 가져오지 않아요</b><span>표준 구조와 실측, 공공데이터만 쓰고 예시 값은 예시라고 밝혀요</span></li>
-        </ul>
-        <a href="#input" class="btn">내 조건부터 넣어봐요 →</a>
-      </div>
-    </div>
-  </div>
-
-  <div class="section" data-catp="story" style="padding-top:0;padding-bottom:var(--section-y)">
-    <div class="container">
-      <div class="cta reveal">
-        <img src="img/cta.jpg" alt="" loading="lazy">
-        <span class="tag-example">예시 이미지</span>
-        <div class="cta__inner">
-          <p class="cta__en">Your furniture, your model house.</p>
-          <h2 class="cta__title">우리 집부터 같이 걸어봐요</h2>
-          <a href="#input" class="btn btn--white">무료로 시작하기 →</a>
-        </div>
+        <button class="round-btn" id="plansPrev" aria-label="이전 단지"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M11 4 6 9l5 5"/></svg></button>
+        <button class="round-btn" id="plansNext" aria-label="다음 단지"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m7 4 5 5-5 5"/></svg></button>
       </div>
     </div>
   </div>
 </section>
+
+<nav class="fp-dots" id="fpDots" aria-label="홈 섹션 이동"></nav>
+<button type="button" class="to-top" id="toTop" aria-label="맨 위로 가기"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14V4M4.5 8.5 9 4l4.5 4.5"/></svg><span>맨 위로</span></button>
 
 <!-- ═══════════════ #guide ═══════════════ -->
 <section class="page" id="page-guide" data-page="guide" aria-label="이용 안내">
@@ -1961,7 +1956,7 @@ body.house-mode .nav{background:var(--bg)}
   <div class="top-right" id="topRight"></div>
 </header>
 
-<div id="mapWrap"><canvas id="mapCanvas" aria-label="대구 미분양 단지 지도. 잿빛 도시 위 크림색 단지가 미분양이에요"></canvas><p id="mapCredit">지도: © OpenStreetMap contributors (재해석 이미지)</p></div>
+<div id="mapWrap"><canvas id="mapCanvas" aria-label="대구 미분양 단지 지도. 잿빛 도시 위 크림색 단지가 미분양이에요"></canvas></div>
 <div class="lbl-layer" id="lblLayer"></div>
 
 <button class="pl-toggle" id="plToggle" aria-controls="panelL" aria-expanded="true" aria-label="패널 닫기">−</button>
@@ -1975,41 +1970,38 @@ body.house-mode .nav{background:var(--bg)}
 
 <!-- S1 정보 입력 -->
 <div class="veil" id="vInput" hidden>
-  <nav class="fsteps m-only" id="fSteps" aria-label="입력 걸음">
-    <button type="button" class="chip" data-step="1">기본 정보</button>
-    <button type="button" class="chip" data-step="2">주거 상황</button>
-    <button type="button" class="chip" data-step="3">예산·시설</button>
-  </nav>
   <div class="form-wrap">
   <div class="form-head">
     <span class="eyebrow">Your conditions</span>
-    <h1 class="title" id="fTitle">30초면 충분해요</h1>
-    <p class="lead">나이, 소득, 모은 돈만 넣으면 대출·지원 요건을 세 단계로 따져서 지도에 불을 켜요.</p>
+    <h1 class="title" id="fTitle">여덟 가지만 물어볼게요</h1>
+    <p class="lead">답한 내용으로 대출·지원 요건을 따져 보고, 들어갈 수 있는 단지에 지도에서 불을 켜요.</p>
     <ol class="gets">
       <li><i>01</i><div><b>대출·지원 판정</b><span>요건 충족 / 확인 필요 / 미충족과 그 이유</span></div></li>
-      <li><i>02</i><div><b>불이 켜지는 지도</b><span>들어갈 수 있는 미분양 단지만 밝게</span></div></li>
-      <li><i>03</i><div><b>지원 반영 월 부담</b><span>지원을 다 받을 때와 못 받을 때 범위까지</span></div></li>
+      <li><i>02</i><div><b>불이 켜지는 지도</b><span>요건이 맞는 미분양 단지에 불이 켜져요</span></div></li>
+      <li><i>03</i><div><b>지원 반영 월 부담</b><span>지원을 다 받을 때와 못 받을 때를 같이 보여줘요</span></div></li>
     </ol>
     <p class="small muted gets-note">입력값은 이 브라우저에만 저장해요. 판정 설명(이 단지 상담하기, 판정 쉽게 설명)을 누를 때만 질문과 판정 요약을 AI 답변을 만드는 데 보내요. 집찾기 대화는 이 화면 안에서만 조건을 정리하고, 대화창에서 AI 해석을 켰을 때만 그 문장을 보내요. 최종 판정과 승인은 각 기관이 해요.</p>
   </div>
   <form class="card form" id="form" novalidate aria-labelledby="fTitle">
-    <div class="persona"><button type="button" class="chip" id="fillPersona">예시 페르소나 넣기 · 김지훈(27)</button><span class="sample">시연용</span><span class="muted small" style="margin-left:auto">금액은 원 단위</span></div>
+    <div class="persona"><button type="button" class="chip" id="fillPersona">예시 · 김지훈(27)</button><button type="button" class="chip" id="fillShort">예시 · 모은 돈이 부족할 때</button><span class="sample">시연용</span><span class="muted small" style="margin-left:auto">금액은 원 단위</span></div>
+    <div class="stp" aria-hidden="true"><div class="stp__bar"><i id="stpFill"></i></div><span id="stpNo">1 / 8</span></div>
     <div class="fgrid">
-      <div class="f" data-step="1"><label for="f-age">나이 <small>만 나이, 19~70</small></label><div class="in"><input id="f-age" type="number" inputmode="numeric" min="19" max="70" required><span>세</span></div><p class="err" id="e-age"></p></div>
-      <div class="f" data-step="1"><label for="f-income">월 소득 <small>세후 실수령</small></label><div class="in"><input id="f-income" type="number" inputmode="numeric" min="0" step="10000" required><span>원</span></div><p class="err" id="e-income"></p></div>
-      <div class="f" data-step="1"><label for="f-gross">세전 연소득 <small>선택 · 알면 더 정확해요</small></label><div class="in"><input id="f-gross" type="number" inputmode="numeric" min="0" step="100" placeholder="모르면 비워두세요"><span>원</span></div></div>
-      <div class="f" data-step="1"><label for="f-assets">모은 돈 <small>보증금에 쓸 수 있는 돈</small></label><div class="in"><input id="f-assets" type="number" inputmode="numeric" min="0" step="100" required><span>원</span></div><p class="err" id="e-assets"></p></div>
-      <div class="f" data-step="2"><span class="lb">무주택인가요?</span><div class="seg" data-k="homeless"><button type="button" data-v="1">무주택</button><button type="button" data-v="0">집 있음</button></div></div>
-      <div class="f" data-step="2"><span class="lb">부모님과 따로 사나요?</span><div class="seg" data-k="lives_with_parents"><button type="button" data-v="0">따로 살아요</button><button type="button" data-v="1">함께 살아요</button></div></div>
-      <div class="f" data-step="2"><span class="lb">대구 거주 또는 전입 예정</span><div class="seg" data-k="daegu_resident_or_moving"><button type="button" data-v="1">예</button><button type="button" data-v="0">아니요</button></div></div>
-      <div class="f" data-step="3"><label for="f-budget">월 예산 <small>월세+관리비+대출이자</small></label><div class="in"><input id="f-budget" type="number" inputmode="numeric" min="0" step="5" required><span>원</span></div><p class="err" id="e-budget"></p></div>
-      <div class="f full" data-step="3"><span class="lb">중요한 시설 <small>선택 · 여러 개 · 가까운 시설 목록에서 먼저 보여줘요</small></span><div class="persona" id="prioChips" style="margin-top:0"></div></div>
+      <div class="f"><label for="f-age">만 나이가 몇 살이에요? <small>19~70세</small></label><div class="in"><input id="f-age" type="number" inputmode="numeric" min="19" max="70" required><span>세</span></div><p class="err" id="e-age"></p></div>
+      <div class="f"><label for="f-income">한 달 실수령액은 얼마예요? <small>세금 떼고 받는 돈</small></label><div class="in"><input id="f-income" type="number" inputmode="numeric" min="0" step="10000" required><span>원</span></div><p class="err" id="e-income"></p></div>
+      <div class="f"><label for="f-gross">세전 연소득을 알면 넣어주세요 <small>모르면 비워두고 넘어가도 돼요</small></label><div class="in"><input id="f-gross" type="number" inputmode="numeric" min="0" step="1000000" placeholder="선택"><span>원</span></div></div>
+      <div class="f"><label for="f-assets">보증금에 쓸 수 있는 돈은 얼마예요? <small>없으면 0</small></label><div class="in"><input id="f-assets" type="number" inputmode="numeric" min="0" step="1000000" required><span>원</span></div><p class="err" id="e-assets"></p></div>
+      <div class="f"><span class="lb">지금 집이 있나요? <small>세대원 모두 포함</small></span><div class="seg" data-k="homeless"><button type="button" data-v="1">없어요</button><button type="button" data-v="0">있어요</button></div></div>
+      <div class="f"><span class="lb">부모님과 따로 사나요?</span><div class="seg" data-k="lives_with_parents"><button type="button" data-v="0">따로 살아요</button><button type="button" data-v="1">함께 살아요</button></div></div>
+      <div class="f"><span class="lb">대구에 살거나 이사 올 예정인가요?</span><div class="seg" data-k="daegu_resident_or_moving"><button type="button" data-v="1">네</button><button type="button" data-v="0">아니요</button></div></div>
+      <div class="f"><label for="f-budget">한 달 주거비는 얼마까지 괜찮아요? <small>월세 + 관리비 + 대출이자</small></label><div class="in"><input id="f-budget" type="number" inputmode="numeric" min="0" step="10000" required><span>원</span></div><p class="err" id="e-budget"></p></div>
     </div>
     <div class="form-btns">
-      <button type="button" class="btn btn--ghost" id="formBack">그냥 둘러보기</button>
-      <button type="button" class="btn btn--ghost m-only" id="fPrev">← 이전</button>
-      <button type="button" class="btn m-only" id="fNext">다음 →</button>
-      <button type="submit" class="btn" id="fSubmit">판정 결과 보기 →</button>
+      <button type="button" class="btn btn--ghost" id="stPrev">이전</button>
+      <button type="button" class="btn" id="stNext">다음</button>
+      <button type="submit" class="btn" id="stSubmit" hidden>판정 결과 보기</button>
+    </div>
+    <div class="form-foot">
+      <button type="button" class="link-btn" id="formBack">입력 없이 지도 둘러보기</button>
     </div>
   </form>
   </div>
@@ -2106,8 +2098,9 @@ const RULES = {
    "deposit_max": 30000,
    "max_amount": 15000,
    "ltv": 0.8,
-   "rate": 3.1,
-   "rate_label": "연 2.0~3.1%(소득별, 지방 −0.2%p 반영) · 계산은 최대 기준 3.1%",
+   "rate": 2.7,
+   "rate_tiers": [[2000, 2.0], [4000, 2.3], [5000, 2.7]],
+   "rate_label": "연 2.0~2.7%(부부합산 연소득 2천만 이하 2.2% · 4천만 이하 2.5% · 5천만 이하 2.9%, 지방 −0.2%p 반영)",
    "check_items": ["순자산 3.45억 원 이하", "세대원 전원 무주택 세대주"],
    "is_housing_fund": true,
    "applies_to": ["cr_reits_jeonse", "lh_dundeun"],
@@ -5461,9 +5454,16 @@ function personChecks(p, it) {
   (it.always_needs_check || []).forEach(n => { status = worse(status, CHECK); reasons.push(`${n} 확인 필요`); });
   return [status, reasons.join(" · ") || "입력 기준 요건 충족"];
 }
+/* 소득 구간 금리: 세전 연소득을 넣었으면 그 구간, 없으면 월 실수령으로 추정한 연소득의 높은 쪽(보수적) */
+function loanRate(ln, p) {
+  if (!ln.rate_tiers) return ln.rate;
+  const y = p.annual_income_gross != null ? p.annual_income_gross : p.monthly_income * 12 * RULES.income_estimate.gross_multiplier_high;
+  const t = ln.rate_tiers.find(([max]) => y <= max);
+  return t ? t[1] : ln.rate;
+}
 function profileResult(p) {
   const loans = [], policies = [];
-  RULES.loans.forEach(ln => { const [s, r] = personChecks(p, ln); loans.push({ id: ln.id, name: ln.name, status: s, max_amount: ln.max_amount, rate: ln.rate, rate_label: ln.rate_label, reason: r, check_items: ln.check_items || [], always_needs_check: ln.always_needs_check || [], approval_by: ln.approval_by, source_url: ln.source_url, checked_at: ln.checked_at }); });
+  RULES.loans.forEach(ln => { const [s, r] = personChecks(p, ln); loans.push({ id: ln.id, name: ln.name, status: s, max_amount: ln.max_amount, rate: loanRate(ln, p), rate_label: ln.rate_label, reason: r, check_items: ln.check_items || [], always_needs_check: ln.always_needs_check || [], approval_by: ln.approval_by, source_url: ln.source_url, checked_at: ln.checked_at }); });
   const m = RULES.market_loan;
   loans.push({ id: m.id, name: m.name, status: CHECK, max_amount: m.max_amount, rate: m.rate, reason: m.reason, approval_by: m.approval_by, source_url: m.link });
   RULES.policies.forEach(po => { const [s, r] = personChecks(p, po); policies.push({ id: po.id, name: po.name, status: s, reason: r, monthly_amount: po.monthly_amount, support_rate: po.support_rate, approval_by: po.approval_by, source_url: po.source_url, checked_at: po.checked_at, always_needs_check: po.always_needs_check || [] }); });
@@ -5490,7 +5490,7 @@ function evaluate(p, c, pr) {
     RULES.loans.forEach(ln => {
       if (!ln.applies_to.includes(c.supply_type) || st[ln.id] === NO) return;
       const cap = loanCap(ln, c); caps.push(cap);
-      if (loan_needed <= cap) add(st[ln.id], interest(loan_needed, ln.rate), ln.name, [ln.id], ln.rate, simple(ln.rate, ln.id === "youth_beotimok" ? "(최대 기준)" : ""));
+      if (loan_needed <= cap) { const rt = loanRate(ln, p); add(st[ln.id], interest(loan_needed, rt), ln.name, [ln.id], rt, simple(rt, ln.rate_tiers ? (p.annual_income_gross != null ? "(소득 구간)" : "(추정 소득 구간)") : "")); }
     });
     const mcap = loanCap(market, c); caps.push(mcap);
     if (loan_needed <= mcap) {
@@ -6009,7 +6009,7 @@ function route(v) {
   const house = v === "house";
   $("#houseView").classList.toggle("is-on", house);
   house ? House.open(S.sel) : House.close();
-  if (v === "input" && !formDirty) { fillForm(S.profile || null); setStep(1); }
+  if (v === "input" && !formDirty) { fillForm(S.profile || null); Step.go(0, false); }
   if (v !== "map") Consult.fit();
   renderTop(v); renderPanels();
 }
@@ -6221,8 +6221,6 @@ function openCard(id) {
 function closeCard() {
   const p = $("#panelR"), was = p.classList.contains("is-open");
   document.body.classList.remove("card-open"); p.classList.remove("is-open"); p.style.transform = ""; syncPl();
-  /* 휴대폰: 시트가 열린 동안에는 단지를 시트 위쪽 좁은 지도로 올려서 봤다. 닫으면 다시 나타나는 구 칩 줄과 요약 줄에 이름표가 깔리지 않게 화면 가운데로 되돌린다 */
-  if (was && isPhone() && S.sel && MapView.ok) { const c = MapView.units[S.sel].c; MapView.fly(c.map_x, c.map_z, Math.min(MapView.zoom, 44)); }
 }
 
 /* ─── S1 입력 ─── */
@@ -6240,50 +6238,65 @@ function fillForm(p) {
 function syncSeg() { $$("#form .seg").forEach(g => $$("button", g).forEach(b => b.classList.toggle("is-on", String(fval[g.dataset.k]) === b.dataset.v))); }
 $$("#form .seg").forEach(g => $$("button", g).forEach(b => b.addEventListener("click", () => { fval[g.dataset.k] = +b.dataset.v; syncSeg(); formDirty = true; })));
 function renderPrio() {
+  if (!$("#prioChips")) return;
   $("#prioChips").innerHTML = Object.entries(CAT_KO).map(([k, v]) => `<button type="button" class="chip${prio.includes(k) ? " is-on" : ""}" data-p="${k}" aria-pressed="${prio.includes(k)}">${v}</button>`).join("");
   $$("#prioChips button").forEach(b => b.addEventListener("click", () => { const k = b.dataset.p; prio = prio.includes(k) ? prio.filter(x => x !== k) : [...prio, k]; renderPrio(); formDirty = true; }));
 }
-$("#fillPersona").onclick = () => { fillForm(PERSONA); formDirty = true; };
+
 /* 칸을 고치면 그 칸의 빨간 알림을 바로 지운다 (다음을 다시 누를 때까지 남아 있으면 맞게 적어도 틀린 것처럼 보인다) */
 $$("#form input").forEach(i => i.addEventListener("input", () => { formDirty = true; const e = $("#e-" + i.id.slice(2)); if (e) e.textContent = ""; }));
 $("#formBack").onclick = () => { S.mode = "browse"; location.hash = "#map"; };
-/* 휴대폰에서는 세 걸음(기본 정보 → 주거 상황 → 예산·시설)으로 나눠 묻는다. PC 는 한 화면에 모두 보인다.
-   걸음을 넘길 때 그 걸음의 값만 검사하고, 틀리면 그 칸으로 간다 */
-const STEP_OF = { age: 1, income: 1, assets: 1, budget: 3 };
-let fstep = 1;
 const num = id => { const v = $("#" + id).value.trim().replace(/[,\s원]/g, ""); if (v === "") return null; return id === "f-age" ? Number(v) : Number(v) / 10000; };
 function readForm() {
   return { age: num("f-age"), monthly_income: num("f-income"), annual_income_gross: num("f-gross"), assets: num("f-assets"), monthly_budget: num("f-budget"),
     homeless: !!fval.homeless, lives_with_parents: !!fval.lives_with_parents, daegu_resident_or_moving: !!fval.daegu_resident_or_moving, priorities: prio };
 }
-/* only 가 있으면 그 걸음의 칸만 검사한다. 틀린 첫 칸의 이름을 돌려준다 */
-function checkForm(p, only) {
+/* 틀린 첫 칸의 이름을 돌려준다 */
+function checkForm(p) {
   const errs = { age: p.age == null || p.age < 19 || p.age > 70 ? "19~70 사이로 넣어주세요" : "", income: p.monthly_income == null || p.monthly_income < 0 ? "월 실수령을 넣어주세요" : "",
     assets: p.assets == null || p.assets < 0 ? "모은 돈을 넣어주세요 (없으면 0)" : "", budget: p.monthly_budget == null || p.monthly_budget <= 0 ? "월 예산을 넣어주세요" : "" };
   let bad = null;
-  Object.entries(errs).forEach(([k, v]) => { if (only && STEP_OF[k] !== only) return; $("#e-" + k).textContent = v; if (v && !bad) bad = k; });
+  Object.entries(errs).forEach(([k, v]) => { $("#e-" + k).textContent = v; if (v && !bad) bad = k; });
   return bad;
 }
-function focusBad(k) { if (isPhone() && STEP_OF[k] !== fstep) setStep(STEP_OF[k]); const el = $("#f-" + k); el.focus(); if (isPhone()) el.scrollIntoView({ block: "center" }); }
-function setStep(n) {
-  fstep = clamp(n, 1, 3); $("#vInput").dataset.step = fstep;
-  $$("#fSteps button").forEach(b => { const on = +b.dataset.step === fstep; b.classList.toggle("is-on", on); on ? b.setAttribute("aria-current", "step") : b.removeAttribute("aria-current"); });
-  $("#vInput .form-wrap").scrollTop = 0;
-}
-function goStep(n) {
-  for (let s = fstep; s < n; s++) { const bad = checkForm(readForm(), s); if (bad) { setStep(s); focusBad(bad); return; } }
-  setStep(n);
-}
-$$("#fSteps button").forEach(b => b.onclick = () => goStep(+b.dataset.step));
-$("#fPrev").onclick = () => setStep(fstep - 1);
-$("#fNext").onclick = () => goStep(fstep + 1);
+/* 한 문항씩 넘기는 입력 (PC·휴대폰 같음): 다음을 누를 때 지금 칸만 검사 */
+const Step = {
+  i: 0,
+  fields() { return $$("#form .fgrid > .f"); },
+  check(f) {
+    const inp = $("input", f); if (!inp || !inp.required) return true;
+    const v = inp.value.trim(), n = Number(v.replace(/[,\s원]/g, "")), err = $(".err", f);
+    let msg = "";
+    if (v === "") msg = inp.id === "f-assets" ? "없으면 0을 넣어주세요" : "값을 넣어주세요";
+    else if (inp.id === "f-age" && (n < 19 || n > 70)) msg = "19~70 사이로 넣어주세요";
+    else if (inp.id === "f-budget" && n <= 0) msg = "0보다 큰 금액을 넣어주세요";
+    if (err) err.textContent = msg;
+    if (msg) inp.focus();
+    return !msg;
+  },
+  go(k, focus = true) {
+    const fs = this.fields(), n = fs.length; this.i = clamp(k, 0, n - 1);
+    fs.forEach((f, j) => f.classList.toggle("is-cur", j === this.i));
+    $("#stpNo").textContent = `${this.i + 1} / ${n}`; $("#stpFill").style.width = ((this.i + 1) / n * 100) + "%";
+    $("#stPrev").disabled = this.i === 0;
+    const last = this.i === n - 1; $("#stNext").hidden = last; $("#stSubmit").hidden = !last;
+    const inp = $("input", fs[this.i]); if (focus && inp && !isMobile()) setTimeout(() => inp.focus(), 60);
+  },
+  next() { const f = this.fields()[this.i]; if (this.check(f)) this.go(this.i + 1); }
+};
+$("#form").classList.add("is-step");
+$("#stNext").onclick = () => Step.next();
+$("#stPrev").onclick = () => Step.go(Step.i - 1);
+$$("#form .fgrid input").forEach(inp => inp.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); if (Step.i < Step.fields().length - 1) Step.next(); else $("#form").requestSubmit(); } }));
+$$("#form .seg button").forEach(b => b.addEventListener("click", () => setTimeout(() => { if (Step.i < Step.fields().length - 1) Step.go(Step.i + 1); }, 220)));
+Step.go(0, false);
+$("#fillPersona").onclick = () => { fillForm(PERSONA); formDirty = true; Step.go(Step.fields().length - 1); };
+$("#fillShort").onclick = () => { fillForm(Object.assign({}, PERSONA, { assets: 1000 })); formDirty = true; Step.go(Step.fields().length - 1); };
 $("#form").addEventListener("submit", e => {
   e.preventDefault();
-  /* 휴대폰에서 마지막 걸음 전에 엔터(이동)를 누르면 다음 걸음으로 간다 */
-  if (isPhone() && fstep < 3) { goStep(fstep + 1); return; }
   const p = readForm(), bad = checkForm(p);
-  if (bad) { focusBad(bad); return; }
-  S.profile = p; try { localStorage.setItem("mh-profile", JSON.parse(JSON.stringify(p)) && JSON.stringify(p)); } catch (er) {}
+  if (bad) { Step.go(Step.fields().findIndex(f => f.contains($("#f-" + bad)))); return; }
+  S.profile = p; try { localStorage.setItem("mh-profile", JSON.stringify(p)); } catch (er) {}
   recompute(); S.mode = "match"; jpOpen = false; formDirty = false; location.hash = "#map"; MapView.applyMode(true);
 });
 
@@ -6386,7 +6399,7 @@ const MapView = {
       }
     });
     new ResizeObserver(() => this.resize()).observe($("#mapWrap"));
-    this.resize(); this.applyMode(false); this.ok = true;
+    this.resize(); this.applyMode(false); this.ok = true; this.overview(false);
     let t0 = performance.now();
     const loop = t => { const dt = Math.min(.05, (t - t0) / 1000); t0 = t; this.tick(dt, t / 1000); requestAnimationFrame(loop); };
     requestAnimationFrame(loop);
@@ -6439,20 +6452,6 @@ const MapView = {
       const me = new T3.Mesh(g, new T3.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false, depthTest: false })); me.position.set(x, .03, z); me.renderOrder = 4; this.scene.add(me); this.guLabels.push(me);
     });
     (document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve()).then(mk);
-    this.buildArt();
-  },
-  buildArt() {
-    /* 단지 주변 바닥 지도: OpenStreetMap 데이터로 다시 그린 그림(img/map, 8x8 단위). 가장자리는 둥글게 흐려지게 */
-    const c = document.createElement("canvas"); c.width = c.height = 256; const x = c.getContext("2d");
-    const g = x.createRadialGradient(128, 128, 0, 128, 128, 128); g.addColorStop(0, "#fff"); g.addColorStop(.6, "#fff"); g.addColorStop(1, "#000");
-    x.fillStyle = g; x.fillRect(0, 0, 256, 256);
-    const fade = new T3.CanvasTexture(c), loader = new T3.TextureLoader();
-    COMPLEX.forEach(u => loader.load(`img/map/${u.id}.jpg`, tex => {
-      tex.encoding = T3.sRGBEncoding; tex.anisotropy = 8;
-      const top = u.id === "c01", geo = new T3.PlaneGeometry(8 * MAP_K, 8 * MAP_K); geo.rotateX(-Math.PI / 2);
-      const m = new T3.Mesh(geo, new T3.MeshStandardMaterial({ map: tex, alphaMap: fade, transparent: true, depthWrite: false, roughness: 1, metalness: 0 }));
-      m.position.set(u.map_x, top ? .02 : .018, u.map_z); m.renderOrder = top ? 2 : 1; m.receiveShadow = true; this.decor.add(m);
-    }, undefined, () => {})); /* 파일로 열면(file://) 그림이 안 올라와도 기본 지도는 그대로 */
   },
   buildCity() {
     /* 도심 격자 블록 (예시, 실제 건물 아님): 미분양 단지보다 낮고 무채색으로 */
@@ -6460,7 +6459,7 @@ const MapView = {
     for (let gx = Math.floor(-22 * MAP_K / CW); gx < Math.ceil(68 * MAP_K / CW); gx++) for (let gz = Math.floor(-20.4 * MAP_K / CD); gz < Math.ceil(68 * MAP_K / CD); gz++) {
       const cx = gx * CW + CW / 2, cz = gz * CD + CD / 2;
       if (!inGeo(cx, cz, GEO.urban) || rnd() < .3 || rnd() < .5) continue;
-      const free = (x, z, pad) => !this.blocked(x, z, pad) && inGeo(x, z, GEO.urban) && !COMPLEX.some(u => Math.hypot(x - u.map_x, z - u.map_z) < 3.2); /* 바닥 지도 위에는 예시 블록을 두지 않음 */
+      const free = (x, z, pad) => !this.blocked(x, z, pad) && inGeo(x, z, GEO.urban);
       const kind = rnd(), dense = Math.max(0, 1 - Math.hypot(cx - 18 * MAP_K, cz - 13 * MAP_K) / (22 * MAP_K));
       if (kind < .36 + dense * .2) {
         const rows = 2 + Math.floor(rnd() * 2), hgt = (.3 + rnd() * .28 + dense * .2) * .6;
@@ -6497,7 +6496,7 @@ const MapView = {
   buildUnits() {
     COMPLEX.forEach(c => {
       const g = new T3.Group(); g.position.set(c.map_x, 0, c.map_z); this.scene.add(g);
-      const rim = rbox(3.3, .03, 2.8, .3, mat("#d9e8de")); g.add(rim); const site = rbox(3.1, .05, 2.6, .25, mat("#f7f2e8")); g.add(site);
+      const rimM = mat("#d9e8de").clone(); const rim = rbox(3.3, .03, 2.8, .3, rimM); g.add(rim); const site = rbox(3.1, .05, 2.6, .25, mat("#f7f2e8")); g.add(site);
       const rnd = seeded(c.id), n = 3 + (rnd() > .5 ? 1 : 0), L = rnd() > .5;
       const wallTex = windowTexture(c.id, 1, false);
       const em = { browse: windowTexture(c.id, .4, true), on: windowTexture(c.id, .7, true), dim: windowTexture(c.id, .3, true) };
@@ -6525,7 +6524,7 @@ const MapView = {
       const hit = new T3.Mesh(new T3.BoxGeometry(3.6, top + 1, 3.2), new T3.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false })); hit.position.y = (top + 1) / 2; hit.userData.id = c.id; g.add(hit);
       const lbl = document.createElement("button"); lbl.className = "clabel"; lbl.setAttribute("aria-label", c.name + " 카드 열기");
       lbl.addEventListener("click", () => this.select(c.id, true)); $("#lblLayer").appendChild(lbl);
-      this.units[c.id] = { c, g, blds, wallM, roofM, bandM, em, glow, beam, ring, ring0, top, sq, hit, lbl, cur: 1.2, tgt: 1.2, delay: 0, light: "browse", lift: 0 };
+      this.units[c.id] = { c, g, blds, wallM, roofM, bandM, rimM, em, glow, beam, ring, ring0, top, sq, hit, lbl, cur: 1.2, tgt: 1.2, delay: 0, light: "browse", lift: 0 };
     });
   },
   buildUnsold() {
@@ -6544,10 +6543,8 @@ const MapView = {
   },
   selectUnsold(k) {
     const [x, z] = this.uPos[k];
-    if (!this.home) this.home = { x: this.target.x, z: this.target.z, zoom: this.zoom };
     S.sel = null; this.lift(); this.showLines(null);
-    this.fly(x + (isMobile() ? 0 : 1.6), z + (isMobile() ? 2.2 : 0), clamp(this.zoom, 36, 44));
-    openUnsold(k);
+    openUnsold(k); this.paintSel(); this.flyTo(x, .3, z);
   },
   applyMode(animate) {
     if (!this.ok && !this.units.c01) return;
@@ -6561,30 +6558,70 @@ const MapView = {
       u.tgt = { browse: 1.0, on: 3.0, dim: 1.0, off: 0 }[light];
       if (animate && light !== "browse") u.cur = 0;
       const off = light === "off";
-      u.wallM.color.set(off ? new T3.Color("#c3c6c4").convertSRGBToLinear() : new T3.Color("#ffffff"));
-      u.bandM.color.set(new T3.Color(off ? "#9DB5B1" : "#1f6b4f").convertSRGBToLinear());
+      u.baseWall = off ? "#c3c6c4" : "#ffffff"; u.baseBand = off ? "#9DB5B1" : "#1f6b4f";
       const ev = S.evals[id];
       u.lbl.className = "clabel" + (light === "on" ? " is-on" : light === "dim" ? " is-dim" : light === "off" ? " is-off" : "");
       u.lbl.innerHTML = (light !== "browse" ? `<i>${LIGHT_ICON[light]}</i>` : `<i class="b">●</i>`) + esc(u.c.name.replace("(예시)", ""));
     });
-    this.nightT = S.mode === "match" ? 1 : 0;
+    this.nightT = S.mode === "match" ? 1 : 0; this.paintSel();
     if (S.sel && $("#panelR").classList.contains("is-open")) openCard(S.sel);
+  },
+  /* 구마다 같은 선택 색 (서로 잘 구분되게): [벽, 띠·바닥·라벨] */
+  GU_PAL: { 달서구: ["#ffb36b", "#d9600f"], 북구: ["#7fb8ff", "#1d5fd1"], 동구: ["#c39bff", "#7034d6"], 수성구: ["#6fe0b0", "#0d8f5c"], 서구: ["#ff8fa8", "#d12e5a"], 중구: ["#ffe066", "#b38600"], 남구: ["#6fd9e8", "#0b8a9c"], 달성군: ["#c8d97a", "#6b7f12"], 군위군: ["#e0b98f", "#8a5a2b"] },
+  paintSel() {
+    const cardOn = document.body.classList.contains("card-open");
+    Object.entries(this.units).forEach(([id, u]) => {
+      const sel = id === S.sel, hide = !!S.sel && cardOn && !sel;
+      u.g.visible = !hide; u.lbl.style.display = (hide || (sel && cardOn)) ? "none" : "";
+      const pal = this.GU_PAL[u.c.district] || ["#8fd6ad", "#0f7a4a"];
+      u.wallM.color.set(new T3.Color(sel ? pal[0] : (u.baseWall || "#ffffff")).convertSRGBToLinear());
+      u.bandM.color.set(new T3.Color(sel ? pal[1] : (u.baseBand || "#1f6b4f")).convertSRGBToLinear());
+      u.rimM.color.set(new T3.Color(sel ? pal[1] : "#d9e8de").convertSRGBToLinear());
+      u.lbl.style.background = sel ? pal[1] : ""; u.lbl.style.color = sel ? "#fff" : "";
+    });
+  },
+  /* P(월드 좌표)가 화면 (dx, dy)에 오도록 하는 카메라 target */
+  placeAt(P, Z, dx, dy) {
+    const W = innerWidth, H = innerHeight, cam = this.cam;
+    const save = { p: cam.position.clone(), q: cam.quaternion.clone() };
+    cam.position.copy(P).add(new T3.Vector3(20, 20, 20)); cam.lookAt(P); cam.updateMatrixWorld();
+    const r = new T3.Vector3().setFromMatrixColumn(cam.matrixWorld, 0), u = new T3.Vector3().setFromMatrixColumn(cam.matrixWorld, 1), d = new T3.Vector3(-1, -1, -1).normalize();
+    cam.position.copy(save.p); cam.quaternion.copy(save.q);
+    const T = P.clone().addScaledVector(r, (W / 2 - dx) / Z).addScaledVector(u, (dy - H / 2) / Z);
+    return T.addScaledVector(d, -T.y / d.y);
+  },
+  /* 카드에 가리지 않는 지도 영역의 가운데로 옮기며 줌인 (휴대폰은 아래 시트 위쪽) */
+  flyTo(x, y, z) {
+    const W = innerWidth, H = innerHeight, Z = clamp(Math.max(this.zoom, 36), 36, 44), pr = $("#panelR");
+    let dx = W / 2, dy = (140 + H) / 2;
+    if (isMobile()) { const top = pr.offsetTop || H * .5; dy = (150 + Math.min(top, H * .6)) / 2; }
+    else if (pr.offsetWidth) dx = Math.max(160, pr.offsetLeft / 2);
+    const T = this.placeAt(new T3.Vector3(x, y, z), Z, dx, dy);
+    this.fly(T.x, T.z, Z);
+  },
+  /* 판정 단지 8곳이 모두 보이게 줌아웃 (왼쪽 패널·위 막대를 피해서) */
+  overview(animate) {
+    const W = innerWidth, H = innerHeight, pl = $("#panelL"), mob = isMobile();
+    const left = !mob && pl && !pl.hidden && pl.offsetWidth ? pl.getBoundingClientRect().right + 24 : 24, right = W - 24;
+    const top = mob ? (pl && !pl.hidden && pl.offsetHeight ? pl.getBoundingClientRect().bottom + 16 : 190) : 150, bottom = H - (mob ? 130 : 90);
+    const sx = c => (c.map_x - c.map_z) / Math.SQRT2, sy = c => -(c.map_x + c.map_z) / Math.sqrt(6);
+    const xs = COMPLEX.map(sx), ys = COMPLEX.map(sy), x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys);
+    const hTop = 5.5 * Math.sqrt(2 / 3);
+    const Z = clamp(Math.min((right - left) / (x1 - x0 + 4), (bottom - top) / (y1 - y0 + hTop + 3)), 4.5 / MAP_K, 40);
+    const mx = (x0 + x1) / 2, my = (y0 + y1) / 2 + hTop / 2;
+    const P = new T3.Vector3((Math.SQRT2 * mx - Math.sqrt(6) * my) / 2, 0, (-Math.SQRT2 * mx - Math.sqrt(6) * my) / 2);
+    const T = this.placeAt(P, Z, (left + right) / 2, (top + bottom) / 2);
+    if (animate) this.fly(T.x, T.z, Z); else { this.target.set(T.x, 0, T.z); this.zoom = Z; this.fly0 = null; }
   },
   lift() { Object.entries(this.units).forEach(([id, u]) => u.liftT = (id === S.hover || id === S.sel) ? .05 : 0); },
   fly(x, z, zoom) { this.fly0 = { x, z, zoom: zoom || this.zoom, t: 0, fx: this.target.x, fz: this.target.z, fzoom: this.zoom }; },
   select(id, fly) {
-    if (id && !this.home) this.home = { x: this.target.x, z: this.target.z, zoom: this.zoom };
     S.sel = id; this.lift(); this.showLines(id);
-    if (!id) { if (this.home) { this.fly(this.home.x, this.home.z, this.home.zoom); this.home = null; } return; }
+    if (!id) { this.paintSel(); if (this.ok && fly !== false) this.overview(true); return; }
     if (location.hash !== "#map") location.hash = "#map";
-    const u = this.units[id], c = u.c, m = u.top * .45;
-    if (fly && isPhone()) {
-      /* 휴대폰: 아래 시트가 화면의 3분의 2를 덮으므로, 단지가 시트 위쪽 지도에 보이게 화면 아래 방향으로 그만큼 옮겨서 본다 */
-      /* 건물(높이 약 3.7)과 이름표가 위 막대와 시트 사이에 다 들어오는 배율로 맞춘다 */
-      const sheetTop = innerHeight * .34, zoom = clamp((sheetTop - 72 - 74) / 3.02, 30, 44), dy = innerHeight / 2 - (sheetTop - 24), d = Math.max(0, dy) / zoom / Math.sin(Math.asin(1 / Math.sqrt(3))) / Math.SQRT2;
-      this.fly(c.map_x + d, c.map_z + d, zoom);
-    } else if (fly) this.fly(c.map_x - m + (isMobile() ? 0 : 1.6), c.map_z - m + (isMobile() ? 2.2 : 0), clamp(this.zoom, 36, 44));
-    openCard(id);
+    const u = this.units[id];
+    openCard(id); this.paintSel();
+    if (fly) this.flyTo(u.c.map_x, u.top * .5, u.c.map_z);
   },
   showLines(id) {
     while (this.lines.children.length) { const o = this.lines.children.pop(); o.geometry && o.geometry.dispose(); }
@@ -6615,13 +6652,15 @@ const MapView = {
     this.r.setClearColor(this._cc.copy(this._c0).lerp(this._c1, n), 1);
     Object.values(this.units).forEach(u => {
       if (now >= u.delay) u.cur += (u.tgt - u.cur) * Math.min(1, dt * 6);
+      const isSel = S.sel === u.c.id && document.body.classList.contains("card-open");
       let e = u.cur;
-      if (u.light === "dim") e = .3 + 1.3 * (.5 + .5 * Math.sin(time * Math.PI * 2 / 3));
+      if (u.light === "dim") e = .75;
+      if (isSel) e = Math.min(e, .7);
       u.wallM.emissiveIntensity = e * (now >= u.delay ? 1 : 0);
-      u.beam.material.opacity = u.light === "on" ? (.22 + .08 * Math.sin(time * 2.4)) * Math.min(1, u.cur / 3) : 0;
-      u.glow.material.opacity = u.light === "on" ? .8 * Math.min(1, u.cur / 3) : u.light === "dim" ? .25 * (e / 1.4) : u.light === "browse" ? .18 : 0;
-      if (u.light === "on" && !REDUCED) { const p = (time % 1.8) / 1.8; u.ring.scale.setScalar(.8 + p * .6); u.ring.material.opacity = .7 * (1 - p); } else u.ring.material.opacity = 0;
-      u.ring0.material.opacity = u.light === "on" ? .9 : 0;
+      u.beam.material.opacity = u.light === "on" && !isSel ? .2 * Math.min(1, u.cur / 3) : 0;
+      u.glow.material.opacity = isSel ? 0 : u.light === "on" ? .55 * Math.min(1, u.cur / 3) : u.light === "dim" ? .18 : u.light === "browse" ? .12 : 0;
+      u.ring.material.opacity = u.light === "on" && !isSel ? .45 : 0;
+      u.ring0.material.opacity = 0;
       u.sq.material.opacity = u.light === "dim" ? .5 : 0;
       u.lift = (u.lift || 0) + ((u.liftT || 0) - (u.lift || 0)) * Math.min(1, dt * 10); u.blds.position.y = u.lift;
       const p = this.project(new T3.Vector3(u.c.map_x, u.top + .6, u.c.map_z)); const far = this.zoom < 18 / MAP_K; u.lbl.classList.toggle("is-sel", S.sel === u.c.id && document.body.classList.contains("card-open"));
@@ -6994,6 +7033,8 @@ window.MH = {
   browse() { S.mode = "browse"; if (location.hash === "#map") { route("map"); MapView.applyMode(false); } else location.hash = "#map"; },
   openHouse(cid) { S.sel = cid; location.hash = "#house"; },
   /* 지도에서 이 단지를 누른 것과 같게 연다 (집찾기 대화의 [지도에서 보기]). 지도를 못 그리면 카드만 연다 */
+  /* 공개 미분양 점(k = UNSOLD_LIST 순번)을 지도에서 연다 */
+  openUnsold(k) { if (!UNSOLD_LIST[k]) return; if (location.hash !== "#map") location.hash = "#map"; const go = n => MapView.ok ? MapView.selectUnsold(k) : n > 0 ? setTimeout(() => go(n - 1), 150) : openUnsold(k); setTimeout(() => go(20), 50); },
   openMap(cid) { if (!COMPLEX.some(c => c.id === cid)) return; S.sel = cid; if (location.hash !== "#map") location.hash = "#map"; const go = n => MapView.ok ? MapView.select(cid, true) : n > 0 ? setTimeout(() => go(n - 1), 150) : openCard(cid); setTimeout(() => go(20), 50); },
   /* 눈높이로 집 보기: "child"(아이) 나 "adult"(어른). 다음에 집 보기를 열 때 room.html 에 view=3d&eye=<mode> 를 붙인다 (한 번 쓰고 지운다).
      이미 집 보기 화면이면 바로 다시 연다. 눈높이 화면 자체는 방 배치 도구(room.html)가 그린다 */
@@ -7369,7 +7410,11 @@ window.MH = {
     interpretEndpoint: remote ? "/api/bangbom-interpret" : undefined,
     onMap: async ({ id }) => { chat.close(); MH.openMap(id); },
     onFloorplan: async ({ id, viewIntent }) => { chat.close(); if (viewIntent === "childView") MH.setEye("child"); MH.openHouse(id); },
-    onProfile: async () => { chat.close(); location.hash = "#input"; }
+    onProfile: async () => { chat.close(); location.hash = "#input"; },
+    /* 전세 후보와 섞지 않는 참고: 같은 구의 공개 미분양 아파트(매매). 구를 안 골랐으면 첫 후보의 구. 준공 후 단지를 먼저 */
+    related: (p, matches) => { const gu = p.district || (matches[0] && matches[0].district); if (!gu || typeof UNSOLD_LIST === "undefined") return [];
+      return UNSOLD_LIST.map((u, k) => ({ u, k })).filter(x => x.u.gu === gu).sort((a, b) => Number(!!b.u.completed) - Number(!!a.u.completed)).slice(0, 2)
+        .map(({ u, k }) => ({ name: u.name, district: u.gu + " " + (u.dong || ""), note: (u.completed ? "준공 후 미분양" : "분양 중") + " · " + (u.source || "대구시 공개 미분양 목록") + " · 계약 가능 여부는 확인 필요", onMap: () => { chat.close(); MH.openUnsold(k); } })); }
   });
   MH.chat = chat;
   const fab = document.getElementById("fab");
@@ -7467,9 +7512,9 @@ $$("video[data-autoplay]").forEach(v => vidIO && vidIO.observe(v));
 /* 비포/애프터 슬라이더 */
 (function () {
   const ba = $("#ba"); if (!ba) return;
-  const range = $(".ba__range", ba); let done = false, touched = false;
+  const range = $(".ba__range", ba); let touched = false, run = 0;
   const set = p => { ba.style.setProperty("--p", p + "%"); range.value = p; };
-  range.addEventListener("input", () => { touched = true; done = true; set(+range.value); });
+  range.addEventListener("input", () => { touched = true; set(+range.value); });
   /* 터치 화면(pointer:coarse)에서는 CSS가 range 의 pointer-events 를 꺼서 여기로 온다: 사진 어디를 잡아도 선이 따라오고,
      세로로 밀면 브라우저가 페이지를 내리며(pointercancel) 선은 그대로 둔다. 마우스 화면에서는 지금처럼 range 입력이 처리한다 */
   let pid = null, x0 = 0, moved = false;
@@ -7479,18 +7524,20 @@ $$("video[data-autoplay]").forEach(v => vidIO && vidIO.observe(v));
     if (e.pointerId !== pid) return;
     if (!moved && Math.abs(e.clientX - x0) < 6) return;
     if (!moved) { moved = true; try { ba.setPointerCapture(pid); } catch (err) {} }
-    touched = true; done = true; set(at(e.clientX));
+    touched = true; set(at(e.clientX));
   });
-  ba.addEventListener("pointerup", e => { if (e.pointerId !== pid) return; if (!moved) { touched = true; done = true; set(at(e.clientX)); } pid = null; });
+  ba.addEventListener("pointerup", e => { if (e.pointerId !== pid) return; if (!moved) { touched = true; set(at(e.clientX)); } pid = null; });
   ba.addEventListener("pointercancel", e => { if (e.pointerId === pid) pid = null; });
-  const io = new IntersectionObserver(es => {
-    if (!es[0].isIntersecting || done) return; io.disconnect(); done = true;
-    if (REDUCED) { set(50); return; }
-    const t0 = performance.now();
-    const step = t => { if (touched) return; const s = (t - t0) / 1000; let p; if (s < 1.8) { const k = s / 1.8; p = 100 - 100 * (k < .5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2); } else { const k = clamp((s - 1.8) / .8, 0, 1); p = 50 * (1 - Math.pow(1 - k, 3)); } set(p); if (s < 2.6) requestAnimationFrame(step); else set(50); };
+  const ease = k => k < .5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
+  const sweep = () => {
+    if (touched) return; if (REDUCED) { set(50); return; }
+    const id = ++run, t0 = performance.now();
+    const step = t => { if (touched || id !== run) return; const s = (t - t0) / 1000; let p;
+      if (s < .4) p = 100; else if (s < 2.0) p = 100 - 100 * ease((s - .4) / 1.6); else if (s < 2.4) p = 0; else p = 50 * ease(clamp((s - 2.4) / 1.1, 0, 1));
+      set(p); if (s < 3.5) requestAnimationFrame(step); };
     requestAnimationFrame(step);
-  }, { threshold: .5 });
-  io.observe(ba);
+  };
+  new IntersectionObserver(es => { if (es[0].isIntersecting) sweep(); else if (!touched) { run++; set(100); } }, { threshold: .55 }).observe(ba);
 })();
 
 /* How it helps 탭 */
@@ -7512,7 +7559,7 @@ if (zzBox) zzBox.addEventListener("scroll", () => {
   if (performance.now() >= zzBusy) zzSync();
 }, { passive: true });
 $$(".zz-tab").forEach(b => b.addEventListener("click", () => setZZ(+b.dataset.zz)));
-$("#zzPrev").addEventListener("click", () => setZZ(zzI - 1)); $("#zzNext").addEventListener("click", () => setZZ(zzI + 1));
+if ($("#zzPrev")) { $("#zzPrev").addEventListener("click", () => setZZ(zzI - 1)); $("#zzNext").addEventListener("click", () => setZZ(zzI + 1)); }
 /* 화면을 돌리거나 창 폭이 바뀌어 휴대폰 배치로 들어오면 넘김 위치를 지금 장에 맞춘다 */
 PHONE.addEventListener("change", () => { if (PHONE.matches && zzBox) requestAnimationFrame(() => { zzBox.scrollLeft = zzBox.clientWidth * zzI; }); });
 
@@ -7524,6 +7571,55 @@ PHONE.addEventListener("change", () => { if (PHONE.matches && zzBox) requestAnim
 
 /* 자주 묻는 질문: 휴대폰에서는 하나를 펴면 나머지를 접어서 화면이 길어지지 않게 한다 */
 $$(".faq details").forEach(d => d.addEventListener("toggle", () => { if (d.open && PHONE.matches) $$(".faq details[open]").forEach(o => { if (o !== d) o.open = false; }); }));
+
+/* 홈 풀페이지 스크롤: 한 번 굴리면 한 섹션. 영상·애니메이션이 끝나길 기다리지 않아요 */
+(function () {
+  const dots = $("#fpDots"); if (!dots) return;
+  const panels = () => [...$$("#page-home .fp"), $(".footer")];
+  const topOf = (el, k, n) => k === n - 1 ? document.documentElement.scrollHeight - innerHeight : Math.round(el.getBoundingClientRect().top + scrollY);
+  const on = () => current === "home" && innerWidth > 900 && innerHeight >= 560 && !document.body.classList.contains("menu-open") && !document.querySelector("dialog[open]"); /* 튜토리얼 같은 창이 열려 있으면 홈을 넘기지 않는다 */
+  const idx = () => { const ps = panels(), n = ps.length; let k = 0; ps.forEach((p, j) => { if (topOf(p, j, n) <= scrollY + innerHeight * .45) k = j; }); return k; };
+  let busy = false, lastWheel = 0, raf = 0;
+  const go = k => {
+    const ps = panels(), n = ps.length; k = clamp(k, 0, n - 1);
+    const from = scrollY, to = topOf(ps[k], k, n), t0 = performance.now(), dur = REDUCED ? 1 : 760;
+    busy = true; cancelAnimationFrame(raf); paint(k);
+    const ease = x => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+    const step = t => { const x = clamp((t - t0) / dur, 0, 1); scrollTo(0, from + (to - from) * ease(x)); if (x < 1) raf = requestAnimationFrame(step); else release(); };
+    raf = requestAnimationFrame(step);
+  };
+  const release = () => { if (performance.now() - lastWheel > 160) busy = false; else setTimeout(release, 60); };
+  const paint = k => {
+    const ps = panels(); $$("button", dots).forEach((b, j) => b.classList.toggle("is-on", j === k));
+    dots.classList.toggle("is-light", k === 0 || (ps[k] && (ps[k].classList.contains("fp--dark") || ps[k].classList.contains("footer"))));
+    $("#nav").classList.toggle("is-dark", current === "home" && !!ps[k] && ps[k].classList.contains("fp--dark") && !document.body.classList.contains("menu-open"));
+  };
+  dots.innerHTML = panels().map((p, j) => `<button type="button" aria-label="${p.dataset.fp || "끝"}로 이동"><span>${p.dataset.fp || "끝"}</span></button>`).join("");
+  $$("button", dots).forEach((b, j) => b.addEventListener("click", () => go(j)));
+  addEventListener("wheel", e => {
+    if (!on() || e.ctrlKey) return;
+    const tr = e.target.closest && e.target.closest(".plans__track"); if (tr && Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
+    e.preventDefault(); lastWheel = performance.now();
+    if (busy || Math.abs(e.deltaY) < 4) return;
+    go(idx() + (e.deltaY > 0 ? 1 : -1));
+  }, { passive: false });
+  addEventListener("keydown", e => {
+    if (!on() || /INPUT|TEXTAREA|SELECT/.test((e.target.tagName || "")) || e.target.isContentEditable) return;
+    const m = { ArrowDown: 1, PageDown: 1, " ": 1, ArrowUp: -1, PageUp: -1 }[e.key];
+    if (e.key === "Home" || e.key === "End") { e.preventDefault(); go(e.key === "Home" ? 0 : panels().length - 1); return; }
+    if (m && !(e.key === " " && e.target.closest("button,a"))) { e.preventDefault(); if (!busy) go(idx() + m); }
+  });
+  let ty = null;
+  addEventListener("touchstart", e => { ty = on() ? e.touches[0].clientY : null; }, { passive: true });
+  addEventListener("touchmove", e => { if (ty !== null && on()) e.preventDefault(); }, { passive: false });
+  addEventListener("touchend", e => { if (ty === null) return; const d = ty - e.changedTouches[0].clientY; ty = null; if (Math.abs(d) > 40 && !busy) go(idx() + (d > 0 ? 1 : -1)); });
+  const top = $("#toTop");
+  top.addEventListener("click", () => { if (on()) go(0); else scrollTo({ top: 0, behavior: REDUCED ? "auto" : "smooth" }); });
+  const syncTop = () => top.classList.toggle("is-on", current === "home" && scrollY + innerHeight >= document.documentElement.scrollHeight - 160);
+  const sync = () => { document.body.classList.toggle("fp-on", on()); syncTop(); if (current !== "home") $("#nav").classList.remove("is-dark"); if (!busy) paint(idx()); };
+  addEventListener("scroll", sync, { passive: true }); addEventListener("resize", sync); addEventListener("hashchange", () => setTimeout(sync, 50));
+  window.BBfp = { sync }; sync();
+})();
 
 /* 평형 갤러리 (모델하우스 집 보기 구조) */
 (function () {

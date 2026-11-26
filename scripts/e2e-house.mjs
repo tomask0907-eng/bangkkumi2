@@ -308,12 +308,8 @@ async function run(cdp) {
 
     await check(`${P} 10. 홈 "아이 눈높이 90cm로 보기" → 전체 구조를 건너뛰고 거실 3D 눈높이, 뒤로 가면 전체 구조`, async () => {
       await fresh('#home')
-      if (mobile) {
-        // 칩 줄은 큰 그림 아래에 있다. 칩 줄이 위 막대 아래에 붙는 곳까지 내린 뒤 "돕는 방법"의 셋째 장으로 넘긴다
-        await ev(`(() => { const r = ${q('#homeCats')}; scrollTo(0, r.getBoundingClientRect().top + scrollY - 72) })()`); await sleep(500)
-        await tap(`${q('#homeCats')}.querySelector('[data-cat="help"]')`, '칩 돕는 방법'); await sleep(700)
-        await tap(q('#zzNext'), '다음'); await sleep(900); await tap(q('#zzNext'), '다음'); await sleep(1000)
-      } else { await tap(q('.zz-tab[data-zz="2"]'), '탭 아이 눈높이'); await sleep(700) }
+      // 홈(풀페이지) 01 화면의 아이 시점 상자에 있는 링크까지 내린다
+      await ev(`${q('a[data-eye="child"]')}.scrollIntoView({ block: "center" })`); await sleep(900)
       await tap(q('a[data-eye="child"]'), '아이 눈높이 90cm로 보기'); await waitFor(`location.hash === '#house/liv'`, '#house/liv', 6000)
       const f = await waitRoom('c01-liv')
       // 방꾸미 화면(iframe) 안의 눈높이 상태: 3D 화면 바깥 요소의 data-eye-mode

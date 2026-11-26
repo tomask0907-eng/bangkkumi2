@@ -28,7 +28,7 @@ const H = `(() => { const hosts = [...document.querySelectorAll('*')].filter(e =
 const root = `([...document.querySelectorAll('*')].find(e => e.shadowRoot && e.shadowRoot.textContent.includes('방봄')).shadowRoot)`
 const text = () => ev(`[...${root}.querySelectorAll('.msg,[class*=bubble],article,li,p')].map(e=>e.textContent.trim()).filter(Boolean).slice(-6).join(' | ').slice(-420)`)
 const textOld = () => ev(`${root}.textContent.replace(/\\s+/g,' ').slice(-700)`)
-const click = (label) => ev(`(() => { const b = [...${root}.querySelectorAll('button')].filter(b => b.textContent.trim().startsWith(${JSON.stringify(label)}) && b.offsetParent !== null).pop(); if (!b) return false; b.click(); return true })()`)
+const click = (label, first) => ev(`(() => { const b = [...${root}.querySelectorAll('button')].filter(b => b.textContent.trim().startsWith(${JSON.stringify(label)}) && b.offsetParent !== null)[${first ? "'shift'" : "'pop'"}](); if (!b) return false; b.click(); return true })()`)
 const say = async (t) => { await ev(`(() => { const i = ${root}.querySelector('textarea,input[type=text],input:not([type])'); i.value = ${JSON.stringify(t)}; i.dispatchEvent(new Event('input',{bubbles:true})); const f = i.closest('form'); if (f) f.requestSubmit(); })()`); await sleep(700) }
 const out = []
 for (const [w, h, mobile] of [[1440, 900, false], [390, 844, true]]) {
@@ -40,10 +40,11 @@ for (const [w, h, mobile] of [[1440, 900, false], [390, 844, true]]) {
   await click('이대로 반영'); await sleep(800); await click('지금 후보 보기'); await sleep(900)
   out.push(`  반영 뒤: ${await text()}`)
   fs.writeFileSync(`${D}/chat-${w}.png`, Buffer.from((await send('Page.captureScreenshot', { format: 'png' }, s)).data, 'base64'))
-  const okMap = await click('지도 보기'); await sleep(2500)
+  out.push(`  공개 미분양 참고(매매, 전세 후보와 따로)=${(await text()).includes('매매 · 전세 아님')}`)
+  const okMap = await click('지도 보기', true); await sleep(2500)
   out.push(`  [지도 보기] 누름=${okMap} → hash=${await ev('location.hash')}, 카드 열림=${await ev(`document.querySelector('#panelR')?.classList.contains('is-open')`)}, 카드 이름=${await ev(`document.querySelector('#panelR h2')?.textContent`)}`)
   await ev(`document.querySelector('#fab')?.click()`); await sleep(800)
-  out.push(`  [24시간 상담] → 위젯 수=${await ev(H)}, 같은 대화 이어짐=${(await text()).includes('상인푸르지오')}, 예전 서랍 열림=${await ev(`document.querySelector('#drawer')?.classList.contains('is-open')`)}`)
+  out.push(`  [24시간 상담] → 위젯 수=${await ev(H)}, 같은 대화 이어짐=${await ev(`${root}.textContent.includes('상인푸르지오')`)}, 예전 서랍 열림=${await ev(`document.querySelector('#drawer')?.classList.contains('is-open')`)}`)
   const okPlan = await click('평면도 보기'); await sleep(2500)
   out.push(`  [평면도 보기] 누름=${okPlan} → hash=${await ev('location.hash')}, 집 보기 제목=${await ev(`document.querySelector('#hvTitle .hv-name')?.textContent`)}`)
   await say('수성구, 2억 이하, 84㎡ 이상'); await sleep(500)
@@ -53,7 +54,7 @@ for (const [w, h, mobile] of [[1440, 900, false], [390, 844, true]]) {
 out.push('POST 요청: ' + JSON.stringify(posts))
 out.push('오류: ' + JSON.stringify(errors))
 console.log(out.join('\n'))
-const bad = out.filter((l) => /누름=false|카드 열림=false|같은 대화 이어짐=false|위젯 수=(0|[2-9])|예전 서랍 열림=true|오류: \["(?!InvalidStateError: Transition)/.test(l))
+const bad = out.filter((l) => /참고(매매, 전세 후보와 따로)=false|누름=false|카드 열림=false|같은 대화 이어짐=false|위젯 수=(0|[2-9])|예전 서랍 열림=true|오류: \["(?!InvalidStateError: Transition)/.test(l))
 console.log(bad.length ? `결과: 실패 ${bad.length}줄` : '결과: 모두 통과')
 process.exitCode = bad.length ? 1 : 0
 child.kill(); await sleep(400); fs.rmSync(prof, { recursive: true, force: true, maxRetries: 5 }); process.exit(process.exitCode)

@@ -31,13 +31,13 @@ body.house-mode #mh .fab{display:none}
   #mh .form-head .title{font-size:24px}
   #mh .form-head .lead{margin-top:6px;font-size:15px;line-height:1.5}
   /* 저장·전송 안내는 보내기 직전인 마지막 걸음에서 보여 준다 */
-  #mh .form-head .gets-note{order:3;margin-top:16px;font-size:14px;line-height:1.5}
-  #mh #vInput:not([data-step="3"]) .gets-note{display:none}
+  #mh .form-head .gets-note{order:4;margin-top:16px;font-size:14px;line-height:1.5}
   #mh #form > .persona{order:1;margin-top:14px}
-  #mh #form > .persona > .muted{display:none}
+  #mh #form > .persona > .muted,#mh #form > .persona > .sample{display:none}
+  #mh #form > .stp{order:1;margin:16px 0 4px}
+  #mh #form > .form-foot{order:3;margin-top:12px}
   #mh #form > .persona .chip{height:44px;font-size:15px}
   #mh .fgrid{order:2;grid-template-columns:minmax(0,1fr);gap:12px;margin-top:14px}
-  #mh #vInput[data-step="1"] .f:not([data-step="1"]),#mh #vInput[data-step="2"] .f:not([data-step="2"]),#mh #vInput[data-step="3"] .f:not([data-step="3"]){display:none}
   #mh .f label,#mh .f .lb{font-size:15px;margin-bottom:4px;align-items:baseline}
   #mh .f label small,#mh .f .lb small{font-size:13px;text-align:right}
   #mh .f.full .lb{flex-direction:column;gap:2px}
@@ -47,11 +47,9 @@ body.house-mode #mh .fab{display:none}
   #mh #prioChips{gap:8px;margin-top:4px}
   #mh #prioChips .chip{height:44px;padding:0 16px;font-size:15px}
   #mh .err{font-size:13px}
-  #mh .form-btns{order:4;position:sticky;bottom:0;z-index:2;display:flex;flex-wrap:nowrap;gap:8px;margin:auto calc(var(--pad-x) * -1) 0;padding:12px var(--pad-x) calc(12px + env(safe-area-inset-bottom));border-top:1px solid var(--line);background:var(--bg)}
+  #mh .form-btns{order:5;position:sticky;bottom:0;z-index:2;display:flex;flex-wrap:nowrap;gap:8px;margin:auto calc(var(--pad-x) * -1) 0;padding:12px var(--pad-x) calc(12px + env(safe-area-inset-bottom));border-top:1px solid var(--line);background:var(--bg)}
   #mh .form-btns .btn{flex:1 1 0;height:48px;padding:0 12px}
   #mh .form-btns .btn:not(.btn--ghost){flex-grow:1.5}
-  #mh .form-btns .m-only{display:inline-flex}
-  #mh #vInput[data-step="1"] #fPrev,#mh #vInput[data-step="1"] #fSubmit,#mh #vInput[data-step="2"] #formBack,#mh #vInput[data-step="2"] #fSubmit,#mh #vInput[data-step="3"] #formBack,#mh #vInput[data-step="3"] #fNext{display:none}
 
   /* 키가 작은 휴대폰(높이 760px 이하): 첫 걸음의 네 칸과 단추가 한 화면에 들어오게 설명 한 줄을 뺀다 */
   @media (max-height:760px){#mh .form-head .lead{display:none}}

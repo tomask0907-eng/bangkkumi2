@@ -41,9 +41,16 @@ function personChecks(p, it) {
   (it.always_needs_check || []).forEach(n => { status = worse(status, CHECK); reasons.push(`${n} 확인 필요`); });
   return [status, reasons.join(" · ") || "입력 기준 요건 충족"];
 }
+/* 소득 구간 금리: 세전 연소득을 넣었으면 그 구간, 없으면 월 실수령으로 추정한 연소득의 높은 쪽(보수적) */
+function loanRate(ln, p) {
+  if (!ln.rate_tiers) return ln.rate;
+  const y = p.annual_income_gross != null ? p.annual_income_gross : p.monthly_income * 12 * RULES.income_estimate.gross_multiplier_high;
+  const t = ln.rate_tiers.find(([max]) => y <= max);
+  return t ? t[1] : ln.rate;
+}
 function profileResult(p) {
   const loans = [], policies = [];
-  RULES.loans.forEach(ln => { const [s, r] = personChecks(p, ln); loans.push({ id: ln.id, name: ln.name, status: s, max_amount: ln.max_amount, rate: ln.rate, rate_label: ln.rate_label, reason: r, check_items: ln.check_items || [], always_needs_check: ln.always_needs_check || [], approval_by: ln.approval_by, source_url: ln.source_url, checked_at: ln.checked_at }); });
+  RULES.loans.forEach(ln => { const [s, r] = personChecks(p, ln); loans.push({ id: ln.id, name: ln.name, status: s, max_amount: ln.max_amount, rate: loanRate(ln, p), rate_label: ln.rate_label, reason: r, check_items: ln.check_items || [], always_needs_check: ln.always_needs_check || [], approval_by: ln.approval_by, source_url: ln.source_url, checked_at: ln.checked_at }); });
   const m = RULES.market_loan;
   loans.push({ id: m.id, name: m.name, status: CHECK, max_amount: m.max_amount, rate: m.rate, reason: m.reason, approval_by: m.approval_by, source_url: m.link });
   RULES.policies.forEach(po => { const [s, r] = personChecks(p, po); policies.push({ id: po.id, name: po.name, status: s, reason: r, monthly_amount: po.monthly_amount, support_rate: po.support_rate, approval_by: po.approval_by, source_url: po.source_url, checked_at: po.checked_at, always_needs_check: po.always_needs_check || [] }); });
@@ -70,7 +77,7 @@ function evaluate(p, c, pr) {
     RULES.loans.forEach(ln => {
       if (!ln.applies_to.includes(c.supply_type) || st[ln.id] === NO) return;
       const cap = loanCap(ln, c); caps.push(cap);
-      if (loan_needed <= cap) add(st[ln.id], interest(loan_needed, ln.rate), ln.name, [ln.id], ln.rate, simple(ln.rate, ln.id === "youth_beotimok" ? "(최대 기준)" : ""));
+      if (loan_needed <= cap) { const rt = loanRate(ln, p); add(st[ln.id], interest(loan_needed, rt), ln.name, [ln.id], rt, simple(rt, ln.rate_tiers ? (p.annual_income_gross != null ? "(소득 구간)" : "(추정 소득 구간)") : "")); }
     });
     const mcap = loanCap(market, c); caps.push(mcap);
     if (loan_needed <= mcap) {

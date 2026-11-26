@@ -1,0 +1,111 @@
+<section class="page" id="page-home" data-page="home" aria-label="홈">
+
+  <div class="hero fp" data-fp="처음">
+    <video class="hero__media" autoplay muted playsinline preload="auto" poster="img/hero.jpg" aria-label="새 집 거실을 천천히 둘러보는 예시 영상">
+      <source src="vid/hero.mp4" type="video/mp4">
+    </video>
+    <div class="hero__shade" aria-hidden="true"></div>
+    <span class="tag-example">예시 영상</span>
+    <div class="container hero__inner">
+      <h1 class="hero__title"><span>가 보기 전에,</span><span class="thin">먼저 살아보는 집</span></h1>
+      <p class="hero__desc">대구에 좋은 매물 있는데, 함께 보시겠어요?</p>
+      <div class="hero__btns">
+        <a href="#input" class="btn btn--white" data-go="input">기본정보 입력하고 더 알아보기 →</a>
+        <a href="#map" class="btn btn--ghost" data-go="browse">그냥 둘러보기</a>
+      </div>
+      <form class="hero__ask" id="homeAsk" role="search"><label for="homeAskIn">어떤 집을 찾으세요?</label><div><input id="homeAskIn" name="preference" placeholder="달서구, 전세 2억 5천 이하" autocomplete="off" maxlength="200"><button class="btn btn--white" type="submit">찾아보기</button></div></form>
+    </div>
+    <div class="scroll-cue" aria-hidden="true">Scroll<i></i></div>
+  </div>
+
+  <div class="fp fp--light" data-fp="3D 집 보기">
+    <div class="container fp__grid">
+      <div class="fp__text reveal">
+        <p class="fp__no">01 · 3D Model house</p>
+        <h2 class="fp__title">집 안까지<br>3D로 둘러봐요</h2>
+        <p class="fp__desc">미분양 단지 면적(59㎡·84㎡)에 맞춘 구조예요. 계약하기 전에 방 크기와 동선을 화면으로 먼저 확인할 수 있어요.</p>
+        <ul class="fp__chips" aria-label="볼 수 있는 시점"><li>평면도</li><li>조감도</li><li>방 안</li></ul>
+        <div class="kid">
+          <div class="kid__media">
+            <video muted playsinline preload="none" poster="img/child.jpg" data-autoplay aria-label="아이 눈높이 90cm에서 거실을 걸어보는 예시 영상"><source src="vid/child.mp4" type="video/mp4"></video>
+          </div>
+          <div class="kid__text">
+            <b>아이 시점으로도 볼 수 있어요</b>
+            <span>눈높이를 90cm로 낮추면 탁자 모서리가 어디쯤 오는지 보여요.</span>
+            <a href="#house" class="link" data-eye="child">아이 눈높이로 보기 →</a>
+          </div>
+        </div>
+        <a href="#house" class="btn">3D로 집 보기 →</a>
+      </div>
+      <div class="fp__media reveal">
+        <video muted playsinline preload="none" poster="img/move.jpg" data-autoplay aria-label="새 집 거실 안으로 천천히 들어가는 예시 영상"><source src="vid/move.mp4" type="video/mp4"></video>
+        <span class="tag-example">예시 영상</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="fp fp--gray" data-fp="가구 옮기기">
+    <div class="container fp__grid fp__grid--rev">
+      <div class="fp__media reveal">
+        <div class="ba" id="ba">
+          <img src="img/furn_after.jpg" alt="침대, 책상, 원목 수납장, 러그를 놓은 새 집 작은방" loading="lazy">
+          <img class="ba__before" src="img/furn_before.jpg" alt="가구가 하나도 없는 새 집 작은방" loading="lazy">
+          <span class="ba__line" aria-hidden="true"></span>
+          <span class="ba__knob" aria-hidden="true">⟷</span>
+          <input class="ba__range" type="range" min="0" max="100" value="100" aria-label="가구 놓기 전과 놓은 후 비교 위치">
+        </div>
+        <span class="pill-label pill-label--l">가구 놓기 전</span>
+        <span class="pill-label pill-label--r">가구 놓은 후</span>
+        <span class="tag-example">예시 이미지</span>
+      </div>
+      <div class="fp__text reveal">
+        <p class="fp__no">02 · Your furniture</p>
+        <h2 class="fp__title">빈 집에 가구를<br>미리 놓아봐요</h2>
+        <p class="fp__desc">침대, 책상, 수납장을 새 집 방에 놓아 보고 들어가는지 확인해요. 새로 살 가구는 예산에 맞춰 구매 목록으로 정리돼요.</p>
+        <span class="fp__hint">사진을 좌우로 밀어 보세요</span>
+        <a href="#house" class="btn">새 집에 가구 놓아보기 →</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="fp fp--dark" data-fp="불 켜지는 지도">
+    <div class="container fp__grid">
+      <div class="fp__text reveal">
+        <p class="fp__no">03 · Match</p>
+        <h2 class="fp__title">내 조건에 맞는 집에<br>불이 켜져요</h2>
+        <p class="fp__desc">나이, 소득, 모은 돈을 넣으면 대출·지원 요건을 단지마다 따져 봐요. 요건이 맞는 단지는 지도에서 불이 켜져요.</p>
+        <ul class="lights">
+          <li><i class="on"></i><b>요건 충족</b>불이 켜져요</li>
+          <li><i class="dim"></i><b>확인 필요</b>깜빡여요</li>
+          <li><i class="off"></i><b>미충족</b>꺼져요</li>
+        </ul>
+        <a href="#input" class="btn btn--white">내 조건 넣기 →</a>
+      </div>
+      <div class="fp__media reveal">
+        <video muted playsinline preload="none" poster="img/match.jpg" data-autoplay aria-label="불이 켜진 단지를 누르면 다른 단지는 사라지고 주변 시설까지 선이 이어지는 방봄 지도 화면"><source src="vid/match.mp4" type="video/mp4"></video>
+        <span class="tag-example">방봄 화면 · 샘플 데이터</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="fp fp--light fp--plans" data-fp="단지 둘러보기">
+    <div class="container">
+      <div class="plans__head reveal">
+        <div>
+          <p class="fp__no">04 · Plans</p>
+          <h2 class="fp__title">대구 미분양 단지,<br>평면부터 둘러봐요</h2>
+        </div>
+        <a href="#map" class="link" data-go="browse">지도에서 전체 보기 →</a>
+      </div>
+      <div class="plans__track" id="plansTrack"></div>
+      <div class="plans__btns">
+        <button class="round-btn" id="plansPrev" aria-label="이전 단지"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M11 4 6 9l5 5"/></svg></button>
+        <button class="round-btn" id="plansNext" aria-label="다음 단지"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m7 4 5 5-5 5"/></svg></button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<nav class="fp-dots" id="fpDots" aria-label="홈 섹션 이동"></nav>
+<button type="button" class="to-top" id="toTop" aria-label="맨 위로 가기"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14V4M4.5 8.5 9 4l4.5 4.5"/></svg><span>맨 위로</span></button>
+

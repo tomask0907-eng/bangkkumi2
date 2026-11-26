@@ -21,6 +21,6 @@ const A = (ok, m) => { if (!ok) { console.error("FAIL " + m); process.exitCode =
 A(out.r1(90.25) === 90.3 && out.r1(56.25) === 56.3 && out.r1(39.66) === 39.7, "반올림");
 const n = cnt(4500); A(n.on === 3 && n.dim === 1 && n.off === 4, "4500 개수 " + JSON.stringify(n));
 A(res[4500].c01.light === "off" && res[4500].c01.net_monthly_best === 63.4, "상인 4500 " + res[4500].c01.net_monthly_best);
-A(res[4500].c02.net_monthly === 42.1 && res[4500].c06.light === "dim" && res[4500].c06.net_monthly_best === 55.9, "c02/c06");
+A(res[4500].c02.net_monthly === 38.6 && res[4500].c06.light === "dim" && res[4500].c06.net_monthly_best === 55.9, "c02/c06");
 A(res[1000].c01.shortfall === 1220 && res[1000].c01.light === "off", "상인 1000 부족액 " + res[1000].c01.shortfall);
 console.log("\n점검 " + (process.exitCode ? "실패" : "통과"));

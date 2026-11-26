@@ -49,7 +49,7 @@ function route(v) {
   const house = v === "house";
   $("#houseView").classList.toggle("is-on", house);
   house ? House.open(S.sel) : House.close();
-  if (v === "input" && !formDirty) { fillForm(S.profile || null); setStep(1); }
+  if (v === "input" && !formDirty) { fillForm(S.profile || null); Step.go(0, false); }
   if (v !== "map") Consult.fit();
   renderTop(v); renderPanels();
 }
@@ -261,8 +261,6 @@ function openCard(id) {
 function closeCard() {
   const p = $("#panelR"), was = p.classList.contains("is-open");
   document.body.classList.remove("card-open"); p.classList.remove("is-open"); p.style.transform = ""; syncPl();
-  /* 휴대폰: 시트가 열린 동안에는 단지를 시트 위쪽 좁은 지도로 올려서 봤다. 닫으면 다시 나타나는 구 칩 줄과 요약 줄에 이름표가 깔리지 않게 화면 가운데로 되돌린다 */
-  if (was && isPhone() && S.sel && MapView.ok) { const c = MapView.units[S.sel].c; MapView.fly(c.map_x, c.map_z, Math.min(MapView.zoom, 44)); }
 }
 
 /* ─── S1 입력 ─── */
@@ -280,50 +278,65 @@ function fillForm(p) {
 function syncSeg() { $$("#form .seg").forEach(g => $$("button", g).forEach(b => b.classList.toggle("is-on", String(fval[g.dataset.k]) === b.dataset.v))); }
 $$("#form .seg").forEach(g => $$("button", g).forEach(b => b.addEventListener("click", () => { fval[g.dataset.k] = +b.dataset.v; syncSeg(); formDirty = true; })));
 function renderPrio() {
+  if (!$("#prioChips")) return;
   $("#prioChips").innerHTML = Object.entries(CAT_KO).map(([k, v]) => `<button type="button" class="chip${prio.includes(k) ? " is-on" : ""}" data-p="${k}" aria-pressed="${prio.includes(k)}">${v}</button>`).join("");
   $$("#prioChips button").forEach(b => b.addEventListener("click", () => { const k = b.dataset.p; prio = prio.includes(k) ? prio.filter(x => x !== k) : [...prio, k]; renderPrio(); formDirty = true; }));
 }
-$("#fillPersona").onclick = () => { fillForm(PERSONA); formDirty = true; };
+
 /* 칸을 고치면 그 칸의 빨간 알림을 바로 지운다 (다음을 다시 누를 때까지 남아 있으면 맞게 적어도 틀린 것처럼 보인다) */
 $$("#form input").forEach(i => i.addEventListener("input", () => { formDirty = true; const e = $("#e-" + i.id.slice(2)); if (e) e.textContent = ""; }));
 $("#formBack").onclick = () => { S.mode = "browse"; location.hash = "#map"; };
-/* 휴대폰에서는 세 걸음(기본 정보 → 주거 상황 → 예산·시설)으로 나눠 묻는다. PC 는 한 화면에 모두 보인다.
-   걸음을 넘길 때 그 걸음의 값만 검사하고, 틀리면 그 칸으로 간다 */
-const STEP_OF = { age: 1, income: 1, assets: 1, budget: 3 };
-let fstep = 1;
 const num = id => { const v = $("#" + id).value.trim().replace(/[,\s원]/g, ""); if (v === "") return null; return id === "f-age" ? Number(v) : Number(v) / 10000; };
 function readForm() {
   return { age: num("f-age"), monthly_income: num("f-income"), annual_income_gross: num("f-gross"), assets: num("f-assets"), monthly_budget: num("f-budget"),
     homeless: !!fval.homeless, lives_with_parents: !!fval.lives_with_parents, daegu_resident_or_moving: !!fval.daegu_resident_or_moving, priorities: prio };
 }
-/* only 가 있으면 그 걸음의 칸만 검사한다. 틀린 첫 칸의 이름을 돌려준다 */
-function checkForm(p, only) {
+/* 틀린 첫 칸의 이름을 돌려준다 */
+function checkForm(p) {
   const errs = { age: p.age == null || p.age < 19 || p.age > 70 ? "19~70 사이로 넣어주세요" : "", income: p.monthly_income == null || p.monthly_income < 0 ? "월 실수령을 넣어주세요" : "",
     assets: p.assets == null || p.assets < 0 ? "모은 돈을 넣어주세요 (없으면 0)" : "", budget: p.monthly_budget == null || p.monthly_budget <= 0 ? "월 예산을 넣어주세요" : "" };
   let bad = null;
-  Object.entries(errs).forEach(([k, v]) => { if (only && STEP_OF[k] !== only) return; $("#e-" + k).textContent = v; if (v && !bad) bad = k; });
+  Object.entries(errs).forEach(([k, v]) => { $("#e-" + k).textContent = v; if (v && !bad) bad = k; });
   return bad;
 }
-function focusBad(k) { if (isPhone() && STEP_OF[k] !== fstep) setStep(STEP_OF[k]); const el = $("#f-" + k); el.focus(); if (isPhone()) el.scrollIntoView({ block: "center" }); }
-function setStep(n) {
-  fstep = clamp(n, 1, 3); $("#vInput").dataset.step = fstep;
-  $$("#fSteps button").forEach(b => { const on = +b.dataset.step === fstep; b.classList.toggle("is-on", on); on ? b.setAttribute("aria-current", "step") : b.removeAttribute("aria-current"); });
-  $("#vInput .form-wrap").scrollTop = 0;
-}
-function goStep(n) {
-  for (let s = fstep; s < n; s++) { const bad = checkForm(readForm(), s); if (bad) { setStep(s); focusBad(bad); return; } }
-  setStep(n);
-}
-$$("#fSteps button").forEach(b => b.onclick = () => goStep(+b.dataset.step));
-$("#fPrev").onclick = () => setStep(fstep - 1);
-$("#fNext").onclick = () => goStep(fstep + 1);
+/* 한 문항씩 넘기는 입력 (PC·휴대폰 같음): 다음을 누를 때 지금 칸만 검사 */
+const Step = {
+  i: 0,
+  fields() { return $$("#form .fgrid > .f"); },
+  check(f) {
+    const inp = $("input", f); if (!inp || !inp.required) return true;
+    const v = inp.value.trim(), n = Number(v.replace(/[,\s원]/g, "")), err = $(".err", f);
+    let msg = "";
+    if (v === "") msg = inp.id === "f-assets" ? "없으면 0을 넣어주세요" : "값을 넣어주세요";
+    else if (inp.id === "f-age" && (n < 19 || n > 70)) msg = "19~70 사이로 넣어주세요";
+    else if (inp.id === "f-budget" && n <= 0) msg = "0보다 큰 금액을 넣어주세요";
+    if (err) err.textContent = msg;
+    if (msg) inp.focus();
+    return !msg;
+  },
+  go(k, focus = true) {
+    const fs = this.fields(), n = fs.length; this.i = clamp(k, 0, n - 1);
+    fs.forEach((f, j) => f.classList.toggle("is-cur", j === this.i));
+    $("#stpNo").textContent = `${this.i + 1} / ${n}`; $("#stpFill").style.width = ((this.i + 1) / n * 100) + "%";
+    $("#stPrev").disabled = this.i === 0;
+    const last = this.i === n - 1; $("#stNext").hidden = last; $("#stSubmit").hidden = !last;
+    const inp = $("input", fs[this.i]); if (focus && inp && !isMobile()) setTimeout(() => inp.focus(), 60);
+  },
+  next() { const f = this.fields()[this.i]; if (this.check(f)) this.go(this.i + 1); }
+};
+$("#form").classList.add("is-step");
+$("#stNext").onclick = () => Step.next();
+$("#stPrev").onclick = () => Step.go(Step.i - 1);
+$$("#form .fgrid input").forEach(inp => inp.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); if (Step.i < Step.fields().length - 1) Step.next(); else $("#form").requestSubmit(); } }));
+$$("#form .seg button").forEach(b => b.addEventListener("click", () => setTimeout(() => { if (Step.i < Step.fields().length - 1) Step.go(Step.i + 1); }, 220)));
+Step.go(0, false);
+$("#fillPersona").onclick = () => { fillForm(PERSONA); formDirty = true; Step.go(Step.fields().length - 1); };
+$("#fillShort").onclick = () => { fillForm(Object.assign({}, PERSONA, { assets: 1000 })); formDirty = true; Step.go(Step.fields().length - 1); };
 $("#form").addEventListener("submit", e => {
   e.preventDefault();
-  /* 휴대폰에서 마지막 걸음 전에 엔터(이동)를 누르면 다음 걸음으로 간다 */
-  if (isPhone() && fstep < 3) { goStep(fstep + 1); return; }
   const p = readForm(), bad = checkForm(p);
-  if (bad) { focusBad(bad); return; }
-  S.profile = p; try { localStorage.setItem("mh-profile", JSON.parse(JSON.stringify(p)) && JSON.stringify(p)); } catch (er) {}
+  if (bad) { Step.go(Step.fields().findIndex(f => f.contains($("#f-" + bad)))); return; }
+  S.profile = p; try { localStorage.setItem("mh-profile", JSON.stringify(p)); } catch (er) {}
   recompute(); S.mode = "match"; jpOpen = false; formDirty = false; location.hash = "#map"; MapView.applyMode(true);
 });
 
@@ -426,7 +439,7 @@ const MapView = {
       }
     });
     new ResizeObserver(() => this.resize()).observe($("#mapWrap"));
-    this.resize(); this.applyMode(false); this.ok = true;
+    this.resize(); this.applyMode(false); this.ok = true; this.overview(false);
     let t0 = performance.now();
     const loop = t => { const dt = Math.min(.05, (t - t0) / 1000); t0 = t; this.tick(dt, t / 1000); requestAnimationFrame(loop); };
     requestAnimationFrame(loop);
@@ -479,20 +492,6 @@ const MapView = {
       const me = new T3.Mesh(g, new T3.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false, depthTest: false })); me.position.set(x, .03, z); me.renderOrder = 4; this.scene.add(me); this.guLabels.push(me);
     });
     (document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve()).then(mk);
-    this.buildArt();
-  },
-  buildArt() {
-    /* 단지 주변 바닥 지도: OpenStreetMap 데이터로 다시 그린 그림(img/map, 8x8 단위). 가장자리는 둥글게 흐려지게 */
-    const c = document.createElement("canvas"); c.width = c.height = 256; const x = c.getContext("2d");
-    const g = x.createRadialGradient(128, 128, 0, 128, 128, 128); g.addColorStop(0, "#fff"); g.addColorStop(.6, "#fff"); g.addColorStop(1, "#000");
-    x.fillStyle = g; x.fillRect(0, 0, 256, 256);
-    const fade = new T3.CanvasTexture(c), loader = new T3.TextureLoader();
-    COMPLEX.forEach(u => loader.load(`img/map/${u.id}.jpg`, tex => {
-      tex.encoding = T3.sRGBEncoding; tex.anisotropy = 8;
-      const top = u.id === "c01", geo = new T3.PlaneGeometry(8 * MAP_K, 8 * MAP_K); geo.rotateX(-Math.PI / 2);
-      const m = new T3.Mesh(geo, new T3.MeshStandardMaterial({ map: tex, alphaMap: fade, transparent: true, depthWrite: false, roughness: 1, metalness: 0 }));
-      m.position.set(u.map_x, top ? .02 : .018, u.map_z); m.renderOrder = top ? 2 : 1; m.receiveShadow = true; this.decor.add(m);
-    }, undefined, () => {})); /* 파일로 열면(file://) 그림이 안 올라와도 기본 지도는 그대로 */
   },
   buildCity() {
     /* 도심 격자 블록 (예시, 실제 건물 아님): 미분양 단지보다 낮고 무채색으로 */
@@ -500,7 +499,7 @@ const MapView = {
     for (let gx = Math.floor(-22 * MAP_K / CW); gx < Math.ceil(68 * MAP_K / CW); gx++) for (let gz = Math.floor(-20.4 * MAP_K / CD); gz < Math.ceil(68 * MAP_K / CD); gz++) {
       const cx = gx * CW + CW / 2, cz = gz * CD + CD / 2;
       if (!inGeo(cx, cz, GEO.urban) || rnd() < .3 || rnd() < .5) continue;
-      const free = (x, z, pad) => !this.blocked(x, z, pad) && inGeo(x, z, GEO.urban) && !COMPLEX.some(u => Math.hypot(x - u.map_x, z - u.map_z) < 3.2); /* 바닥 지도 위에는 예시 블록을 두지 않음 */
+      const free = (x, z, pad) => !this.blocked(x, z, pad) && inGeo(x, z, GEO.urban);
       const kind = rnd(), dense = Math.max(0, 1 - Math.hypot(cx - 18 * MAP_K, cz - 13 * MAP_K) / (22 * MAP_K));
       if (kind < .36 + dense * .2) {
         const rows = 2 + Math.floor(rnd() * 2), hgt = (.3 + rnd() * .28 + dense * .2) * .6;
@@ -537,7 +536,7 @@ const MapView = {
   buildUnits() {
     COMPLEX.forEach(c => {
       const g = new T3.Group(); g.position.set(c.map_x, 0, c.map_z); this.scene.add(g);
-      const rim = rbox(3.3, .03, 2.8, .3, mat("#d9e8de")); g.add(rim); const site = rbox(3.1, .05, 2.6, .25, mat("#f7f2e8")); g.add(site);
+      const rimM = mat("#d9e8de").clone(); const rim = rbox(3.3, .03, 2.8, .3, rimM); g.add(rim); const site = rbox(3.1, .05, 2.6, .25, mat("#f7f2e8")); g.add(site);
       const rnd = seeded(c.id), n = 3 + (rnd() > .5 ? 1 : 0), L = rnd() > .5;
       const wallTex = windowTexture(c.id, 1, false);
       const em = { browse: windowTexture(c.id, .4, true), on: windowTexture(c.id, .7, true), dim: windowTexture(c.id, .3, true) };
@@ -565,7 +564,7 @@ const MapView = {
       const hit = new T3.Mesh(new T3.BoxGeometry(3.6, top + 1, 3.2), new T3.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false })); hit.position.y = (top + 1) / 2; hit.userData.id = c.id; g.add(hit);
       const lbl = document.createElement("button"); lbl.className = "clabel"; lbl.setAttribute("aria-label", c.name + " 카드 열기");
       lbl.addEventListener("click", () => this.select(c.id, true)); $("#lblLayer").appendChild(lbl);
-      this.units[c.id] = { c, g, blds, wallM, roofM, bandM, em, glow, beam, ring, ring0, top, sq, hit, lbl, cur: 1.2, tgt: 1.2, delay: 0, light: "browse", lift: 0 };
+      this.units[c.id] = { c, g, blds, wallM, roofM, bandM, rimM, em, glow, beam, ring, ring0, top, sq, hit, lbl, cur: 1.2, tgt: 1.2, delay: 0, light: "browse", lift: 0 };
     });
   },
   buildUnsold() {
@@ -584,10 +583,8 @@ const MapView = {
   },
   selectUnsold(k) {
     const [x, z] = this.uPos[k];
-    if (!this.home) this.home = { x: this.target.x, z: this.target.z, zoom: this.zoom };
     S.sel = null; this.lift(); this.showLines(null);
-    this.fly(x + (isMobile() ? 0 : 1.6), z + (isMobile() ? 2.2 : 0), clamp(this.zoom, 36, 44));
-    openUnsold(k);
+    openUnsold(k); this.paintSel(); this.flyTo(x, .3, z);
   },
   applyMode(animate) {
     if (!this.ok && !this.units.c01) return;
@@ -601,30 +598,70 @@ const MapView = {
       u.tgt = { browse: 1.0, on: 3.0, dim: 1.0, off: 0 }[light];
       if (animate && light !== "browse") u.cur = 0;
       const off = light === "off";
-      u.wallM.color.set(off ? new T3.Color("#c3c6c4").convertSRGBToLinear() : new T3.Color("#ffffff"));
-      u.bandM.color.set(new T3.Color(off ? "#9DB5B1" : "#1f6b4f").convertSRGBToLinear());
+      u.baseWall = off ? "#c3c6c4" : "#ffffff"; u.baseBand = off ? "#9DB5B1" : "#1f6b4f";
       const ev = S.evals[id];
       u.lbl.className = "clabel" + (light === "on" ? " is-on" : light === "dim" ? " is-dim" : light === "off" ? " is-off" : "");
       u.lbl.innerHTML = (light !== "browse" ? `<i>${LIGHT_ICON[light]}</i>` : `<i class="b">●</i>`) + esc(u.c.name.replace("(예시)", ""));
     });
-    this.nightT = S.mode === "match" ? 1 : 0;
+    this.nightT = S.mode === "match" ? 1 : 0; this.paintSel();
     if (S.sel && $("#panelR").classList.contains("is-open")) openCard(S.sel);
+  },
+  /* 구마다 같은 선택 색 (서로 잘 구분되게): [벽, 띠·바닥·라벨] */
+  GU_PAL: { 달서구: ["#ffb36b", "#d9600f"], 북구: ["#7fb8ff", "#1d5fd1"], 동구: ["#c39bff", "#7034d6"], 수성구: ["#6fe0b0", "#0d8f5c"], 서구: ["#ff8fa8", "#d12e5a"], 중구: ["#ffe066", "#b38600"], 남구: ["#6fd9e8", "#0b8a9c"], 달성군: ["#c8d97a", "#6b7f12"], 군위군: ["#e0b98f", "#8a5a2b"] },
+  paintSel() {
+    const cardOn = document.body.classList.contains("card-open");
+    Object.entries(this.units).forEach(([id, u]) => {
+      const sel = id === S.sel, hide = !!S.sel && cardOn && !sel;
+      u.g.visible = !hide; u.lbl.style.display = (hide || (sel && cardOn)) ? "none" : "";
+      const pal = this.GU_PAL[u.c.district] || ["#8fd6ad", "#0f7a4a"];
+      u.wallM.color.set(new T3.Color(sel ? pal[0] : (u.baseWall || "#ffffff")).convertSRGBToLinear());
+      u.bandM.color.set(new T3.Color(sel ? pal[1] : (u.baseBand || "#1f6b4f")).convertSRGBToLinear());
+      u.rimM.color.set(new T3.Color(sel ? pal[1] : "#d9e8de").convertSRGBToLinear());
+      u.lbl.style.background = sel ? pal[1] : ""; u.lbl.style.color = sel ? "#fff" : "";
+    });
+  },
+  /* P(월드 좌표)가 화면 (dx, dy)에 오도록 하는 카메라 target */
+  placeAt(P, Z, dx, dy) {
+    const W = innerWidth, H = innerHeight, cam = this.cam;
+    const save = { p: cam.position.clone(), q: cam.quaternion.clone() };
+    cam.position.copy(P).add(new T3.Vector3(20, 20, 20)); cam.lookAt(P); cam.updateMatrixWorld();
+    const r = new T3.Vector3().setFromMatrixColumn(cam.matrixWorld, 0), u = new T3.Vector3().setFromMatrixColumn(cam.matrixWorld, 1), d = new T3.Vector3(-1, -1, -1).normalize();
+    cam.position.copy(save.p); cam.quaternion.copy(save.q);
+    const T = P.clone().addScaledVector(r, (W / 2 - dx) / Z).addScaledVector(u, (dy - H / 2) / Z);
+    return T.addScaledVector(d, -T.y / d.y);
+  },
+  /* 카드에 가리지 않는 지도 영역의 가운데로 옮기며 줌인 (휴대폰은 아래 시트 위쪽) */
+  flyTo(x, y, z) {
+    const W = innerWidth, H = innerHeight, Z = clamp(Math.max(this.zoom, 36), 36, 44), pr = $("#panelR");
+    let dx = W / 2, dy = (140 + H) / 2;
+    if (isMobile()) { const top = pr.offsetTop || H * .5; dy = (150 + Math.min(top, H * .6)) / 2; }
+    else if (pr.offsetWidth) dx = Math.max(160, pr.offsetLeft / 2);
+    const T = this.placeAt(new T3.Vector3(x, y, z), Z, dx, dy);
+    this.fly(T.x, T.z, Z);
+  },
+  /* 판정 단지 8곳이 모두 보이게 줌아웃 (왼쪽 패널·위 막대를 피해서) */
+  overview(animate) {
+    const W = innerWidth, H = innerHeight, pl = $("#panelL"), mob = isMobile();
+    const left = !mob && pl && !pl.hidden && pl.offsetWidth ? pl.getBoundingClientRect().right + 24 : 24, right = W - 24;
+    const top = mob ? (pl && !pl.hidden && pl.offsetHeight ? pl.getBoundingClientRect().bottom + 16 : 190) : 150, bottom = H - (mob ? 130 : 90);
+    const sx = c => (c.map_x - c.map_z) / Math.SQRT2, sy = c => -(c.map_x + c.map_z) / Math.sqrt(6);
+    const xs = COMPLEX.map(sx), ys = COMPLEX.map(sy), x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys);
+    const hTop = 5.5 * Math.sqrt(2 / 3);
+    const Z = clamp(Math.min((right - left) / (x1 - x0 + 4), (bottom - top) / (y1 - y0 + hTop + 3)), 4.5 / MAP_K, 40);
+    const mx = (x0 + x1) / 2, my = (y0 + y1) / 2 + hTop / 2;
+    const P = new T3.Vector3((Math.SQRT2 * mx - Math.sqrt(6) * my) / 2, 0, (-Math.SQRT2 * mx - Math.sqrt(6) * my) / 2);
+    const T = this.placeAt(P, Z, (left + right) / 2, (top + bottom) / 2);
+    if (animate) this.fly(T.x, T.z, Z); else { this.target.set(T.x, 0, T.z); this.zoom = Z; this.fly0 = null; }
   },
   lift() { Object.entries(this.units).forEach(([id, u]) => u.liftT = (id === S.hover || id === S.sel) ? .05 : 0); },
   fly(x, z, zoom) { this.fly0 = { x, z, zoom: zoom || this.zoom, t: 0, fx: this.target.x, fz: this.target.z, fzoom: this.zoom }; },
   select(id, fly) {
-    if (id && !this.home) this.home = { x: this.target.x, z: this.target.z, zoom: this.zoom };
     S.sel = id; this.lift(); this.showLines(id);
-    if (!id) { if (this.home) { this.fly(this.home.x, this.home.z, this.home.zoom); this.home = null; } return; }
+    if (!id) { this.paintSel(); if (this.ok && fly !== false) this.overview(true); return; }
     if (location.hash !== "#map") location.hash = "#map";
-    const u = this.units[id], c = u.c, m = u.top * .45;
-    if (fly && isPhone()) {
-      /* 휴대폰: 아래 시트가 화면의 3분의 2를 덮으므로, 단지가 시트 위쪽 지도에 보이게 화면 아래 방향으로 그만큼 옮겨서 본다 */
-      /* 건물(높이 약 3.7)과 이름표가 위 막대와 시트 사이에 다 들어오는 배율로 맞춘다 */
-      const sheetTop = innerHeight * .34, zoom = clamp((sheetTop - 72 - 74) / 3.02, 30, 44), dy = innerHeight / 2 - (sheetTop - 24), d = Math.max(0, dy) / zoom / Math.sin(Math.asin(1 / Math.sqrt(3))) / Math.SQRT2;
-      this.fly(c.map_x + d, c.map_z + d, zoom);
-    } else if (fly) this.fly(c.map_x - m + (isMobile() ? 0 : 1.6), c.map_z - m + (isMobile() ? 2.2 : 0), clamp(this.zoom, 36, 44));
-    openCard(id);
+    const u = this.units[id];
+    openCard(id); this.paintSel();
+    if (fly) this.flyTo(u.c.map_x, u.top * .5, u.c.map_z);
   },
   showLines(id) {
     while (this.lines.children.length) { const o = this.lines.children.pop(); o.geometry && o.geometry.dispose(); }
@@ -655,13 +692,15 @@ const MapView = {
     this.r.setClearColor(this._cc.copy(this._c0).lerp(this._c1, n), 1);
     Object.values(this.units).forEach(u => {
       if (now >= u.delay) u.cur += (u.tgt - u.cur) * Math.min(1, dt * 6);
+      const isSel = S.sel === u.c.id && document.body.classList.contains("card-open");
       let e = u.cur;
-      if (u.light === "dim") e = .3 + 1.3 * (.5 + .5 * Math.sin(time * Math.PI * 2 / 3));
+      if (u.light === "dim") e = .75;
+      if (isSel) e = Math.min(e, .7);
       u.wallM.emissiveIntensity = e * (now >= u.delay ? 1 : 0);
-      u.beam.material.opacity = u.light === "on" ? (.22 + .08 * Math.sin(time * 2.4)) * Math.min(1, u.cur / 3) : 0;
-      u.glow.material.opacity = u.light === "on" ? .8 * Math.min(1, u.cur / 3) : u.light === "dim" ? .25 * (e / 1.4) : u.light === "browse" ? .18 : 0;
-      if (u.light === "on" && !REDUCED) { const p = (time % 1.8) / 1.8; u.ring.scale.setScalar(.8 + p * .6); u.ring.material.opacity = .7 * (1 - p); } else u.ring.material.opacity = 0;
-      u.ring0.material.opacity = u.light === "on" ? .9 : 0;
+      u.beam.material.opacity = u.light === "on" && !isSel ? .2 * Math.min(1, u.cur / 3) : 0;
+      u.glow.material.opacity = isSel ? 0 : u.light === "on" ? .55 * Math.min(1, u.cur / 3) : u.light === "dim" ? .18 : u.light === "browse" ? .12 : 0;
+      u.ring.material.opacity = u.light === "on" && !isSel ? .45 : 0;
+      u.ring0.material.opacity = 0;
       u.sq.material.opacity = u.light === "dim" ? .5 : 0;
       u.lift = (u.lift || 0) + ((u.liftT || 0) - (u.lift || 0)) * Math.min(1, dt * 10); u.blds.position.y = u.lift;
       const p = this.project(new T3.Vector3(u.c.map_x, u.top + .6, u.c.map_z)); const far = this.zoom < 18 / MAP_K; u.lbl.classList.toggle("is-sel", S.sel === u.c.id && document.body.classList.contains("card-open"));
@@ -820,6 +859,8 @@ window.MH = {
   browse() { S.mode = "browse"; if (location.hash === "#map") { route("map"); MapView.applyMode(false); } else location.hash = "#map"; },
   openHouse(cid) { S.sel = cid; location.hash = "#house"; },
   /* 지도에서 이 단지를 누른 것과 같게 연다 (집찾기 대화의 [지도에서 보기]). 지도를 못 그리면 카드만 연다 */
+  /* 공개 미분양 점(k = UNSOLD_LIST 순번)을 지도에서 연다 */
+  openUnsold(k) { if (!UNSOLD_LIST[k]) return; if (location.hash !== "#map") location.hash = "#map"; const go = n => MapView.ok ? MapView.selectUnsold(k) : n > 0 ? setTimeout(() => go(n - 1), 150) : openUnsold(k); setTimeout(() => go(20), 50); },
   openMap(cid) { if (!COMPLEX.some(c => c.id === cid)) return; S.sel = cid; if (location.hash !== "#map") location.hash = "#map"; const go = n => MapView.ok ? MapView.select(cid, true) : n > 0 ? setTimeout(() => go(n - 1), 150) : openCard(cid); setTimeout(() => go(20), 50); },
   /* 눈높이로 집 보기: "child"(아이) 나 "adult"(어른). 다음에 집 보기를 열 때 room.html 에 view=3d&eye=<mode> 를 붙인다 (한 번 쓰고 지운다).
      이미 집 보기 화면이면 바로 다시 연다. 눈높이 화면 자체는 방 배치 도구(room.html)가 그린다 */

@@ -18,7 +18,11 @@
     interpretEndpoint: remote ? "/api/bangbom-interpret" : undefined,
     onMap: async ({ id }) => { chat.close(); MH.openMap(id); },
     onFloorplan: async ({ id, viewIntent }) => { chat.close(); if (viewIntent === "childView") MH.setEye("child"); MH.openHouse(id); },
-    onProfile: async () => { chat.close(); location.hash = "#input"; }
+    onProfile: async () => { chat.close(); location.hash = "#input"; },
+    /* 전세 후보와 섞지 않는 참고: 같은 구의 공개 미분양 아파트(매매). 구를 안 골랐으면 첫 후보의 구. 준공 후 단지를 먼저 */
+    related: (p, matches) => { const gu = p.district || (matches[0] && matches[0].district); if (!gu || typeof UNSOLD_LIST === "undefined") return [];
+      return UNSOLD_LIST.map((u, k) => ({ u, k })).filter(x => x.u.gu === gu).sort((a, b) => Number(!!b.u.completed) - Number(!!a.u.completed)).slice(0, 2)
+        .map(({ u, k }) => ({ name: u.name, district: u.gu + " " + (u.dong || ""), note: (u.completed ? "준공 후 미분양" : "분양 중") + " · " + (u.source || "대구시 공개 미분양 목록") + " · 계약 가능 여부는 확인 필요", onMap: () => { chat.close(); MH.openUnsold(k); } })); }
   });
   MH.chat = chat;
   const fab = document.getElementById("fab");
