@@ -93,8 +93,8 @@
         + '<path d="M210 48q12-10 24 0q-12 10-24 0z" fill="#fff" stroke="#141714" stroke-width="1.3"/><circle cx="222" cy="48" r="3.2" fill="#141714"/>')
     },
     {
-      title: "궁금한 건 24시간 상담에 물어봐요",
-      body: "판정과 숫자는 정해진 규칙이 계산하고, 상담은 그 결과를 쉬운 말로 풀어 줘요. 최종 결정은 각 기관이 해요.",
+      title: "궁금한 건 AI 상담에 물어봐요",
+      body: "판정과 숫자는 정해진 규칙이 계산하고, AI 상담은 그 결과를 쉬운 말로 풀어 주고, 맞는 집도 대화로 찾아 줘요. 최종 결정은 각 기관이 해요.",
       art: svg('<rect x="136" y="14" width="154" height="32" rx="16" fill="#141714"/><text x="213" y="34.5" font-size="11.5" text-anchor="middle" fill="#fff">월 부담은 어떻게 나와요?</text>'
         + '<rect x="30" y="58" width="158" height="58" rx="16" fill="#fff" stroke="#e3e1db" stroke-width="1.5"/><rect x="46" y="73" width="118" height="5" rx="2.5" fill="#cfccc4"/><rect x="46" y="84" width="94" height="5" rx="2.5" fill="#cfccc4"/><rect x="46" y="96" width="60" height="10" rx="5" fill="#e2efe7"/>'
         + '<rect x="204" y="84" width="92" height="30" rx="15" fill="#141714"/><circle cx="220" cy="99" r="4" fill="#7ED6A8"/><text x="230" y="103" font-size="11.5" fill="#fff">24시간 상담</text>')

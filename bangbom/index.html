@@ -1739,15 +1739,22 @@ body.house-mode .nav{background:var(--bg)}
   .bbu--panel .bbu__chip{background:#fff;border-color:var(--line);-webkit-backdrop-filter:none;backdrop-filter:none}
   .bbu--panel .bbu__menu{position:static;width:auto;max-width:320px;margin-top:8px;box-shadow:none}
 }
-/* 홈 큰 그림 아래의 집찾기 한 줄 입력 (누르면 집찾기 대화가 그 문장으로 열린다) */
-.hero__ask{margin-top:22px;max-width:520px}
-.hero__ask label{display:block;margin-bottom:8px;font-size:15px;font-weight:600;color:#fff}
-.hero__ask div{display:flex;gap:8px}
-.hero__ask input{flex:1;min-width:0;height:48px;padding:0 16px;border:1px solid rgba(255,255,255,.55);border-radius:999px;background:rgba(255,255,255,.96);color:#141714;font:inherit;font-size:16px}
-.hero__ask input::placeholder{color:#71746f}
-.hero__ask input:focus-visible{outline:2px solid #fff;outline-offset:2px}
-.hero__ask .btn{height:48px;flex:none}
-@media (max-width:820px){.hero__ask{margin-top:16px}.hero__ask label{font-size:14px}}
+/* 홈 큰 그림 안의 AI 상담 입력 카드: 챗봇이라는 걸 알아보게 머리(아이콘·이름)와 말풍선을 둔다. 보내면 같은 챗봇이 그 문장으로 열린다 */
+.hero__ask{margin-top:24px;max-width:460px;padding:16px;border-radius:24px;background:rgba(255,255,255,.94);color:#141714;box-shadow:0 24px 60px -24px rgba(0,0,0,.55);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
+.ask__head{display:flex;align-items:center;gap:10px}
+.ask__head b{display:block;font-size:15px;font-weight:700;letter-spacing:-.02em;line-height:1.3}
+.ask__head small{display:block;font-size:12px;color:#5d625d;line-height:1.4}
+.ask__mark{position:relative;flex:none;width:36px;height:36px;border-radius:50%;background:#141714;color:#fff;display:grid;place-items:center;font-size:14px;font-weight:700}
+.ask__mark::after{content:"";position:absolute;right:-1px;bottom:0;width:10px;height:10px;border-radius:50%;background:#3fbf7f;border:2px solid #fff}
+.ask__bubble{margin:12px 0 12px;padding:10px 14px;border-radius:6px 18px 18px 18px;background:#f3f2ee;font-size:14px;line-height:1.55;color:#141714;max-width:none}
+.ask__box{display:flex;gap:6px;align-items:center;padding:5px 5px 5px 6px;border:1px solid rgba(20,23,20,.12);border-radius:999px;background:#fff}
+.ask__box:focus-within{border-color:#141714}
+.ask__box input{flex:1;min-width:0;height:40px;padding:0 10px;border:0;background:transparent;color:#141714;font:inherit;font-size:16px}
+.ask__box input:focus-visible{outline:0}
+.ask__box input::placeholder{color:#8a8d88}
+.hero__ask .btn{height:40px;padding:0 18px;flex:none;background:#141714;color:#fff;font-size:14px}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+@media (max-width:820px){.hero__ask{margin-top:16px;padding:14px}.ask__bubble{font-size:13px;margin:10px 0}}
 
 </style>
 </head>
@@ -1813,7 +1820,12 @@ body.house-mode .nav{background:var(--bg)}
         <a href="#input" class="btn btn--white" data-go="input">기본정보 입력하고 더 알아보기 →</a>
         <a href="#map" class="btn btn--ghost" data-go="browse">그냥 둘러보기</a>
       </div>
-      <form class="hero__ask" id="homeAsk" role="search"><label for="homeAskIn">어떤 집을 찾으세요?</label><div><input id="homeAskIn" name="preference" placeholder="달서구, 전세 2억 5천 이하" autocomplete="off" maxlength="200"><button class="btn btn--white" type="submit">찾아보기</button></div></form>
+      <form class="hero__ask" id="homeAsk" role="search" aria-label="방봄 AI 상담에게 묻기">
+        <div class="ask__head"><span class="ask__mark" aria-hidden="true">봄</span><div><b>방봄 AI 상담</b><small>대화로 집 찾기 · 대출·지원 질문</small></div></div>
+        <p class="ask__bubble">살고 싶은 동네와 보증금을 말해 보세요. 맞는 집을 찾아 드릴게요.</p>
+        <label class="sr-only" for="homeAskIn">AI 상담에게 보낼 문장</label>
+        <div class="ask__box"><input id="homeAskIn" name="preference" placeholder="예: 달서구, 전세 2억 5천 이하" autocomplete="off" maxlength="200"><button class="btn" type="submit">보내기</button></div>
+      </form>
     </div>
     <div class="scroll-cue" aria-hidden="true">Scroll<i></i></div>
   </div>
@@ -1925,7 +1937,7 @@ body.house-mode .nav{background:var(--bg)}
       <div class="s5 reveal"><i>2</i><b>판정 결과 보기</b><p>대출·지원마다 요건 충족 / 확인 필요 / 미충족과 이유를 봐요.</p></div>
       <div class="s5 reveal"><i>3</i><b>지도에서 불빛 보기</b><p>들어갈 수 있는 단지에 불이 켜지고, 역·병원까지 거리가 보여요.</p></div>
       <div class="s5 reveal"><i>4</i><b>단지 카드·집 보기</b><p>지원 반영 월 부담을 확인하고, 평면도·3D로 가구를 놓아봐요.</p></div>
-      <div class="s5 reveal"><i>5</i><b>상담하고 신청하기</b><p>24시간 상담과 체크리스트, 공식 신청 링크로 이어가요.</p></div>
+      <div class="s5 reveal"><i>5</i><b>상담하고 신청하기</b><p>AI 상담과 체크리스트, 공식 신청 링크로 이어가요.</p></div>
     </div>
   </div>
   <div class="section section--white" data-catp="faq">
@@ -1940,8 +1952,8 @@ body.house-mode .nav{background:var(--bg)}
         <details><summary>데이터는 어디서 오나요?<i aria-hidden="true"></i></summary><p>미분양 통계는 국토교통부 주택통계를 쓰고 출처와 기준일을 적어요. 이름 끝에 (예시)가 붙은 단지와 (샘플)이 붙은 시설은 시연용이에요. 대출·지원 기준은 공고에서 확인한 값이고, 시중금리 4.5% 같은 가정치는 화면에 따로 적어요. 작은 주황 점은 대구시 공개 미분양 목록(2026.9.30 기준)이에요.</p></details>
         <details><summary>지도와 평면도는 어디서 가져왔나요?<i aria-hidden="true"></i></summary><p>지도는 실제 배치를 참고해 단순한 블록으로 직접 그렸고, 지도 화면을 복사하지 않았어요. 평면도도 공고 평면도 원본 이미지를 쓰지 않고 표준 구조로 단순화해 그렸어요.</p></details>
         <details><summary>아이 눈높이는 왜 90cm인가요?<i aria-hidden="true"></i></summary><p>만 3~5세 아이의 눈높이가 대략 이 정도라서 잡은 참고값이에요. 법적·안전 기준은 아니에요. 집 보기의 3D에서 [아이 눈높이]를 누르면 그 높이로 방 안을 둘러볼 수 있고, 아이 얼굴 높이에 오는 가구 모서리를 빨간 점으로 짚어줘요. 참고용 안전 체크예요.</p></details>
-        <details><summary>24시간 상담은 AI가 판정하나요?<i aria-hidden="true"></i></summary><p>판정은 규칙이 하고, 상담은 그 결과를 쉬운 말로 설명만 해요. 판정을 바꾸거나 새 숫자를 만들지 않고, 링크는 공식 주소만 붙여요. AI 연결이 안 되면 규칙으로 만든 기본 안내로 답해요.</p></details>
-        <details><summary>무료인가요?<i aria-hidden="true"></i></summary><p>네, 지금 시연 버전은 모두 무료예요. 입력한 값은 이 브라우저에만 저장해요. 판정 설명(이 단지 상담하기, 판정 쉽게 설명)을 누를 때만 질문과 판정 요약을 AI 답변을 만드는 데 보내요. 집찾기 대화는 이 화면 안에서만 조건을 정리하고, 대화창에서 AI 해석을 켰을 때만 그 문장을 보내요.</p></details>
+        <details><summary>AI 상담이 판정하나요?<i aria-hidden="true"></i></summary><p>판정은 규칙이 하고, 상담은 그 결과를 쉬운 말로 설명만 해요. 판정을 바꾸거나 새 숫자를 만들지 않고, 링크는 공식 주소만 붙여요. AI 연결이 안 되면 규칙으로 만든 기본 안내로 답해요.</p></details>
+        <details><summary>무료인가요?<i aria-hidden="true"></i></summary><p>네, 지금 시연 버전은 모두 무료예요. 입력한 값은 이 브라우저에만 저장해요. AI 상담에 집 조건이 아닌 질문(판정 설명, 계약 전 확인 등)을 하면 그 질문과 판정 요약만 AI 답변을 만드는 데 보내요. 나이·소득 같은 입력값은 보내지 않아요. 집 조건은 이 화면 안에서 정리하고, 대화창에서 AI 해석을 켰을 때만 그 문장을 보내요.</p></details>
       </div>
     </div>
   </div>
@@ -1966,7 +1978,7 @@ body.house-mode .nav{background:var(--bg)}
 <div class="legend" id="legend"></div>
 <p class="map-hint" id="mapHint">단지를 누르면<span class="hint-more"> 주변 시설과</span> 집 정보가 보여요</p>
 <p class="notice">샘플 데이터 · 참고용, 최종 판정과 승인은 각 기관</p>
-<button class="fab" id="fab" aria-controls="drawer"><i></i>24시간 상담</button>
+<button class="fab" id="fab" aria-controls="drawer"><i></i>AI 상담</button>
 
 <!-- S1 정보 입력 -->
 <div class="veil" id="vInput" hidden>
@@ -1980,20 +1992,19 @@ body.house-mode .nav{background:var(--bg)}
       <li><i>02</i><div><b>불이 켜지는 지도</b><span>요건이 맞는 미분양 단지에 불이 켜져요</span></div></li>
       <li><i>03</i><div><b>지원 반영 월 부담</b><span>지원을 다 받을 때와 못 받을 때를 같이 보여줘요</span></div></li>
     </ol>
-    <p class="small muted gets-note">입력값은 이 브라우저에만 저장해요. 판정 설명(이 단지 상담하기, 판정 쉽게 설명)을 누를 때만 질문과 판정 요약을 AI 답변을 만드는 데 보내요. 집찾기 대화는 이 화면 안에서만 조건을 정리하고, 대화창에서 AI 해석을 켰을 때만 그 문장을 보내요. 최종 판정과 승인은 각 기관이 해요.</p>
+    <p class="small muted gets-note">입력값은 이 브라우저에만 저장해요. AI 상담에 집 조건이 아닌 질문(판정 설명, 계약 전 확인 등)을 하면 그 질문과 판정 요약만 AI 답변을 만드는 데 보내요. 나이·소득 같은 입력값은 보내지 않아요. 집 조건은 이 화면 안에서 정리하고, 대화창에서 AI 해석을 켰을 때만 그 문장을 보내요. 최종 판정과 승인은 각 기관이 해요.</p>
   </div>
   <form class="card form" id="form" novalidate aria-labelledby="fTitle">
-    <div class="persona"><button type="button" class="chip" id="fillPersona">예시 · 김지훈(27)</button><button type="button" class="chip" id="fillShort">예시 · 모은 돈이 부족할 때</button><span class="sample">시연용</span><span class="muted small" style="margin-left:auto">금액은 원 단위</span></div>
     <div class="stp" aria-hidden="true"><div class="stp__bar"><i id="stpFill"></i></div><span id="stpNo">1 / 8</span></div>
     <div class="fgrid">
       <div class="f"><label for="f-age">만 나이가 몇 살이에요? <small>19~70세</small></label><div class="in"><input id="f-age" type="number" inputmode="numeric" min="19" max="70" required><span>세</span></div><p class="err" id="e-age"></p></div>
-      <div class="f"><label for="f-income">한 달 실수령액은 얼마예요? <small>세금 떼고 받는 돈</small></label><div class="in"><input id="f-income" type="number" inputmode="numeric" min="0" step="10000" required><span>원</span></div><p class="err" id="e-income"></p></div>
-      <div class="f"><label for="f-gross">세전 연소득을 알면 넣어주세요 <small>모르면 비워두고 넘어가도 돼요</small></label><div class="in"><input id="f-gross" type="number" inputmode="numeric" min="0" step="1000000" placeholder="선택"><span>원</span></div></div>
-      <div class="f"><label for="f-assets">보증금에 쓸 수 있는 돈은 얼마예요? <small>없으면 0</small></label><div class="in"><input id="f-assets" type="number" inputmode="numeric" min="0" step="1000000" required><span>원</span></div><p class="err" id="e-assets"></p></div>
+      <div class="f"><label for="f-income">한 달 실수령액은 얼마예요? <small>세금 떼고 받는 돈</small></label><div class="in"><input id="f-income" type="text" inputmode="numeric" autocomplete="off" required><span>원</span></div><p class="err" id="e-income"></p></div>
+      <div class="f"><label for="f-gross">세전 연소득을 알면 넣어주세요 <small>모르면 비워두고 넘어가도 돼요</small></label><div class="in"><input id="f-gross" type="text" inputmode="numeric" autocomplete="off" placeholder="선택"><span>원</span></div></div>
+      <div class="f"><label for="f-assets">보증금에 쓸 수 있는 돈은 얼마예요? <small>없으면 0</small></label><div class="in"><input id="f-assets" type="text" inputmode="numeric" autocomplete="off" required><span>원</span></div><p class="err" id="e-assets"></p></div>
       <div class="f"><span class="lb">지금 집이 있나요? <small>세대원 모두 포함</small></span><div class="seg" data-k="homeless"><button type="button" data-v="1">없어요</button><button type="button" data-v="0">있어요</button></div></div>
       <div class="f"><span class="lb">부모님과 따로 사나요?</span><div class="seg" data-k="lives_with_parents"><button type="button" data-v="0">따로 살아요</button><button type="button" data-v="1">함께 살아요</button></div></div>
       <div class="f"><span class="lb">대구에 살거나 이사 올 예정인가요?</span><div class="seg" data-k="daegu_resident_or_moving"><button type="button" data-v="1">네</button><button type="button" data-v="0">아니요</button></div></div>
-      <div class="f"><label for="f-budget">한 달 주거비는 얼마까지 괜찮아요? <small>월세 + 관리비 + 대출이자</small></label><div class="in"><input id="f-budget" type="number" inputmode="numeric" min="0" step="10000" required><span>원</span></div><p class="err" id="e-budget"></p></div>
+      <div class="f"><label for="f-budget">한 달 주거비는 얼마까지 괜찮아요? <small>월세 + 관리비 + 대출이자</small></label><div class="in"><input id="f-budget" type="text" inputmode="numeric" autocomplete="off" required><span>원</span></div><p class="err" id="e-budget"></p></div>
     </div>
     <div class="form-btns">
       <button type="button" class="btn btn--ghost" id="stPrev">이전</button>
@@ -5974,7 +5985,6 @@ const man1 = n => n == null ? "—" : (Math.round(n * 10) / 10).toFixed(1);
 function toast(m) { const t = $("#mhToast"); t.textContent = m; t.classList.add("is-on"); clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove("is-on"), 2400); }
 
 /* ─── 상태 ─── */
-const PERSONA = { age: 27, monthly_income: 250, annual_income_gross: null, assets: 4500, homeless: true, lives_with_parents: false, daegu_resident_or_moving: true, monthly_budget: 60, priorities: [] };
 const S = { mode: "browse", profile: null, pr: null, evals: {}, sel: null, hover: null, chk: {} };
 try { const raw = localStorage.getItem("mh-profile"); if (raw) { S.profile = JSON.parse(raw); } } catch (e) {}
 const COMPLEX = COMPLEXES.map(c => Object.assign({}, c, { nearby: nearbyOf(c) }));
@@ -6057,7 +6067,7 @@ function renderPanels() {
     $("#jpFold").onclick = $("#jpLine").onclick = e => { const id = e.currentTarget.id; jpOpen = !jpOpen; renderPanels(); $("#" + id).focus({ preventScroll: true }); };
     $("#jpEdit").onclick = () => location.hash = "#input"; $("#jpBrowse").onclick = () => setMode("browse");
     $("#panelL").dataset.mode = "match";
-    $("#jpConsult").onclick = () => { Consult.open(); Consult.ask("내 판정 결과 쉽게 설명해 줘"); };
+    $("#jpConsult").onclick = () => askBot("내 판정 결과 쉽게 설명해 줘");
     const mn = minNet();
     $("#pillsR").innerHTML = `<span class="pill-n">모은 돈 <b>${wonFull(S.profile.assets)}</b></span><span class="pill-n">월 예산 <b>${wonFull(S.profile.monthly_budget)}</b></span>${mn != null ? `<span class="pill-n">지원 반영 최저 <b>월 ${wonFull(mn)}</b></span>` : ""}`;
     $("#legend").innerHTML = "";
@@ -6206,7 +6216,7 @@ function openCard(id) {
   const shut = () => { closeCard(); MapView.select(null); };
   $("#ccX").onclick = shut;
   const cm = $("#ccMatch"); if (cm) cm.onclick = () => S.profile ? setMode("match") : (location.hash = "#input");
-  const cc = $("#ccConsult"); if (cc) cc.onclick = () => { Consult.open(); Consult.ask("이 단지 월 부담은 어떻게 계산했어요?"); };
+  const cc = $("#ccConsult"); if (cc) cc.onclick = () => askBot("이 단지 월 부담은 어떻게 계산했어요?");
   $$("[data-ck]").forEach(i => i.addEventListener("change", () => S.chk[i.dataset.ck] = i.checked));
   $$(".cc-chips button", p).forEach(b => b.onclick = () => setTab(b.dataset.tab));
   setTab(S.tab);
@@ -6227,7 +6237,9 @@ function closeCard() {
 const fval = { homeless: 1, lives_with_parents: 0, daegu_resident_or_moving: 1 };
 let prio = [];
 /* 입력 칸은 원, 저장·계산은 만 원 */
-const toWon = v => v == null || v === "" ? "" : Math.round(v * 10000);
+const toWon = v => v == null || v === "" ? "" : Math.round(v * 10000).toLocaleString("ko-KR");
+/* 금액 칸은 적는 대로 세 자리마다 쉼표를 넣는다 (계산할 때는 num()이 쉼표를 뺀다) */
+$$("#f-income,#f-gross,#f-assets,#f-budget").forEach(i => i.addEventListener("input", () => { const d = i.value.replace(/[^\d]/g, "").replace(/^0+(?=\d)/, ""); const v = d ? Number(d).toLocaleString("ko-KR") : ""; if (v !== i.value) i.value = v; }));
 function fillForm(p) {
   p = p || {};
   $("#f-age").value = p.age ?? ""; $("#f-income").value = toWon(p.monthly_income); $("#f-gross").value = toWon(p.annual_income_gross);
@@ -6290,8 +6302,6 @@ $("#stPrev").onclick = () => Step.go(Step.i - 1);
 $$("#form .fgrid input").forEach(inp => inp.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); if (Step.i < Step.fields().length - 1) Step.next(); else $("#form").requestSubmit(); } }));
 $$("#form .seg button").forEach(b => b.addEventListener("click", () => setTimeout(() => { if (Step.i < Step.fields().length - 1) Step.go(Step.i + 1); }, 220)));
 Step.go(0, false);
-$("#fillPersona").onclick = () => { fillForm(PERSONA); formDirty = true; Step.go(Step.fields().length - 1); };
-$("#fillShort").onclick = () => { fillForm(Object.assign({}, PERSONA, { assets: 1000 })); formDirty = true; Step.go(Step.fields().length - 1); };
 $("#form").addEventListener("submit", e => {
   e.preventDefault();
   const p = readForm(), bad = checkForm(p);
@@ -6905,6 +6915,8 @@ ${this.photo ? `<details class="hvo-fix"><summary>방 크기 고치기 (cm)</sum
 
 
 /* ═══════════════ S6 24시간 상담 (규칙이 답을 만들고 AI가 쉽게 풀어 쓴다) ═══════════════ */
+/* 상담은 챗봇 하나: 새 챗봇이 있으면 거기서 묻고, 못 불러왔으면(chat=0 포함) 예전 서랍 */
+function askBot(q) { if (window.MH && MH.chat) MH.chat.open(q); else { Consult.open(); Consult.ask(q); } }
 const QUICK = ["내 판정 결과 쉽게 설명해 줘", "확인 필요는 어떻게 확인해요?", "신청은 어디서, 뭐가 필요해요?", "이 단지 월 부담은 어떻게 계산했어요?", "계약 전에 꼭 확인할 것은?"];
 const Consult = {
   init() {
@@ -6934,6 +6946,15 @@ const Consult = {
     const d = document.createElement("div"); d.className = "msg " + (me ? "me" : "ai"); d.textContent = text;
     if (links && links.length) { const l = document.createElement("div"); l.className = "links"; l.innerHTML = links.map(x => x.url ? `<a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.label)} ↗</a>` : x.action ? `<a href="${esc(x.action)}">${esc(x.label)}</a>` : `<span>${esc(x.label)}</span>`).join(""); d.appendChild(l); }
     $("#drBody").appendChild(d); $("#drBody").scrollTop = 1e6; return d;
+  },
+  reply(q) {
+    const [t, l] = this.answer(q), tidy = s => String(s || "").replace(/\s*\(입력 만 \d+세\)/g, "");
+    const rule = { text: tidy(t), links: (l || []).filter(x => x.url).map(x => ({ label: x.label, url: x.url })) };
+    if (/주민(?:등록)?\s?번호|계좌\s?번호|비밀번호|여권\s?번호|카드\s?번호|\d{6}\s*-?\s*\d{7}/.test(q) || !/^https?:$/.test(location.protocol)) return Promise.resolve(rule);
+    const ctl = new AbortController(), timer = setTimeout(() => ctl.abort(), 15000);
+    return fetch("/api/consult", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ question: q.slice(0, 500), draft: rule.text, facts: tidy(this.facts()) }), signal: ctl.signal })
+      .then(r => r.ok ? r.json() : null).catch(() => null)
+      .then(d => { clearTimeout(timer); const ai = d && d.isFallback === false && typeof d.answer === "string" ? d.answer.trim() : ""; return ai ? Object.assign({}, rule, { text: ai, note: "AI가 쉽게 풀어 쓴 답이에요. 판정과 숫자는 규칙이 계산했어요." }) : rule; });
   },
   ask(q) {
     this.say(q, null, true);
@@ -7029,6 +7050,8 @@ addEventListener("keydown", e => {
 });
 $("#plToggle").onclick = () => { plOpen = !plOpen; if (plOpen && document.body.classList.contains("card-open")) { closeCard(); MapView.select(null); } syncPl(); };
 window.MH = {
+  /* 챗봇이 쓰는 상담 답 (규칙 답 + AI 풀어 쓰기) */
+  reply: q => Consult.reply(q),
   route(v) { if (v === "map" && S.profile && S.mode !== "match" && !route.seen) S.mode = "match"; route.seen = true; route(v); if (v === "map" && MapView.ok) MapView.applyMode(false); },
   browse() { S.mode = "browse"; if (location.hash === "#map") { route("map"); MapView.applyMode(false); } else location.hash = "#map"; },
   openHouse(cid) { S.sel = cid; location.hash = "#house"; },
@@ -7144,8 +7167,8 @@ window.MH = {
         + '<path d="M210 48q12-10 24 0q-12 10-24 0z" fill="#fff" stroke="#141714" stroke-width="1.3"/><circle cx="222" cy="48" r="3.2" fill="#141714"/>')
     },
     {
-      title: "궁금한 건 24시간 상담에 물어봐요",
-      body: "판정과 숫자는 정해진 규칙이 계산하고, 상담은 그 결과를 쉬운 말로 풀어 줘요. 최종 결정은 각 기관이 해요.",
+      title: "궁금한 건 AI 상담에 물어봐요",
+      body: "판정과 숫자는 정해진 규칙이 계산하고, AI 상담은 그 결과를 쉬운 말로 풀어 주고, 맞는 집도 대화로 찾아 줘요. 최종 결정은 각 기관이 해요.",
       art: svg('<rect x="136" y="14" width="154" height="32" rx="16" fill="#141714"/><text x="213" y="34.5" font-size="11.5" text-anchor="middle" fill="#fff">월 부담은 어떻게 나와요?</text>'
         + '<rect x="30" y="58" width="158" height="58" rx="16" fill="#fff" stroke="#e3e1db" stroke-width="1.5"/><rect x="46" y="73" width="118" height="5" rx="2.5" fill="#cfccc4"/><rect x="46" y="84" width="94" height="5" rx="2.5" fill="#cfccc4"/><rect x="46" y="96" width="60" height="10" rx="5" fill="#e2efe7"/>'
         + '<rect x="204" y="84" width="92" height="30" rx="15" fill="#141714"/><circle cx="220" cy="99" r="4" fill="#7ED6A8"/><text x="230" y="103" font-size="11.5" fill="#fff">24시간 상담</text>')
@@ -7407,6 +7430,11 @@ window.MH = {
   const remote = location.protocol !== "file:";
   const chat = B.mount({
     catalog: rows, includeSamples: false, showLauncher: false,
+    title: "방봄 AI 상담", subtitle: "Ask Bangbom",
+    greeting: "안녕하세요, 방봄 AI 상담이에요.\n살고 싶은 동네와 보증금을 한 문장으로 말하면 맞는 집을 찾아 드려요. 대출·지원 판정이나 계약 전 확인할 것도 물어보세요.",
+    quick: ["내 판정 결과 쉽게 설명해 줘", "신청은 어디서, 뭐가 필요해요?", "계약 전에 꼭 확인할 것은?"],
+    /* 집 조건으로 읽히지 않는 질문: 예전 상담과 같은 규칙 답 + AI 풀어 쓰기 */
+    answer: q => MH.reply(q),
     interpretEndpoint: remote ? "/api/bangbom-interpret" : undefined,
     onMap: async ({ id }) => { chat.close(); MH.openMap(id); },
     onFloorplan: async ({ id, viewIntent }) => { chat.close(); if (viewIntent === "childView") MH.setEye("child"); MH.openHouse(id); },

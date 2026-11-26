@@ -14,7 +14,6 @@ const man1 = n => n == null ? "—" : (Math.round(n * 10) / 10).toFixed(1);
 function toast(m) { const t = $("#mhToast"); t.textContent = m; t.classList.add("is-on"); clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove("is-on"), 2400); }
 
 /* ─── 상태 ─── */
-const PERSONA = { age: 27, monthly_income: 250, annual_income_gross: null, assets: 4500, homeless: true, lives_with_parents: false, daegu_resident_or_moving: true, monthly_budget: 60, priorities: [] };
 const S = { mode: "browse", profile: null, pr: null, evals: {}, sel: null, hover: null, chk: {} };
 try { const raw = localStorage.getItem("mh-profile"); if (raw) { S.profile = JSON.parse(raw); } } catch (e) {}
 const COMPLEX = COMPLEXES.map(c => Object.assign({}, c, { nearby: nearbyOf(c) }));
@@ -97,7 +96,7 @@ function renderPanels() {
     $("#jpFold").onclick = $("#jpLine").onclick = e => { const id = e.currentTarget.id; jpOpen = !jpOpen; renderPanels(); $("#" + id).focus({ preventScroll: true }); };
     $("#jpEdit").onclick = () => location.hash = "#input"; $("#jpBrowse").onclick = () => setMode("browse");
     $("#panelL").dataset.mode = "match";
-    $("#jpConsult").onclick = () => { Consult.open(); Consult.ask("내 판정 결과 쉽게 설명해 줘"); };
+    $("#jpConsult").onclick = () => askBot("내 판정 결과 쉽게 설명해 줘");
     const mn = minNet();
     $("#pillsR").innerHTML = `<span class="pill-n">모은 돈 <b>${wonFull(S.profile.assets)}</b></span><span class="pill-n">월 예산 <b>${wonFull(S.profile.monthly_budget)}</b></span>${mn != null ? `<span class="pill-n">지원 반영 최저 <b>월 ${wonFull(mn)}</b></span>` : ""}`;
     $("#legend").innerHTML = "";
@@ -246,7 +245,7 @@ function openCard(id) {
   const shut = () => { closeCard(); MapView.select(null); };
   $("#ccX").onclick = shut;
   const cm = $("#ccMatch"); if (cm) cm.onclick = () => S.profile ? setMode("match") : (location.hash = "#input");
-  const cc = $("#ccConsult"); if (cc) cc.onclick = () => { Consult.open(); Consult.ask("이 단지 월 부담은 어떻게 계산했어요?"); };
+  const cc = $("#ccConsult"); if (cc) cc.onclick = () => askBot("이 단지 월 부담은 어떻게 계산했어요?");
   $$("[data-ck]").forEach(i => i.addEventListener("change", () => S.chk[i.dataset.ck] = i.checked));
   $$(".cc-chips button", p).forEach(b => b.onclick = () => setTab(b.dataset.tab));
   setTab(S.tab);
@@ -267,7 +266,9 @@ function closeCard() {
 const fval = { homeless: 1, lives_with_parents: 0, daegu_resident_or_moving: 1 };
 let prio = [];
 /* 입력 칸은 원, 저장·계산은 만 원 */
-const toWon = v => v == null || v === "" ? "" : Math.round(v * 10000);
+const toWon = v => v == null || v === "" ? "" : Math.round(v * 10000).toLocaleString("ko-KR");
+/* 금액 칸은 적는 대로 세 자리마다 쉼표를 넣는다 (계산할 때는 num()이 쉼표를 뺀다) */
+$$("#f-income,#f-gross,#f-assets,#f-budget").forEach(i => i.addEventListener("input", () => { const d = i.value.replace(/[^\d]/g, "").replace(/^0+(?=\d)/, ""); const v = d ? Number(d).toLocaleString("ko-KR") : ""; if (v !== i.value) i.value = v; }));
 function fillForm(p) {
   p = p || {};
   $("#f-age").value = p.age ?? ""; $("#f-income").value = toWon(p.monthly_income); $("#f-gross").value = toWon(p.annual_income_gross);
@@ -330,8 +331,6 @@ $("#stPrev").onclick = () => Step.go(Step.i - 1);
 $$("#form .fgrid input").forEach(inp => inp.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); if (Step.i < Step.fields().length - 1) Step.next(); else $("#form").requestSubmit(); } }));
 $$("#form .seg button").forEach(b => b.addEventListener("click", () => setTimeout(() => { if (Step.i < Step.fields().length - 1) Step.go(Step.i + 1); }, 220)));
 Step.go(0, false);
-$("#fillPersona").onclick = () => { fillForm(PERSONA); formDirty = true; Step.go(Step.fields().length - 1); };
-$("#fillShort").onclick = () => { fillForm(Object.assign({}, PERSONA, { assets: 1000 })); formDirty = true; Step.go(Step.fields().length - 1); };
 $("#form").addEventListener("submit", e => {
   e.preventDefault();
   const p = readForm(), bad = checkForm(p);
@@ -731,6 +730,8 @@ function glowTex() { if (_glow) return _glow; const c = document.createElement("
 /* [house_view.js] 집 보기(House)는 house_view.js 에 있다. build.py 가 이 줄 자리에 끼워 넣는다 */
 
 /* ═══════════════ S6 24시간 상담 (규칙이 답을 만들고 AI가 쉽게 풀어 쓴다) ═══════════════ */
+/* 상담은 챗봇 하나: 새 챗봇이 있으면 거기서 묻고, 못 불러왔으면(chat=0 포함) 예전 서랍 */
+function askBot(q) { if (window.MH && MH.chat) MH.chat.open(q); else { Consult.open(); Consult.ask(q); } }
 const QUICK = ["내 판정 결과 쉽게 설명해 줘", "확인 필요는 어떻게 확인해요?", "신청은 어디서, 뭐가 필요해요?", "이 단지 월 부담은 어떻게 계산했어요?", "계약 전에 꼭 확인할 것은?"];
 const Consult = {
   init() {
@@ -760,6 +761,15 @@ const Consult = {
     const d = document.createElement("div"); d.className = "msg " + (me ? "me" : "ai"); d.textContent = text;
     if (links && links.length) { const l = document.createElement("div"); l.className = "links"; l.innerHTML = links.map(x => x.url ? `<a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.label)} ↗</a>` : x.action ? `<a href="${esc(x.action)}">${esc(x.label)}</a>` : `<span>${esc(x.label)}</span>`).join(""); d.appendChild(l); }
     $("#drBody").appendChild(d); $("#drBody").scrollTop = 1e6; return d;
+  },
+  reply(q) {
+    const [t, l] = this.answer(q), tidy = s => String(s || "").replace(/\s*\(입력 만 \d+세\)/g, "");
+    const rule = { text: tidy(t), links: (l || []).filter(x => x.url).map(x => ({ label: x.label, url: x.url })) };
+    if (/주민(?:등록)?\s?번호|계좌\s?번호|비밀번호|여권\s?번호|카드\s?번호|\d{6}\s*-?\s*\d{7}/.test(q) || !/^https?:$/.test(location.protocol)) return Promise.resolve(rule);
+    const ctl = new AbortController(), timer = setTimeout(() => ctl.abort(), 15000);
+    return fetch("/api/consult", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ question: q.slice(0, 500), draft: rule.text, facts: tidy(this.facts()) }), signal: ctl.signal })
+      .then(r => r.ok ? r.json() : null).catch(() => null)
+      .then(d => { clearTimeout(timer); const ai = d && d.isFallback === false && typeof d.answer === "string" ? d.answer.trim() : ""; return ai ? Object.assign({}, rule, { text: ai, note: "AI가 쉽게 풀어 쓴 답이에요. 판정과 숫자는 규칙이 계산했어요." }) : rule; });
   },
   ask(q) {
     this.say(q, null, true);
@@ -855,6 +865,8 @@ addEventListener("keydown", e => {
 });
 $("#plToggle").onclick = () => { plOpen = !plOpen; if (plOpen && document.body.classList.contains("card-open")) { closeCard(); MapView.select(null); } syncPl(); };
 window.MH = {
+  /* 챗봇이 쓰는 상담 답 (규칙 답 + AI 풀어 쓰기) */
+  reply: q => Consult.reply(q),
   route(v) { if (v === "map" && S.profile && S.mode !== "match" && !route.seen) S.mode = "match"; route.seen = true; route(v); if (v === "map" && MapView.ok) MapView.applyMode(false); },
   browse() { S.mode = "browse"; if (location.hash === "#map") { route("map"); MapView.applyMode(false); } else location.hash = "#map"; },
   openHouse(cid) { S.sel = cid; location.hash = "#house"; },

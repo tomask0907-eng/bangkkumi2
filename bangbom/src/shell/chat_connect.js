@@ -15,6 +15,11 @@
   const remote = location.protocol !== "file:";
   const chat = B.mount({
     catalog: rows, includeSamples: false, showLauncher: false,
+    title: "방봄 AI 상담", subtitle: "Ask Bangbom",
+    greeting: "안녕하세요, 방봄 AI 상담이에요.\n살고 싶은 동네와 보증금을 한 문장으로 말하면 맞는 집을 찾아 드려요. 대출·지원 판정이나 계약 전 확인할 것도 물어보세요.",
+    quick: ["내 판정 결과 쉽게 설명해 줘", "신청은 어디서, 뭐가 필요해요?", "계약 전에 꼭 확인할 것은?"],
+    /* 집 조건으로 읽히지 않는 질문: 예전 상담과 같은 규칙 답 + AI 풀어 쓰기 */
+    answer: q => MH.reply(q),
     interpretEndpoint: remote ? "/api/bangbom-interpret" : undefined,
     onMap: async ({ id }) => { chat.close(); MH.openMap(id); },
     onFloorplan: async ({ id, viewIntent }) => { chat.close(); if (viewIntent === "childView") MH.setEye("child"); MH.openHouse(id); },

@@ -13,7 +13,12 @@
         <a href="#input" class="btn btn--white" data-go="input">기본정보 입력하고 더 알아보기 →</a>
         <a href="#map" class="btn btn--ghost" data-go="browse">그냥 둘러보기</a>
       </div>
-      <form class="hero__ask" id="homeAsk" role="search"><label for="homeAskIn">어떤 집을 찾으세요?</label><div><input id="homeAskIn" name="preference" placeholder="달서구, 전세 2억 5천 이하" autocomplete="off" maxlength="200"><button class="btn btn--white" type="submit">찾아보기</button></div></form>
+      <form class="hero__ask" id="homeAsk" role="search" aria-label="방봄 AI 상담에게 묻기">
+        <div class="ask__head"><span class="ask__mark" aria-hidden="true">봄</span><div><b>방봄 AI 상담</b><small>대화로 집 찾기 · 대출·지원 질문</small></div></div>
+        <p class="ask__bubble">살고 싶은 동네와 보증금을 말해 보세요. 맞는 집을 찾아 드릴게요.</p>
+        <label class="sr-only" for="homeAskIn">AI 상담에게 보낼 문장</label>
+        <div class="ask__box"><input id="homeAskIn" name="preference" placeholder="예: 달서구, 전세 2억 5천 이하" autocomplete="off" maxlength="200"><button class="btn" type="submit">보내기</button></div>
+      </form>
     </div>
     <div class="scroll-cue" aria-hidden="true">Scroll<i></i></div>
   </div>
