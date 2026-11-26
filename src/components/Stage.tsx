@@ -36,7 +36,7 @@ function MobileBar({ viewMode, roomName }: { viewMode: ViewMode; roomName: strin
   const Bar = EMBEDDED ? 'div' : 'header'
   return (
     <Bar className="relative z-30 shrink-0 border-b border-line bg-surface pt-[env(safe-area-inset-top)]">
-      <div className="flex h-12 items-center gap-2 pr-[max(0.25rem,env(safe-area-inset-right))] pl-[max(0.75rem,env(safe-area-inset-left))]">
+      <div className="flex h-12 items-center gap-2 max-[320px]:gap-0.5 pr-[max(0.25rem,env(safe-area-inset-right))] pl-[max(0.75rem,env(safe-area-inset-left))]">
         {EMBEDDED ? null : <h1 className="shrink-0 text-[17px] font-semibold tracking-tight text-ink">방봄</h1>}
         <div role="group" aria-label="보기 방식" className="inline-flex h-10 shrink-0 items-center rounded-lg bg-sunken px-0.5">
           {VIEW_MODES.map((mode) => {
@@ -48,7 +48,7 @@ function MobileBar({ viewMode, roomName }: { viewMode: ViewMode; roomName: strin
                 type="button"
                 aria-pressed={active}
                 onClick={() => actions.setViewMode(mode.key)}
-                className="flex h-11 min-w-12 cursor-pointer items-center rounded-md"
+                className="flex h-11 min-w-12 cursor-pointer items-center rounded-md max-[320px]:min-w-11"
               >
                 <span
                   className={`flex h-9 w-full items-center justify-center rounded-md border px-3 text-[15px] font-medium transition-colors ${

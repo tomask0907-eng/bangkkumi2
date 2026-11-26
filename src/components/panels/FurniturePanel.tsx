@@ -42,6 +42,10 @@ export default function FurniturePanel() {
   const selectedId = useAppState((state) => state.selectedId)
   const [tab, setTab] = useState<TabKey>(room.furniture.length > 0 ? 'placed' : 'catalog')
   const [notice, setNotice] = useState<NoticeState | null>(null)
+  const noticeRef = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    if (notice) noticeRef.current?.scrollIntoView({ block: "nearest" })
+  }, [notice])
   // 방금 이 패널에서 추가한 가구. 추가 직후에는 탭을 바꾸지 않으려고 기억한다
   const [lastAddedId, setLastAddedId] = useState<string | null>(null)
   const [seenSelectedId, setSeenSelectedId] = useState(selectedId)
@@ -110,7 +114,8 @@ export default function FurniturePanel() {
         </div>
       )}
 
-      {notice ? <Notice tone={notice.tone}>{notice.text}</Notice> : null}
+      {/* 목록을 내려 둔 채 [추가]를 눌러도 보이게, 알림이 바뀌면 알림까지 올려 보여 준다 */}
+      {notice ? <div ref={noticeRef}><Notice tone={notice.tone}>{notice.text}</Notice></div> : null}
 
       {tab === 'placed' ? (
         <PlacedList furniture={room.furniture} selectedId={selectedId} onGoAdd={() => setTab('catalog')} />

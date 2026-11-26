@@ -69,12 +69,19 @@ interface AdviceState {
   basedOn: ValidationResult
 }
 
+/** 마지막으로 받은 해설. 휴대폰에서는 다른 메뉴로 가면 이 화면이 닫히므로, 돌아왔을 때 AI를 다시 부르지 않고 보여 준다 */
+let keptAdvice: AdviceState | null = null
+
 function AdviceBlock() {
   const room = useActiveRoom()
   const validation = useAppState((state) => state.validation)
   const lifestyle = useAppState((state) => state.project.profile.lifestyle)
   const [loading, setLoading] = useState(false)
-  const [advice, setAdvice] = useState<AdviceState | null>(null)
+  const [advice, setAdviceState] = useState<AdviceState | null>(() => keptAdvice)
+  const setAdvice = (next: AdviceState | null) => {
+    keptAdvice = next
+    setAdviceState(next)
+  }
   const [failed, setFailed] = useState(false)
   const requestNo = useRef(0)
 
