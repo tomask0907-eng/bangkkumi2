@@ -190,7 +190,7 @@ function saleHTML(c, jeonse) {
   const lp = sc.loanP;
   return `<details class="fold" data-pane="sale"><summary>매매로 보면</summary>
     ${sc.shortfall ? `<p class="big">사려면 자기자금이 모자라요<b class="is-off">${wonK(sc.shortfall)} 부족</b>필요한 자기자금 ${wonK(sc.own_needed)} · 모은 돈 ${wonK(S.profile.assets)}</p>` : ""}
-    <p class="why">전세로 살 때 월 ${jeonse != null ? man1(jeonse) + "만" : "—"} / 사서 살 때 월 ${wonFull(sc.monthly)}(원리금+관리비)</p>
+    <p class="why">전세로 살 때 월 ${jeonse != null ? wonFull(jeonse) : "—"} / 사서 살 때 월 ${wonFull(sc.monthly)}(원리금+관리비)</p>
     <p class="small" style="margin-top:8px">지방 준공 후 미분양이라 금리 0.2%p 우대 대상이에요</p>
     <table class="calc"><tbody>
       <tr><td>디딤돌대출</td><td><span class="st st--${sc.didimdol.status}">${ST_KO[sc.didimdol.status]}</span></td></tr>
