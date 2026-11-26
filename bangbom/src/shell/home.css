@@ -67,3 +67,13 @@ body.fp-on .fp-dots{display:flex}
 @media (max-width:900px){.to-top{bottom:calc(var(--tab-h) + 16px);right:16px}}
 .footer{padding-bottom:112px}
 @media (max-width:900px){.footer{padding-bottom:calc(var(--s5) + 72px)}}
+@media (prefers-reduced-motion:reduce){.fp-dots button,.to-top{transition:none}}
+/* 이용 안내 세 걸음: 예전 다섯 걸음(.steps5/.s5) 모양을 그대로 쓰고 세 칸으로 */
+.steps5.steps3{grid-template-columns:repeat(3,1fr)}
+.steps3 .s5{display:flex;flex-direction:column}
+.g-flow{list-style:none;margin:var(--s2) 0 0;padding:0;counter-reset:g}
+.g-flow li{position:relative;padding:8px 0 8px 18px;font-size:15px;line-height:1.5;color:#3d413d;border-bottom:1px solid var(--line)}
+.g-flow li::before{content:"→";position:absolute;left:0;top:8px;color:var(--green);font-size:13px}
+.g-flow li:first-child::before{content:"·"}
+.steps3 .s5 .link{margin-top:var(--s3);align-self:flex-start}
+@media (max-width:1100px){.steps5.steps3{grid-template-columns:1fr}.steps3 .s5 + .s5{padding-left:0;border-left:0;border-top:1px solid var(--line)}.steps3 .s5:nth-child(n+4){border-top:0}}

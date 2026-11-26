@@ -379,6 +379,9 @@ mb=mb.replace('<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128
 b=b.replace('<footer class="footer">','<div id="mh" hidden>\n'+mb+'\n</div>\n\n<footer class="footer">',1)
 b=R(b,'<li>대구광역시 · 공공데이터포털<span>단지 정보 연결 예정</span></li>','<li>단지 공개 보도 · 뉴시스·뉴스1<span>2026.9</span></li>\n          <li>대구광역시 공동주택 미분양 현황(공개 단지)<span>2026.9.30 기준</span></li>')
 b=R(b,'<li>국토교통부 건축물 현황<span>2023 기준</span></li>\n','<li>국토교통부 건축물 현황<span>2023 기준</span></li>\n')
+# 이용 안내(#guide)는 guide.html 로 통째로 바꾼다 (세 걸음 + 자주 묻는 질문). 위의 R() 들이 예전 안내 문장을 바꾼 뒤에 끼워 넣는다
+_i=b.index('<!-- ═══════════════ #guide'); _j=b.index('</main>',_i)
+b=b[:_i]+open(os.path.join(HERE,'guide.html'),encoding='utf-8').read()+b[_j:]
 # 탭바 4칸
 h=h.replace('.tabbar{display:grid;grid-template-columns:repeat(5,1fr);','.tabbar{display:grid;grid-template-columns:repeat(4,1fr);')
 
