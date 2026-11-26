@@ -212,7 +212,7 @@ ${this.photo ? `<p class="hvo-note">평면도 사진에서 읽은 추정값이�
   /* 사진 올리기 단추, 사진 구조일 때는 방 크기 고치기와 표준 구조로 되돌리기 */
   photoHTML(L) {
     const rows = this.photo ? L.rooms.map(r => `<li><span>${esc(r.name)}</span><label>가로 <input type="number" inputmode="numeric" min="100" max="3000" step="5" data-fix="${r.id}" data-k="w" value="${Math.round(r.w * 100)}"></label><label>세로 <input type="number" inputmode="numeric" min="100" max="3000" step="5" data-fix="${r.id}" data-k="d" value="${Math.round(r.d * 100)}"></label></li>`).join("") : "";
-    return `<div class="hvo-photo"><p class="hvo-photo-lead">${this.photo ? "다른 사진으로 다시 읽거나 표준 구조로 돌아갈 수 있어요." : "직방 등에서 본 실제 평면도를 캡처해 올리면, 방 자리와 크기를 읽어 이 집 구조로 바꿔요."}</p>
+    return `<div class="hvo-photo"><p class="hvo-photo-lead">${this.photo ? "다른 사진으로 다시 읽거나 표준 구조로 돌아갈 수 있어요." : "부동산 앱에서 본 실제 평면도를 캡처해 올리면, 방 자리와 크기를 읽어 이 집 구조로 바꿔요."}</p>
 <div class="hvo-photo-btns"><button type="button" class="btn btn--ghost btn--sm" id="hvoPick">평면도 사진으로 실제 구조 만들기</button>${this.photo ? '<button type="button" class="btn btn--ghost btn--sm" id="hvoReset">표준 구조로 되돌리기</button>' : ""}</div>
 <input type="file" id="hvoFile" accept="image/png,image/jpeg,image/webp" hidden>
 <p class="small muted" id="hvoMsg" role="status" aria-live="polite"></p>
