@@ -402,6 +402,18 @@ b=R(b,'<li><a class="nav__link" href="#house" data-route="house"><span>집 보�
 b=R(b,'<li><a href="#house" data-route="house"><b>집 보기</b><i>House</i></a></li>','<li><a href="#house" data-route="house"><b>집 보기</b><i>House</i></a></li>\n      <li><a href="#rent" data-route="rent"><b>원룸·투룸·오피스텔</b><i>Rent</i></a></li>')
 b=R(b,'<path d="M4 7.5 12 12l8-4.5M12 12v9"/></svg>집 보기</a>','<path d="M4 7.5 12 12l8-4.5M12 12v9"/></svg>집 보기</a>\n  <a href="#rent" data-route="rent"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><path d="M5 20V8l7-4 7 4v12z"/><path d="M9 20v-5h6v5M9 10.5h.01M15 10.5h.01"/></svg>전월세</a>')
 h=h.replace('.tabbar{display:grid;grid-template-columns:repeat(4,1fr);','.tabbar{display:grid;grid-template-columns:repeat(5,1fr);')
+# 공개 링크 미리보기: thumb.png(1200×630, public/ → dist 루트, bangbom/src/tools/make_thumb.mjs). <head> 맨 앞쪽(처음 8KB 안)에 두고,
+# og·twitter 문구와 설명은 지금 홈 히어로 문구으로 맞춘다. 앞의 R() 들이 예전 문장을 바꾼 뒤라 맨 끝에서 한다
+_desc='대구에서 집을 구하는 청년이 내 조건을 넣으면 받을 수 있는 대출·지원을 따져 주고, 요건이 맞는 집을 지도에서 밝혀 주고, 평면도·3D로 방 안까지 미리 살아 보게 해요.'
+_ttl='방봄 BANGBOM · 가 보기 전에, 먼저 살아보는 집'
+for _pat,_new in [(r'<meta name="description" content="[^"]*">','<meta name="description" content="'+_desc+'">'),
+                  (r'<meta property="og:title" content="[^"]*">','<meta property="og:title" content="'+_ttl+'">'),
+                  (r'<meta property="og:description" content="[^"]*">','<meta property="og:description" content="'+_desc+'">'),
+                  (r'<meta property="og:image" content="[^"]*">','<meta property="og:image" content="thumb.png">\n<meta property="og:image:width" content="1200">\n<meta property="og:image:height" content="630">'),
+                  (r'<meta name="twitter:title" content="[^"]*">','<meta name="twitter:title" content="'+_ttl+'">'),
+                  (r'<meta name="twitter:description" content="[^"]*">','<meta name="twitter:description" content="'+_desc+'">')]:
+    h,_n=re.subn(_pat,_new,h,count=1); assert _n==1, _pat
+h=R(h,'<meta charset="UTF-8">\n','<meta charset="UTF-8">\n<link rel="artifact-thumbnail" href="thumb.png">\n')
 out=h+b.replace('</body>','').replace('</html>','')+tail
 open(os.path.join(HERE,'../../index.html'),'w',encoding='utf-8').write(out)
 print('ok', len(out))
