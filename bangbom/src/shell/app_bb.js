@@ -845,11 +845,40 @@ const Consult = {
 };
 
 /* ─── 평면 그림 (홈 갤러리용) ─── */
+/* 평면도 그림 공통 (단지 카드·홈 갤러리·집 전체 구조). 1 = 1cm. 바닥은 재질 무늬(방·거실 마루, 욕실 타일, 주방 타일, 현관·드레스룸 돌),
+   벽은 진한 숯색, 창문은 흰 겹선, 문은 방 안쪽으로 열리는 호. extra 는 바닥과 벽 사이에 끼울 그림(놓아 둔 가구 자리 등) */
+function planArt(L, extra = "", pad = .5) {
+  const s = 100, P = v => Math.round((v + pad) * s), len = v => Math.round(v * s), id = "pa" + (planArt.n = (planArt.n || 0) + 1);
+  const defs = `<defs>
+<pattern id="${id}w" width="140" height="44" patternUnits="userSpaceOnUse"><rect width="140" height="44" fill="#eedfc6"/><path d="M0 21H140M0 43H140M46 0V22M116 22V44" stroke="#e0cdaa" stroke-width="2"/></pattern>
+<pattern id="${id}t" width="30" height="30" patternUnits="userSpaceOnUse"><rect width="30" height="30" fill="#e9eef0"/><path d="M0 29H30M29 0V30" stroke="#d6dfe2" stroke-width="2"/></pattern>
+<pattern id="${id}k" width="40" height="40" patternUnits="userSpaceOnUse"><rect width="40" height="40" fill="#f2eee6"/><path d="M0 39H40M39 0V40" stroke="#e3ddd1" stroke-width="2"/></pattern>
+<pattern id="${id}s" width="60" height="60" patternUnits="userSpaceOnUse"><rect width="60" height="60" fill="#e7e4dd"/><path d="M0 59H60M59 0V60" stroke="#d9d5cc" stroke-width="2"/></pattern>
+<filter id="${id}f" x="-10%" y="-10%" width="120%" height="120%"><feGaussianBlur stdDeviation="14"/></filter></defs>`;
+  const fill = r => `url(#${id}${r.type === "bath" ? "t" : r.type === "kitchen" ? "k" : r.type === "hall" || r.type === "dress" ? "s" : "w"})`;
+  const shadow = `<rect x="${P(0) + 10}" y="${P(0) + 18}" width="${len(L.W)}" height="${len(L.D)}" fill="#141714" opacity=".16" filter="url(#${id}f)"/>`;
+  const floors = L.rooms.map(r => `<rect x="${P(r.x)}" y="${P(r.z)}" width="${len(r.w)}" height="${len(r.d)}" fill="${fill(r)}"/>`).join("");
+  /* 벽 조각은 모서리에서 벽 두께 절반보다 조금 더 나와 있다. 집 테두리에서 잘라 모서리가 반듯하게 한다 */
+  const cut = (p, v) => P(Math.max(-.07, Math.min((p.axis === "x" ? L.W : L.D) + .07, v)));
+  const walls = L.pieces.filter(p => p.kind === "solid").map(p => p.axis === "x" ? `<line x1="${cut(p, p.a)}" y1="${P(p.c)}" x2="${cut(p, p.b)}" y2="${P(p.c)}"/>` : `<line x1="${P(p.c)}" y1="${cut(p, p.a)}" x2="${P(p.c)}" y2="${cut(p, p.b)}"/>`).join("");
+  const wins = L.pieces.filter(p => p.kind === "glass").map(p => p.axis === "x" ? `<rect x="${P(p.a)}" y="${P(p.c) - 7}" width="${len(p.b - p.a)}" height="14"/>` : `<rect x="${P(p.c) - 7}" y="${P(p.a)}" width="14" height="${len(p.b - p.a)}"/>`).join("");
+  const glassLine = L.pieces.filter(p => p.kind === "glass").map(p => p.axis === "x" ? `M${P(p.a)} ${P(p.c)}H${P(p.b)}` : `M${P(p.c)} ${P(p.a)}V${P(p.b)}`).join("");
+  /* 문: 경첩(a 쪽)에서 방 안쪽으로 열린 문짝과 열리는 길(호). 현관은 집 안쪽으로 */
+  const doors = L.doors.map(d => {
+    const r = d.room && L.rooms.find(x => x.id === d.room), w = len(d.b - d.a), ax = P(d.a), bx = P(d.b), c = P(d.c);
+    let dir = d.entry ? (L.entry.side === "N" || L.entry.side === "W" ? 1 : -1) : r ? ((d.axis === "x" ? r.z + r.d / 2 : r.x + r.w / 2) > d.c ? 1 : -1) : 1;
+    if (d.axis === "x") return `<path d="M${ax} ${c}V${c + dir * w}A${w} ${w} 0 0 ${dir > 0 ? 0 : 1} ${bx} ${c}"/>`;
+    return `<path d="M${c} ${ax}H${c + dir * w}A${w} ${w} 0 0 ${dir > 0 ? 1 : 0} ${c} ${bx}"/>`;
+  }).join("");
+  return defs + shadow + floors + extra
+    + `<g fill="none" stroke="#8b8f8a" stroke-width="3" stroke-dasharray="10 8">${doors}</g>`
+    + `<g stroke="#2b302c" stroke-width="16" stroke-linecap="square">${walls}</g>`
+    + `<g fill="#fff" stroke="#2b302c" stroke-width="3">${wins}</g><path d="${glassLine}" stroke="#2b302c" stroke-width="2" fill="none"/>`;
+}
 function planSVG(L) {
   const pad = .5, s = 100, vw = (L.W + pad * 2) * s, vh = (L.D + pad * 2) * s;
-  const rooms = L.rooms.map(r => `<rect x="${(r.x + pad) * s}" y="${(r.z + pad) * s}" width="${r.w * s}" height="${r.d * s}" fill="${r.type === "bath" ? "#e6e8e4" : r.type === "kitchen" ? "#efe7da" : r.type === "hall" || r.type === "dress" ? "#ece8e0" : "#f4ede1"}"/><text x="${(r.x + r.w / 2 + pad) * s}" y="${(r.z + r.d / 2 + pad) * s}" font-size="${Math.min(30, r.w * 11)}" text-anchor="middle" dominant-baseline="middle" fill="#71746f" font-family="Pretendard, sans-serif">${esc(r.name)}</text>`).join("");
-  const walls = L.pieces.filter(p => p.kind === "solid" || p.kind === "sill").map(p => p.axis === "x" ? `<line x1="${(p.a + pad) * s}" y1="${(p.c + pad) * s}" x2="${(p.b + pad) * s}" y2="${(p.c + pad) * s}"/>` : `<line x1="${(p.c + pad) * s}" y1="${(p.a + pad) * s}" x2="${(p.c + pad) * s}" y2="${(p.b + pad) * s}"/>`).join("");
-  return `<svg viewBox="0 0 ${vw} ${vh}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="${esc(L.name)} 평면도"><rect width="100%" height="100%" fill="#fcfbf9"/>${rooms}<g stroke="#1f6b4f" stroke-width="13" stroke-linecap="square">${walls}</g></svg>`;
+  const names = L.rooms.map(r => `<text x="${(r.x + r.w / 2 + pad) * s}" y="${(r.z + r.d / 2 + pad) * s}" font-size="${Math.min(28, r.w * 10)}" font-weight="600" text-anchor="middle" dominant-baseline="middle" fill="#3d413d" font-family="PretendardLocal, Pretendard, sans-serif">${esc(r.name)}</text>`).join("");
+  return `<svg viewBox="0 0 ${vw} ${vh}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="${esc(L.name)} 평면도"><rect width="100%" height="100%" fill="#fbfaf7"/>${planArt(L)}${names}</svg>`;
 }
 
 /* ─── 시작 ─── */

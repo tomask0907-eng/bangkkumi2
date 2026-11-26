@@ -94,3 +94,11 @@ body.house-mode .nav{background:var(--bg)}
 #mh .hvo-fix ul{list-style:none;margin:0 0 10px;padding:0;display:grid;gap:6px}
 #mh .hvo-fix li{display:grid;grid-template-columns:minmax(60px,1fr) auto auto;gap:8px;align-items:center;font-size:14px}
 #mh .hvo-fix input{width:84px;height:40px;padding:0 8px;font-size:16px;border:1px solid var(--line,#e3e1db);border-radius:10px;background:#fff}
+
+/* 집 전체 3D: 평면도 자리에 같은 크기로 끼운다 */
+#mh .hv3-bar,#mh .hv3-rooms{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 12px}
+#mh .hv3-rooms{margin:12px 0 0}
+#mh .hv3-b{height:38px;padding:0 16px;border-radius:999px;border:1px solid var(--card-line);background:#fff;font-size:14px;font-weight:600;color:var(--ink)}
+#mh .hv3-b.is-on{background:var(--ink);border-color:var(--ink);color:#fff}
+#mh .hvo-fig.is-3d .hv3-cv{display:block;width:100%;aspect-ratio:var(--ar);min-height:320px;border-radius:20px;touch-action:none;cursor:grab;background:#f3f1ec}
+#mh .hvo-fig.is-3d .hvo-key{display:none}

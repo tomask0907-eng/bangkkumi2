@@ -50,7 +50,7 @@ const House = {
       const room = p && Array.isArray(p.rooms) ? p.rooms.find(x => x && x.id === p.activeRoomId) || p.rooms[0] : null;
       if (!room || !num(room.widthCm) || !num(room.depthCm) || room.widthCm <= 0 || room.depthCm <= 0 || !Array.isArray(room.furniture)) return null;
       const items = room.furniture.filter(f => f && [f.xCm, f.yCm, f.widthCm, f.depthCm].every(num) && f.widthCm > 0 && f.depthCm > 0).slice(0, 60);
-      return { w: room.widthCm, d: room.depthCm, items: items.map(f => ({ x: f.xCm, y: f.yCm, w: f.widthCm, d: f.depthCm, rot: num(f.rotation) ? f.rotation : 0 })) };
+      return { w: room.widthCm, d: room.depthCm, items: items.map(f => ({ x: f.xCm, y: f.yCm, w: f.widthCm, d: f.depthCm, rot: num(f.rotation) ? f.rotation : 0, h: num(f.heightCm) ? f.heightCm : null, cat: typeof f.category === "string" ? f.category : "", color: typeof f.color === "string" && /^#[0-9a-f]{6}$/i.test(f.color) ? f.color : null })) };
     } catch (e) { return null; }
   },
   open(cid) {
@@ -108,13 +108,13 @@ const House = {
     if (this.loaded) { this.loaded = null; this.swap(""); }
     this.shown = null;
     $("#hvOver").innerHTML = this.overHTML(c, L, rooms);
-    this.mode(false);
+    this.mode(false); this.sync3d(L, rooms);
     /* 방에서 돌아왔으면 그 방 단추에 초점을 둔다 (키보드로 이어서 고를 수 있게) */
     const b = left && $(`#hvOver .hvo-room[data-room="${left}"]`);
     if (b && (document.activeElement === document.body || $("#houseView").contains(document.activeElement))) b.focus({ preventScroll: true });
   },
   /* 집 전체 구조: 평면도(벽·문 자리·창문·입구·방 이름과 크기·놓아 둔 가구 자리)와 꾸밀 방 목록.
-     그림의 말투는 단지 카드의 작은 평면도(planSVG)와 같다: 초록 벽, 1 = 1cm. 꾸밀 수 있는 방만 단추이고 나머지는 조용한 글자다 */
+     그림은 단지 카드의 작은 평면도와 같은 planArt 를 쓴다(1 = 1cm). 꾸밀 수 있는 방만 단추이고 나머지는 조용한 글자다 */
   overHTML(c, L, rooms) {
     const pad = .5, s = 100, vw = (L.W + pad * 2) * s, vh = (L.D + pad * 2) * s;
     const P = v => Math.round((v + pad) * s), len = v => Math.round(v * s), pc = v => (v * 100).toFixed(2) + "%", n1 = v => Math.round(v * 10) / 10;
@@ -122,16 +122,11 @@ const House = {
     const box = r => `left:${pc(P(r.x) / vw)};top:${pc(P(r.z) / vh)};width:${pc(len(r.w) / vw)};height:${pc(len(r.d) / vh)}`;
     const mine = {}; rooms.forEach(r => { mine[r.id] = this.saved(this.sb + "-" + r.id); });
     const count = r => mine[r.id] ? mine[r.id].items.length : 0;
-    const fills = L.rooms.map(r => `<rect x="${P(r.x)}" y="${P(r.z)}" width="${len(r.w)}" height="${len(r.d)}" fill="${r.id in mine ? "#fff" : "#eceae5"}"/>`).join("");
     /* 방마다 저장된 방 크기(cm)를 그대로 좌표로 쓰는 작은 그림을 끼운다. 방 밖으로 나간 부분은 잘린다 */
     const furs = rooms.map(r => count(r) ? `<svg data-fur="${r.id}" x="${P(r.x)}" y="${P(r.z)}" width="${len(r.w)}" height="${len(r.d)}" viewBox="0 0 ${n1(mine[r.id].w)} ${n1(mine[r.id].d)}" preserveAspectRatio="none">${mine[r.id].items.map(f => {
       const turned = Math.abs(Math.round(f.rot / 90)) % 2 === 1, cx = f.x + (turned ? f.d : f.w) / 2, cy = f.y + (turned ? f.w : f.d) / 2;
       return `<rect x="${n1(cx - f.w / 2)}" y="${n1(cy - f.d / 2)}" width="${n1(f.w)}" height="${n1(f.d)}" rx="3" transform="rotate(${n1(f.rot)} ${n1(cx)} ${n1(cy)})"/>`;
     }).join("")}</svg>` : "").join("");
-    /* 벽 조각은 모서리에서 벽 두께 절반보다 조금 더 나와 있다. 집 테두리(벽 두께 절반)에서 잘라 모서리가 반듯하게 한다 */
-    const cut = (p, v) => P(Math.max(-.065, Math.min((p.axis === "x" ? L.W : L.D) + .065, v)));
-    const walls = L.pieces.filter(p => p.kind === "solid").map(p => p.axis === "x" ? `<line x1="${cut(p, p.a)}" y1="${P(p.c)}" x2="${cut(p, p.b)}" y2="${P(p.c)}"/>` : `<line x1="${P(p.c)}" y1="${cut(p, p.a)}" x2="${P(p.c)}" y2="${cut(p, p.b)}"/>`).join("");
-    const wins = L.pieces.filter(p => p.kind === "glass").map(p => p.axis === "x" ? `<rect x="${P(p.a)}" y="${P(p.c) - 6.5}" width="${len(p.b - p.a)}" height="13"/>` : `<rect x="${P(p.c) - 6.5}" y="${P(p.a)}" width="13" height="${len(p.b - p.a)}"/>`).join("");
     /* 입구: 현관문 바깥에서 집 안쪽을 가리키는 세모 */
     const e = L.entry, m = P(e.m), out = e.side === "N" || e.side === "W" ? -1 : 1, tip = P(e.c) + out * 10, base = tip + out * 34;
     const tri = e.axis === "z" ? `${tip},${m} ${base},${m - 24} ${base},${m + 24}` : `${m},${tip} ${m - 24},${base} ${m + 24},${base}`;
@@ -143,15 +138,35 @@ const House = {
     return `<div class="hvo">
 <h2 class="hvo-lead">꾸미고 싶은 방을 눌러 주세요.</h2>
 <div class="hvo-fig" style="--ar:${(vw / vh).toFixed(4)}">
+${HAS3D ? `<div class="hv3-bar" role="group" aria-label="보는 방법"><button type="button" class="hv3-b" data-v3="plan">평면도</button><button type="button" class="hv3-b" data-v3="bird">3D 위에서</button><button type="button" class="hv3-b" data-v3="walk">3D 안에서 걷기</button></div>` : ""}
 <div class="hvo-plan" role="group" aria-label="${esc(L.name)} 평면도 (${this.photo ? "사진에서 읽은 추정값" : "표준 구조 단순화"})">
-<svg viewBox="0 0 ${vw} ${vh}" aria-hidden="true" focusable="false">${fills}<g class="hvo-fur" fill="#f1e6d3" stroke="#9a8f79" stroke-width="2">${furs}</g><g stroke="#1f6b4f" stroke-width="13">${walls}</g><g fill="#fff" stroke="#1f6b4f" stroke-width="3">${wins}</g><polygon class="hvo-entry" points="${tri}" fill="#141714"/></svg>
+<svg viewBox="0 0 ${vw} ${vh}" aria-hidden="true" focusable="false">${planArt(L, `<g class="hvo-fur" fill="#fffaf2" stroke="#9a8f79" stroke-width="3">${furs}</g>`)}<polygon class="hvo-entry" points="${tri}" fill="#141714"/></svg>
 ${labels}
 </div>
-<p class="hvo-key">${key('<path d="M4 7 16 1v12z" fill="#141714"/>', "입구")}${key('<rect x="1.5" y="4" width="17" height="6" fill="#fff" stroke="#1f6b4f" stroke-width="1.5"/>', "창문")}${rooms.some(count) ? key('<rect x="2.5" y="1.5" width="15" height="11" rx="1.5" fill="#f1e6d3" stroke="#9a8f79"/>', "놓아 둔 가구") : ""}</p>
+<p class="hvo-key">${key('<path d="M4 7 16 1v12z" fill="#141714"/>', "입구")}${key('<rect x="1.5" y="4" width="17" height="6" fill="#fff" stroke="#2b302c" stroke-width="1.5"/><path d="M1.5 7h17" stroke="#2b302c"/>', "창문")}${key('<path d="M3 13V3a10 10 0 0 1 10 10" fill="none" stroke="#8b8f8a" stroke-dasharray="2.5 2"/>', "문")}${rooms.some(count) ? key('<rect x="2.5" y="1.5" width="15" height="11" rx="1.5" fill="#f1e6d3" stroke="#9a8f79"/>', "놓아 둔 가구") : ""}</p>
 </div>
 <ul class="hvo-list">${list}</ul>
 ${this.photo ? `<p class="hvo-note">평면도 사진에서 읽은 추정값이에요. 실제 치수와 다를 수 있어요. 방 크기는 아래에서 고칠 수 있고, 꾸민 배치는 이 브라우저에만 저장돼요.</p>` : `<p class="hvo-note">표준 구조로 단순화한 평면이에요.${c.area_m2 !== L.area ? ` 이 단지는 ${c.area_m2}㎡인데 ${L.area}㎡ 구조로 대신 보여 드려요.` : ""} 공고 평면도 원본이 아니고, 방 크기도 실제와 다를 수 있어요. 꾸민 배치는 이 브라우저에만 저장돼요.</p>`}${this.photoHTML(L)}
 </div>`;
+  },
+  /* 3D 보기: view3d 가 "bird" | "walk" 이면 평면도 자리에 3D 그림을 끼운다. 다시 그려도(innerHTML) 같은 그림을 다시 붙인다 */
+  sync3d(L, rooms) {
+    const fig = $("#hvOver .hvo-fig"), plan = fig && $(".hvo-plan", fig); if (!fig) return;
+    $$("#hvOver [data-v3]").forEach(b => { const on = b.dataset.v3 === (this.view3d || "plan"); b.classList.toggle("is-on", on); b.setAttribute("aria-pressed", on); });
+    $$("#hvOver [data-v3]").forEach(b => b.onclick = () => { this.view3d = b.dataset.v3 === "plan" ? null : b.dataset.v3; this.sync3d(L, rooms); });
+    if (!this.view3d || !Whole3D.init()) { this.view3d = null; if (Whole3D.cv) Whole3D.cv.remove(); const rb = $("#hvOver .hv3-rooms"); if (rb) rb.remove(); if (plan) plan.hidden = false; fig.classList.remove("is-3d"); return; }
+    if (plan) plan.hidden = true; fig.classList.add("is-3d");
+    if (Whole3D.cv.parentNode !== fig) { const bar = $(".hv3-bar", fig); if (bar) bar.after(Whole3D.cv); else fig.prepend(Whole3D.cv); }
+    const mine = {}; rooms.forEach(r => { mine[r.id] = this.saved(this.sb + "-" + r.id); });
+    Whole3D.build(L, r => mine[r.id] ? mine[r.id].items : null);
+    if (Whole3D.view !== this.view3d || this.view3d === "walk") Whole3D.setView(this.view3d === "walk" ? "walk" : "bird");
+    let rb = $("#hvOver .hv3-rooms");
+    if (this.view3d === "walk") {
+      if (!rb) { rb = document.createElement("div"); rb.className = "hv3-rooms"; rb.setAttribute("role", "group"); rb.setAttribute("aria-label", "서 있을 방"); fig.append(rb); }
+      rb.innerHTML = L.rooms.filter(r => r.type !== "hall").map(r => `<button type="button" class="hv3-b${Whole3D.room === r.id ? " is-on" : ""}" data-w3="${r.id}">${esc(r.name)}</button>`).join("");
+      $$("[data-w3]", rb).forEach(b => b.onclick = () => { Whole3D.goRoom(b.dataset.w3); $$("[data-w3]", rb).forEach(x => x.classList.toggle("is-on", x === b)); });
+    } else if (rb) rb.remove();
+    requestAnimationFrame(() => Whole3D.resize());
   },
   /* 이 단지에 저장된 사진 구조가 있으면 그것을, 없으면 표준 구조를 쓴다. 저장된 값이 망가졌으면 지운다 */
   layoutKey(c) {
@@ -211,4 +226,73 @@ ${this.photo ? `<details class="hvo-fix"><summary>방 크기 고치기 (cm)</sum
   },
   /* 집 보기를 떠난다. 열어 둔 방은 그대로 두어서 뒤로 가기로 돌아오면 바로 보인다 */
   close() { this.on = false; this.shown = null; }
+};
+
+/* ═══════ 집 전체 3D (전체 구조 화면 안): 위에서 돌려 보기 · 방 안에서 둘러보기 ═══════
+   벽·창문은 buildLayout 의 조각(pieces)을 그대로 세우고, 방마다 방꾸미에서 꾸민 가구(저장소)를 그 방 자리에 놓는다.
+   가구 크기·자리는 저장된 값(cm)을 그대로 쓰고 새로 계산하지 않는다. 3D를 못 쓰면 단추를 숨기고 평면도만 둔다 */
+const Whole3D = {
+  ok: false, L: null, view: "bird", orbit: { th: .7, ph: .9, r: .74 }, look: { x: 0, z: 0, yaw: 0, pitch: -.12 },
+  init() {
+    if (this.ok) return true; if (!HAS3D) return false; this.ok = true;
+    const cv = this.cv = document.createElement("canvas"); cv.className = "hv3-cv"; cv.setAttribute("aria-label", "집 전체 3D. 끌어서 돌려 보고, 휠이나 두 손가락으로 확대해요");
+    this.r = renderer(cv); this.r.setClearColor(new T3.Color("#f3f1ec"), 1);
+    const sc = this.scene = new T3.Scene();
+    this.cam = new T3.PerspectiveCamera(40, 1, .05, 200); this.cam.rotation.order = "YXZ";
+    sc.add(new T3.HemisphereLight(0xfffaf2, 0xd9d2c4, .75));
+    const sun = new T3.DirectionalLight(0xfff3e2, 1.15); sun.position.set(6, 12, 9); sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048);
+    Object.assign(sun.shadow.camera, { left: -10, right: 10, top: 10, bottom: -10, near: 1, far: 40 }); sun.shadow.camera.updateProjectionMatrix(); sun.shadow.bias = -.0004; sc.add(sun);
+    dragInput(cv, {
+      drag: (dx, dy) => {
+        if (this.view === "bird") { this.orbit.th -= dx * .006; this.orbit.ph = clamp(this.orbit.ph - dy * .005, .35, 1.25); }
+        else { this.look.yaw -= dx * .005; this.look.pitch = clamp(this.look.pitch - dy * .004, -.9, .6); }
+      },
+      zoom: k => { if (this.view === "bird") this.orbit.r = clamp(this.orbit.r / k, .55, 1.8); else { this.cam.fov = clamp(this.cam.fov / k, 40, 85); this.cam.updateProjectionMatrix(); } }
+    });
+    new ResizeObserver(() => this.resize()).observe(cv);
+    const loop = () => { if (cv.isConnected && House.on && House.view3d) this.tick(); requestAnimationFrame(loop); }; requestAnimationFrame(loop);
+    return true;
+  },
+  build(L, furnOf) {
+    this.L = L;
+    if (this.root) { this.scene.remove(this.root); this.root.traverse(o => { if (o.geometry) o.geometry.dispose(); }); }
+    const root = this.root = new T3.Group(); root.position.set(-L.W / 2, 0, -L.D / 2); this.scene.add(root);
+    const base = box(L.W + .5, .2, L.D + .5, mat("#e4e0d8")); base.position.set(L.W / 2, -.105, L.D / 2); root.add(base);
+    const floorC = r => r.type === "bath" ? "#dfe4e5" : r.type === "kitchen" ? "#ebe6dc" : r.type === "hall" || r.type === "dress" ? "#dcd7ce" : "#d4b48c";
+    L.rooms.forEach(r => { const f = new T3.Mesh(new T3.PlaneGeometry(r.w, r.d), mat(floorC(r), { roughness: .75 })); f.rotation.x = -Math.PI / 2; f.position.set(r.x + r.w / 2, .004, r.z + r.d / 2); f.receiveShadow = true; root.add(f); });
+    this.walls = new T3.Group(); this.front = new T3.Group(); root.add(this.walls, this.front);
+    const wm = mat("#f6f3ee"), glass = new T3.MeshStandardMaterial({ color: 0xcfe0dc, transparent: true, opacity: .28, depthWrite: false });
+    L.pieces.forEach(p => {
+      const len = p.b - p.a, hh = p.y1 - p.y0, th = p.kind === "glass" ? .03 : .15, mid = (p.a + p.b) / 2;
+      const b = box(p.axis === "x" ? len : th, hh, p.axis === "x" ? th : len, p.kind === "glass" ? glass : wm);
+      b.position.set(p.axis === "x" ? mid : p.c, p.y0 + hh / 2, p.axis === "x" ? p.c : mid); (p.front ? this.front : this.walls).add(b);
+    });
+    /* 꾸민 가구: 자리(x, y)는 회전을 반영한 바닥 차지 영역의 왼쪽 위(cm) */
+    L.rooms.forEach(r => (furnOf(r) || []).forEach(f => {
+      const turned = Math.abs(Math.round(f.rot / 90)) % 2 === 1, fw = (turned ? f.d : f.w) / 100, fd = (turned ? f.w : f.d) / 100, h = clamp((f.h || 70) / 100, .03, 2.4);
+      const g = new T3.Group(), m = mat(f.color || "#d9cdb8", { roughness: .8 });
+      if (f.cat === "bed") { g.add(Object.assign(rbox(f.w / 100, .3, f.d / 100, .04, mat("#b88b5e")), {})); const top = rbox(f.w / 100 - .06, .18, f.d / 100 - .08, .06, mat("#f4f1ea")); top.position.y = .3; g.add(top); }
+      else if (f.cat === "mat") g.add(rbox(f.w / 100, .02, f.d / 100, .02, m));
+      else g.add(rbox(f.w / 100, h, f.d / 100, .03, m));
+      g.traverse(o => { if (o.isMesh) o.castShadow = true; });
+      g.rotation.y = -f.rot * Math.PI / 180; g.position.set(r.x + f.x / 100 + fw / 2, 0, r.z + f.y / 100 + fd / 2); root.add(g);
+    }));
+  },
+  setView(v) {
+    this.view = v; const L = this.L;
+    if (v === "walk" && L) { const r = L.rooms.find(x => x.type === "living") || L.rooms[0]; this.goRoom(r.id); }
+    this.cam.fov = v === "walk" ? 70 : 40; this.cam.updateProjectionMatrix();
+  },
+  /* 방의 한쪽 끝(벽에서 40cm)에 서서 긴 쪽을 바라본다. 카메라는 yaw 0 일 때 -z 를 본다 */
+  goRoom(id) { const r = this.L.rooms.find(x => x.id === id); if (!r) return; const m = Math.min(.4, r.w / 4, r.d / 4); this.look = r.w >= r.d ? { x: r.x + m, z: r.z + r.d / 2, yaw: -Math.PI / 2, pitch: -.15 } : { x: r.x + r.w / 2, z: r.z + r.d - m, yaw: 0, pitch: -.15 }; this.room = id; },
+  resize() { if (!this.cv) return; const w = this.cv.clientWidth, h = this.cv.clientHeight; if (!w || !h) return; this.r.setSize(w, h, false); this.cam.aspect = w / h; this.cam.updateProjectionMatrix(); },
+  tick() {
+    const L = this.L; if (!L) return; const cam = this.cam;
+    this.front.scale.y = this.view === "walk" ? 1 : .4; this.walls.scale.y = this.view === "walk" ? 1 : .62;
+    if (this.view === "bird") {
+      const o = this.orbit, fit = (Math.hypot(L.W, L.D) / 2 + .6) / Math.sin(Math.min(cam.fov * Math.PI / 180, 2 * Math.atan(Math.tan(cam.fov * Math.PI / 360) * cam.aspect)) / 2), r = fit * o.r;
+      cam.position.set(r * Math.sin(o.ph) * Math.sin(o.th), r * Math.cos(o.ph), r * Math.sin(o.ph) * Math.cos(o.th)); cam.up.set(0, 1, 0); cam.lookAt(0, .3, 0);
+    } else { cam.position.set(this.look.x - L.W / 2, 1.6, this.look.z - L.D / 2); cam.rotation.set(this.look.pitch, this.look.yaw, 0); }
+    this.r.render(this.scene, cam);
+  }
 };
