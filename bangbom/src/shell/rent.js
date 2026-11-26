@@ -20,10 +20,12 @@
   function load() {
     if (loading) return loading;
     loading = fetch("data/daegu_rent.json", { cache: "no-cache" }).then(r => r.ok ? r.json() : null).catch(() => null).then(d => {
-      if (!d || !Array.isArray(d.rows) || !Array.isArray(d.cols) || d.cols.join() !== COLS.join()) { rows = []; meta = null; return; }
+      if (!d || !Array.isArray(d.rows) || !Array.isArray(d.cols) || d.cols.slice(0, COLS.length).join() !== COLS.join()) { rows = []; meta = null; return; }
+      const at = { lat: d.cols.indexOf("lat"), lng: d.cols.indexOf("lng"), approx: d.cols.indexOf("approx") };
       meta = d.meta || {};
       rows = d.rows.filter(r => Array.isArray(r) && CAT[r[0]] && typeof r[7] === "number" && typeof r[8] === "number").map(r => {
         const x = {}; COLS.forEach((k, i) => { x[k] = r[i]; });
+        if (at.lat >= 0 && typeof r[at.lat] === "number" && typeof r[at.lng] === "number") { x.lat = r[at.lat]; x.lng = r[at.lng]; x.approx = !!r[at.approx]; }
         x.area = typeof x.area === "number" ? x.area : null; x.room = roomOf(x); x.kind = x.rent > 0 ? "월세" : "전세";
         return x;
       });
@@ -67,6 +69,16 @@
     f.dep = money(q("#rentDep")); f.mon = money(q("#rentMon")); shown = PAGE; render();
   }));
   q("#rentMore").addEventListener("click", () => { shown += PAGE; render(); });
+  /* 지도(app_bb.js MapView)가 쓴다: 받기, 같은 자리끼리 묶기, 방 종류 이름 */
+  window.BBRent = {
+    load: () => load().then(() => rows),
+    places(list) {
+      const by = new Map();
+      list.forEach(x => { if (x.lat == null) return; const k = x.lat.toFixed(5) + "," + x.lng.toFixed(5); let p = by.get(k); if (!p) by.set(k, p = { lat: x.lat, lng: x.lng, approx: x.approx, gu: x.gu, dong: x.dong, items: [] }); p.items.push(x); });
+      return [...by.values()];
+    },
+    roomKo: x => ROOM_KO[x.room] + (x.room === "one" || x.room === "two" || x.room === "three" ? "(추정)" : "")
+  };
   const go = () => { if (location.hash === "#rent") load().then(render); };
   addEventListener("hashchange", go); go();
 })();

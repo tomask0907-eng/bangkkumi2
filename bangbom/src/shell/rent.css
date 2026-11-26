@@ -34,4 +34,19 @@
 .rent-empty p{margin-top:8px;color:var(--sub);font-size:14px}
 @media (max-width:900px){.rent-fields{grid-template-columns:repeat(2,minmax(0,1fr))}.rent-fields .rent-f:last-child{grid-column:span 2}.rent-bar{top:var(--nav-h)}}
 @media (max-width:820px){.rent-list{grid-template-columns:minmax(0,1fr)}}
+/* 지도 카드 안 전월세 기록 */
+#mh .rr-sum{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-top:14px}
+#mh .rr-sum div{padding:12px 14px;border-radius:14px;background:var(--gray, #efeeea)}
+#mh .rr-sum span{display:block;font-size:12px;color:var(--sub)}
+#mh .rr-sum b{display:block;margin-top:2px;font-size:17px;font-weight:700;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+#mh .rr-sum small{font-size:12px;color:var(--sub)}
+#mh .rr-list{list-style:none;padding:0;margin:14px 0 0;display:grid;gap:8px}
+#mh .rr-list li{display:grid;grid-template-columns:auto 1fr;column-gap:8px;padding:10px 0;border-top:1px solid var(--line)}
+#mh .rr-k{grid-row:span 2;align-self:start;font-size:12px;font-weight:600;padding:2px 8px;border-radius:999px;background:var(--green-soft, #e2efe7);color:var(--green, #1f6b4f)}
+#mh .rr-list b{font-size:15px;font-weight:700;font-variant-numeric:tabular-nums}
+#mh .rr-s{font-size:12px;color:var(--sub)}
+#mh .dnav .dn-rent{color:var(--ink)}
+#mh .dnav .dn-rent::before{content:"";display:inline-block;width:8px;height:8px;margin-right:6px;border-radius:50%;background:#4f7396;vertical-align:1px}
+#mh .dnav .dn-rent.is-on{background:var(--ink);border-color:var(--ink);color:#fff}
+@media (max-width:820px){#mh .rr-sum,#mh .rr-list,#mh .cc > .small.muted{margin-left:16px;margin-right:16px}#mh .rr-list{padding-bottom:16px}}
 .rent [hidden],.rent-bar[hidden]{display:none!important}
