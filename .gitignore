@@ -73,3 +73,8 @@ bangbom/trace/art/
 .cache_rtms/
 .cache_rent/
 bangbom/trace/rtms_log.txt
+
+# 키를 적어 둔 메모 파일이 실수로 올라가지 않게
+*api키*
+*API키*
+*apikey*.txt
