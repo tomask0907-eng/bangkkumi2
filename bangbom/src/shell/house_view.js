@@ -171,6 +171,7 @@ ${HAS3D ? `<div class="hv3-bar" role="group" aria-label="보는 방법"><button 
 <div class="hvo-plan" role="group" aria-label="${esc(L.name)} 평면도 (${this.photo ? "사진에서 읽은 추정값" : "표준 구조 단순화"})">
 <svg viewBox="0 0 ${vw} ${vh}" aria-hidden="true" focusable="false">${planArt(L, `<g class="hvo-fur" fill="#fffaf2" stroke="#9a8f79" stroke-width="3">${furs}</g>`)}<polygon class="hvo-entry" points="${tri}" fill="#141714"/></svg>
 ${labels}
+<span class="hvo-dim is-x" aria-hidden="true" style="left:${pc(P(0) / vw)};width:${pc(len(L.W) / vw)}"><i>${L.W.toFixed(1)} m</i></span><span class="hvo-dim is-z" aria-hidden="true" style="top:${pc(P(0) / vh)};height:${pc(len(L.D) / vh)}"><i>${L.D.toFixed(1)} m</i></span>
 </div>
 <p class="hvo-key">${key('<path d="M4 7 16 1v12z" fill="#141714"/>', "입구")}${key('<rect x="1.5" y="4" width="17" height="6" fill="#fff" stroke="#2b302c" stroke-width="1.5"/><path d="M1.5 7h17" stroke="#2b302c"/>', "창문")}${key('<path d="M3 13V3a10 10 0 0 1 10 10" fill="none" stroke="#8b8f8a" stroke-dasharray="2.5 2"/>', "문")}${rooms.some(count) ? key('<rect x="2.5" y="1.5" width="15" height="11" rx="1.5" fill="#f1e6d3" stroke="#9a8f79"/>', "놓아 둔 가구") : ""}</p>
 </div>
