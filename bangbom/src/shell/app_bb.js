@@ -102,7 +102,7 @@ function renderPanels() {
     $("#pillsR").innerHTML = `<span class="pill-n">모은 돈 <b>${wonFull(S.profile.assets)}</b></span><span class="pill-n">월 예산 <b>${wonFull(S.profile.monthly_budget)}</b></span>${mn != null ? `<span class="pill-n">지원 반영 최저 <b>월 ${wonFull(mn)}</b></span>` : ""}`;
     $("#legend").innerHTML = "";
   } else {
-    $("#panelL").innerHTML = `<button class="x pl-x" aria-label="패널 닫기"><svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 3l10 10M13 3L3 13"/></svg></button><div class="jp jp--browse"><span class="eyebrow-s">Browse</span><h2>대구 미분양 ${COMPLEX.length}곳</h2><p class="muted small" style="margin-top:4px">${MapView.ok ? "단지를 누르면 주변 시설과 집 정보가 보여요" : "조건을 넣으면 대출·지원 판정은 볼 수 있어요"}</p><p class="muted small" style="margin-top:4px"><i style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#c99a6b;margin-right:6px"></i>작은 점 ${UNSOLD_LIST.length}곳: 대구시 공개 미분양 목록(2026.9.30) + 언론 보도 단지, 판정 없음</p>
+    $("#panelL").innerHTML = `<button class="x pl-x" aria-label="패널 닫기"><svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 3l10 10M13 3L3 13"/></svg></button><div class="jp jp--browse"><span class="eyebrow-s">Browse</span><h2>대구 미분양 ${COMPLEX.length}곳</h2><p class="muted small" style="margin-top:4px">${MapView.ok ? "단지를 누르면 주변 시설과 집 정보가 보여요" : "조건을 넣으면 대출·지원 판정은 볼 수 있어요"}</p><p class="muted small" style="margin-top:4px"><i style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#b8743a;margin-right:6px"></i>주황 핀 ${UNSOLD_LIST.filter(u => typeof UNSOLD_PRICE !== "undefined" && UNSOLD_PRICE[u.name]).length}곳: 공개 목록 중 최근 실거래가가 있는 단지<br><i style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#cdbfae;margin-right:6px"></i>베이지 핀 ${UNSOLD_LIST.filter(u => !(typeof UNSOLD_PRICE !== "undefined" && UNSOLD_PRICE[u.name])).length}곳: 실거래가 없음 · 핀을 누르면 가격과 출처가 보여요</p>
       <div class="jp-btns"><button class="btn btn--sm" id="bMatch">${S.profile ? "내 조건으로 보기" : "내 조건 넣고 불 켜기"} →</button></div></div>`;
     $("#bMatch").onclick = () => S.profile ? setMode("match") : (location.hash = "#input");
     $("#panelL").dataset.mode = "browse";
@@ -590,15 +590,21 @@ const MapView = {
   },
   buildUnsold() {
     /* 대구시 공개 미분양 목록: 작은 회색-주황 점. 판정 없음, 마우스 올림 라벨 없음(클릭만) */
-    const m = mat("#c99a6b"), geo = new T3.CylinderGeometry(.32, .32, .22, 16); geo.translate(0, .11, 0);
-    const hg = new T3.CylinderGeometry(.6, .6, .8, 8); hg.translate(0, .4, 0);
+    /* 지도를 MAP_K배로 키운 만큼 핀도 키운다. 실거래가가 있는 곳은 진한 주황, 없는 곳은 연한 베이지 */
+    const hasP = u => typeof UNSOLD_PRICE !== "undefined" && !!UNSOLD_PRICE[u.name];
+    const mOn = mat("#b8743a"), mOff = mat("#cdbfae"), mStem = mat("#8a7b6c");
+    const geo = new T3.CylinderGeometry(.85, .85, .32, 20); geo.translate(0, 2.2, 0);
+    const stem = new T3.CylinderGeometry(.09, .09, 2.2, 6); stem.translate(0, 1.1, 0);
+    const base = new T3.CylinderGeometry(.5, .5, .06, 16); base.translate(0, .03, 0);
+    const hg = new T3.CylinderGeometry(1.4, 1.4, 3, 8); hg.translate(0, 1.5, 0);
     const same = {}; /* 동 중심 근사로 같은 자리에 겹친 점은 작은 원으로 벌려 각각 누를 수 있게 */
     this.uPos = UNSOLD_LIST.map(u => { const key = u.lat + "," + u.lng, i = same[key] = (same[key] || 0) + 1, a = i * 2.4, r = i > 1 ? .75 * Math.sqrt(i - 1) : 0;
       let x = PX(u.lng) + Math.cos(a) * r, z = PZ(u.lat) + Math.sin(a) * r;
       const c = COMPLEX.find(c => Math.abs(x - c.map_x) < 2.2 && Math.abs(z - c.map_z) < 2.0); if (c) z = c.map_z + (z >= c.map_z ? 2.0 : -2.0); /* 판정 단지 건물에 가려지지 않게 */
       return [x, z]; });
     this.uHits = UNSOLD_LIST.map((u, k) => {
-      const [x, z] = this.uPos[k], d = new T3.Mesh(geo, m); d.position.set(x, 0, z); d.castShadow = true; this.decor.add(d);
+      const [x, z] = this.uPos[k], on = hasP(u);
+      [[geo, on ? mOn : mOff], [stem, mStem], [base, on ? mOn : mOff]].forEach(([g, mm]) => { const d = new T3.Mesh(g, mm); d.position.set(x, 0, z); d.castShadow = true; this.decor.add(d); });
       const hit = new T3.Mesh(hg, new T3.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false })); hit.position.set(x, 0, z); hit.userData.uk = k; this.scene.add(hit); return hit;
     });
   },
