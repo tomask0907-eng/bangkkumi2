@@ -282,7 +282,7 @@ body.card-open #mh .map-hint,#mh .map-hint.is-gone{opacity:0}
 }
 '''
 # 휴대폰 화면용 CSS (가장 마지막에 붙여서 위의 규칙을 덮어쓴다). 홈·이용 안내는 mobile_home.css, 입력·지도·집 보기·상담은 mobile_app.css
-mobile=''.join(open(os.path.join(HERE,n),encoding='utf-8').read() for n in ('home.css','rent.css','mobile_home.css','mobile_app.css','step_input.css','house_overview.css','tutorial.css','chat.css'))
+mobile=''.join(open(os.path.join(HERE,n),encoding='utf-8').read() for n in ('home.css','card.css','rent.css','mobile_home.css','mobile_app.css','step_input.css','house_overview.css','tutorial.css','chat.css'))
 h=R(h,'</style>\n</head>', mscoped+over+mobile+'\n</style>\n</head>')
 
 # ---------- BODY ----------

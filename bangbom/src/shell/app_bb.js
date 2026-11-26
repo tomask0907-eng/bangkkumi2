@@ -101,7 +101,7 @@ function renderPanels() {
   if (S.mode === "match" && S.pr) {
     const n = counts(), tot = n.on + n.dim + n.off || 1;
     const row = x => `<div class="jp-row" role="button" tabindex="0"><span class="ico ${x.status}">${ST_ICON[x.status]}</span><span class="nm">${esc(x.name)}</span><span class="st st--${x.status}">${ST_KO[x.status]}</span>
- $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+      <span class="jp-more">${esc(x.reason)}${x.rate_label ? `<br>금리 ${esc(x.rate_label)}` : ""}${rentWhy(x.id, x.status, x.reason) ? `<br>${rentWhy(x.id, x.status, x.reason)}` : ""}${x.check_items && x.check_items.length ? `<br>직접 확인할 것: ${esc(x.check_items.join(", "))}` : ""}<br>최종 결정: ${esc(x.approval_by)}${x.source_url ? ` · <a href="${esc(x.source_url)}" target="_blank" rel="noopener" style="pointer-events:auto">출처</a>` : ""}${x.checked_at ? ` · 확인일 ${esc(x.checked_at)}` : " · 기준일 확인 전(시연용)"}</span></div>`;
     $("#panelL").innerHTML = `<button class="x pl-x" aria-label="패널 닫기"><svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 3l10 10M13 3L3 13"/></svg></button><div class="jp${jpOpen ? " is-open" : ""}"><button class="jp-line m-only" id="jpLine" aria-expanded="${jpOpen}"><span>요건 충족 <b>${n.on}</b> · 확인 필요 <b>${n.dim}</b> · 미충족 <b>${n.off}</b></span><i>${jpOpen ? "접기" : "펼치기"}</i></button><span class="eyebrow-s">Your result</span><div class="jp-head"><h2>내 조건 판정</h2><button class="jp-fold" id="jpFold">${jpOpen ? "접기" : "대출·지원 보기"}</button></div>
       <div class="jp-list" ${jpOpen ? "" : "hidden"}>
         <p class="jp-date">기준 ${esc(RULES.version)} · 공고 확인값 + 가정치(시중금리 4.5% 등)</p>
@@ -134,6 +134,10 @@ function bindPl() { const x = $("#panelL .pl-x"); if (x) x.onclick = () => { plO
 function legendCats() { return Object.keys(CAT_KO).map(k => `<span class="cat"><i style="background:${CAT_LIGHT[k]}"></i>${CAT_KO[k]}</span>`).join(""); }
 
 /* ─── 단지 카드 ─── */
+/* 계산 내역 금액 표시: 소수 첫째 자리까지, .0 은 뺀다(15.0만 → 15만, 0.5만은 그대로). 0 인 줄은 zero 글자로 */
+/* 계산 내역 표 금액(원). 0이면 zero 글자 */
+const manT = v => wonFull(v);
+const manZ = (v, zero) => v == null || Math.abs(v) < .05 ? zero : manT(v);
 function whyLine(c) {
   const w = WHY[c.id]; if (!w) return "";
   const built = w.built ? `${w.built}년 준공${c.is_sample ? "(예시)" : ""}` : "준공 연도 확인 중";
@@ -150,24 +154,24 @@ function cardHTML(id) {
   const roomNote = noteText ? `<p class="small muted pc-only" style="margin-top:6px">${noteText}</p>` : "", roomNoteM = noteText ? `<p class="small muted m-only" style="margin-top:10px">${noteText}</p>` : "";
   const bd = match ? breakdown(c, ev) : null;
   const panes = [["sum", "요약"], bd && ["calc", "계산 내역"], match && ["sup", "지원"], match && ["chk", "체크리스트"], ["safe", "보증·권리 확인"], c.sale_price && ["sale", "매매"], ["near", "주변 시설"], match && ["link", "링크"], ["plan", "평면"]].filter(Boolean);
-  let head = `<div class="cc-plan" data-pane="plan">${planSVG(buildLayout(c.room_id || "room_84a"))}<span class="cc-plan-tag">평면 예시 · ${c.area_m2}㎡</span></div><div class="cc-top"><div><span class="eyebrow-s">${c.is_sample ? "Sample complex" : "Complex"}</span>${match ? `<span class="st st--${ev.light}">${LIGHT_ICON[ev.light]} ${LIGHT_KO[ev.light]}</span>` : ""}<h2 style="margin-top:${match ? 8 : 0}px">${esc(c.name)}</h2>
-    <div class="tags"><span class="tag">${SUPPLY_KO[c.supply_type]}</span><span class="tag">${esc(c.district)}</span><span class="tag">${c.area_m2}㎡</span>${c.supply_type === "lh_dundeun" ? '<span class="tag">공고·추첨</span>' : ""}${c.is_sample ? '<span class="sample">예시</span>' : ""}${match && brokerageBadge(S.profile, c) ? `<span class="tag">${esc(RULES.badges.brokerage.text)}</span>` : ""}</div>${!c.is_sample && c.source_url ? `<p class="small muted" style="margin-top:6px">보증금 출처: <a href="${esc(c.source_url)}" target="_blank" rel="noopener">${esc(c.source)}</a> · 확인일 ${esc(c.checked_at)}</p>` : ""}${whyLine(c)}</div>
-    <button class="x" id="ccX" aria-label="카드 닫기"><svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 3l10 10M13 3L3 13"/></svg></button></div>
+  let head = `<div class="cc-plan" data-pane="plan">${planSVG(buildLayout(c.room_id || "room_84a"))}<span class="cc-plan-tag">평면 예시 · ${c.area_m2}㎡</span></div><div class="cc-top"><div><span class="eyebrow-s">${c.is_sample ? "Sample complex" : "Complex"}</span>${match ? `<span class="st st--${ev.light}">${LIGHT_ICON[ev.light]} ${LIGHT_KO[ev.light]}</span>` : ""}<h2 style="margin-top:${match ? 8 : 0}px">${esc(c.name)}</h2>${whyLine(c)}
+    <div class="tags"><span class="tag">${SUPPLY_KO[c.supply_type]}</span><span class="tag">${esc(c.district)}</span><span class="tag">${c.area_m2}㎡</span>${c.supply_type === "lh_dundeun" ? '<span class="tag">공고·추첨</span>' : ""}${c.is_sample ? '<span class="sample">예시</span>' : ""}${match && brokerageBadge(S.profile, c) ? `<span class="tag">${esc(RULES.badges.brokerage.text)}</span>` : ""}</div><p class="cc-dep">보증금 <b>${wonK(c.deposit)}</b>${c.rent ? ` · 월세 ${wonFull(c.rent)}` : " · 전세"}</p>${!c.is_sample && c.source_url ? `<p class="small muted cc-src">보증금 출처: <a href="${esc(c.source_url)}" target="_blank" rel="noopener">${esc(c.source)}</a> · 확인일 ${esc(c.checked_at)}</p>` : ""}</div>
+    <button class="cc-big" id="ccBig" type="button" aria-label="크게 보기"><span aria-hidden="true">⤢</span></button><button class="x" id="ccX" aria-label="카드 닫기"><svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 3l10 10M13 3L3 13"/></svg></button></div>
     <div class="cc-chips m-only" role="tablist" aria-label="단지 정보 항목">${panes.map(p => `<button type="button" class="chip" role="tab" data-tab="${p[0]}">${p[1]}</button>`).join("")}</div>`;
   let body = `<div class="cc-panes">`;
   if (match) {
     const al = appliedLists(c, ev, S.pr);
     const main = ev.net_monthly != null ? ev.net_monthly : ev.net_monthly_best;
     body += ev.shortfall ? `<div class="cc-sum" data-pane="sum"><p class="big">자기자금이 모자라요<b class="is-off">${wonK(ev.shortfall)} 부족</b>보증금 ${wonK(c.deposit)} − 모은 돈 ${wonK(S.profile.assets)} = 필요 대출 ${wonK(ev.loan_needed)}</p>`
-      : `<p class="big">지원 반영 후 월 부담<b class="${ev.light === "off" ? "is-off" : ""}">월 ${wonFull(main)}</b>
-      ${ev.net_monthly == null && ev.net_monthly_best != null ? "요건 충족 지원만으로는 어려워요 · 확인 필요까지 받을 때 기준<br>" : ""}지원 모두 받으면 ${wonFull(ev.net_monthly_best)} · 하나도 못 받으면 ${wonFull(ev.net_monthly_worst)}</p>
+      : `<div class="cc-sum" data-pane="sum"><p class="big">지원 반영 후 월 부담<b class="${ev.light === "off" ? "is-off" : ""}">월 ${wonFull(main)}</b>
+      ${ev.net_monthly == null && ev.net_monthly_best != null ? "요건 충족 지원만으로는 어려워요 · 확인 필요까지 받을 때 기준<br>" : ""}지원 모두 받으면 ${wonFull(ev.net_monthly_best)} · 하나도 못 받으면 ${wonFull(ev.net_monthly_worst)} 원</p>
       ${ev.alts.length ? `<p class="small muted" style="margin-top:6px">다른 선택: ${ev.alts.slice(0, 2).map(a => `${esc(a.label)} 월 ${wonFull(a.net)}(${ST_KO[a.status]})`).join(" · ")}</p>` : ""}`;
     body += `<p class="why">${esc(ev.light_reason)}</p>${roomNoteM}</div>`;
     if (bd) body += `<details class="fold" data-pane="calc"><summary>계산 내역</summary><table class="calc"><tbody>
-      <tr><td>월세${bd.rent ? "" : `<br><span class="muted">전세 단지라 월세가 없어요 · 보증금 ${wonFull(c.deposit)}</span>`}</td><td>${wonFull(bd.rent)}</td></tr><tr><td>관리비${c.mgmt_known ? "" : " (추정)"}</td><td>${wonFull(bd.mgmt)}</td></tr>
-      <tr><td>보증금 대출이자<br><span class="muted">${bd.loan_needed ? esc(bd.calc) : `모은 돈이 보증금보다 많아 대출이 필요 없어요`}</span></td><td>${wonFull(bd.loan_interest)}</td></tr>
-      <tr><td>월세 지원</td><td class="neg">−${wonFull(bd.rent_support)}</td></tr>
-      <tr class="tot"><td>월 실부담 · ${esc(bd.financing)}</td><td>${wonFull(bd.total)}</td></tr></tbody></table>
+      <tr><td>월세${bd.rent ? "" : `<br><span class="muted">전세 단지라 월세가 없어요 · 보증금 ${wonFull(c.deposit)}</span>`}</td><td>${manZ(bd.rent, "없음")}</td></tr><tr><td>관리비${c.mgmt_known ? "" : " (추정)"}</td><td>${manZ(bd.mgmt, "–")}</td></tr>
+      <tr><td>보증금 대출이자<br><span class="muted">${bd.loan_needed ? esc(bd.calc) : `모은 돈이 보증금보다 많아 대출이 필요 없어요`}</span></td><td>${manZ(bd.loan_interest, "–")}</td></tr>
+      <tr><td>월세 지원</td>${Math.abs(bd.rent_support || 0) < .05 ? `<td class="muted">해당 없음</td>` : `<td class="neg">−${manT(bd.rent_support)}</td>`}</tr>
+      <tr class="tot"><td>월 실부담 · ${esc(bd.financing)}</td><td>${manT(bd.total)}</td></tr></tbody></table>
       <p class="small muted" style="margin-top:6px">실부담 = 월세 + 관리비 + 보증금 대출이자 − 월세지원 − 이자지원 (이자지원은 금리에서 빼서 계산). 중개수수료 지원은 1회라 월 부담에 넣지 않고 배지로만 보여줘요.</p></details>`;
     body += `<details class="fold" data-pane="sup"><summary>적용 지원 · 빠진 지원</summary><ul class="lst">${al.applied.map(a => `<li><span>${esc(a.name)}</span><span class="st st--${a.status}">${ST_KO[a.status]}</span></li>`).join("") || "<li><span>대출·지원 없이 계산</span><span></span></li>"}
       ${al.not_applied.map(a => `<li><span class="muted">${esc(a.name)}</span><span style="white-space:normal;text-align:right">${esc(a.reason)}${rentWhy(a.id, "ineligible", a.reason) ? `<br>${rentWhy(a.id, "ineligible", a.reason)}` : ""}</span></li>`).join("")}</ul></details>`;
@@ -175,7 +179,7 @@ function cardHTML(id) {
     const links = [...(APPLY_LINKS[c.supply_type] || []), ...al.applied.map(a => ({ label: a.name.replace("(시연용)", "") + " 안내", url: a.source_url }))];
     body += `<details class="fold" data-pane="link"><summary>신청·문의 링크</summary><div class="links">${links.map(l => l.url ? `<a href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.label)} ↗</a>` : `<span>${esc(l.label)} · 공고 확인 중</span>`).join("")}</div></details>`;
   } else {
-    body += `<div class="cc-sum" data-pane="sum"><p class="big">보증금<b>${wonK(c.deposit)}</b>${c.rent ? `월세 ${wonFull(c.rent)}` : "월세 없음 (전세)"} · 관리비 ${mg}</p><p class="why">내 조건을 넣으면 대출·지원을 반영한 실제 월 부담을 계산해 드려요.</p>${roomNoteM}</div>`;
+    body += `<div class="cc-sum" data-pane="sum"><p class="small">${c.rent ? `월세 ${wonFull(c.rent)}` : "월세 없음 (전세)"} · 관리비 ${mg}</p><p class="why">내 조건을 넣으면 대출·지원을 반영한 실제 월 부담을 계산해 드려요.</p>${roomNoteM}</div>`;
   }
   body += safetyHTML(c) + saleHTML(c, match ? (ev.shortfall ? null : (ev.net_monthly != null ? ev.net_monthly : ev.net_monthly_best)) : null);
   body += `<details class="fold" data-pane="near"><summary>가까운 시설</summary><p class="pane-h m-only">가까운 시설</p><ul class="lst">${near}</ul><p class="small muted" style="margin-top:6px">거리는 직선거리 × 1.3으로 추정했어요. 시설 위치는 실제 위치예요(OpenStreetMap·Wikidata).</p></details>`;
@@ -279,11 +283,43 @@ function openRent(pl) {
   $("#ccX").onclick = () => { closeCard(); MapView.rentSel = null; MapView.select(null); };
   document.body.classList.add("card-open"); syncPl();
 }
+/* ─── 단지 카드 크게 보기 ───
+   같은 cardHTML 을 그대로 쓰고 #panelR 에 is-big 만 붙인다(두 군데가 따로 놀지 않게). PC 는 가운데 넓은 창 두 칸, 휴대폰은 시트를 꼭대기까지.
+   닫기: X · Esc · 바깥 누르기 · 브라우저 뒤로가기. 닫으면 같은 함수로 원래 카드를 다시 그린다(지도 위치는 그대로). Tab 은 창 안에서만 돈다 */
+let cardBig = false;
+function bigOpen() {
+  const p = $("#panelR"); if (cardBig || !p.classList.contains("is-open") || !S.sel) return;
+  cardBig = true; let sc = $("#cardScrim"); if (!sc) { sc = document.createElement("div"); sc.id = "cardScrim"; sc.addEventListener("click", () => bigClose()); $("#mh").appendChild(sc); }
+  /* 오른쪽 칸에는 판정·계산 내역·지원·체크리스트·신청 링크를 펼친다. 보증·권리, 매매, 주변 시설은 접어 둔다(눌러서 펼침) */
+  $("details.fold", p).forEach(d => d.open = ["calc", "sup", "chk", "link"].includes(d.dataset.pane));
+  p.classList.add("is-big"); document.body.classList.add("card-big"); p.setAttribute("role", "dialog"); p.setAttribute("aria-modal", "true");
+  const b = $("#ccBig"); if (b) { b.setAttribute("aria-label", "작게 보기"); b.firstChild.textContent = "⤡"; }
+  const h = $(".cc-top h2", p); if (h) { h.tabIndex = -1; h.id = "ccTitle"; p.setAttribute("aria-labelledby", "ccTitle"); h.focus({ preventScroll: true }); }
+  try { history.pushState(Object.assign({}, history.state, { cardBig: 1 }), ""); } catch (er) {}
+}
+function bigReset() { cardBig = false; const p = $("#panelR"); p.classList.remove("is-big"); document.body.classList.remove("card-big"); ["role", "aria-modal", "aria-labelledby"].forEach(a => p.removeAttribute(a)); }
+function bigClose(fromPop) {
+  if (!cardBig) return; bigReset();
+  if (!fromPop && history.state && history.state.cardBig) { try { history.back(); } catch (er) {} }
+  if (S.sel && $("#panelR").classList.contains("is-open")) { openCard(S.sel); const b = $("#ccBig"); if (b) b.focus({ preventScroll: true }); }
+}
+addEventListener("popstate", () => { if (cardBig) bigClose(true); });
+addEventListener("keydown", e => {
+  if (!cardBig) return;
+  if (e.key === "Escape") { e.preventDefault(); e.stopImmediatePropagation(); bigClose(); return; }
+  if (e.key !== "Tab") return;
+  const f = $('#panelR a[href], #panelR button:not([disabled]), #panelR input, #panelR summary, #panelR [tabindex]:not([tabindex="-1"])').filter(x => x.offsetParent !== null);
+  if (!f.length) return; const a = f[0], z = f[f.length - 1];
+  if (e.shiftKey && (document.activeElement === a || !$("#panelR").contains(document.activeElement))) { e.preventDefault(); z.focus(); }
+  else if (!e.shiftKey && document.activeElement === z) { e.preventDefault(); a.focus(); }
+});
 function openCard(id) {
   if (S.tabFor !== id) { S.tab = "sum"; S.tabFor = id; }
   S.sel = id; const p = $("#panelR"); p.innerHTML = cardHTML(id); p.classList.add("is-open"); p.scrollTop = 0;
   const shut = () => { closeCard(); MapView.select(null); };
-  $("#ccX").onclick = shut;
+  /* 크게 보기 중의 X 는 원래 카드로 돌아간다 */
+  $("#ccX").onclick = () => cardBig ? bigClose() : shut();
+  const bb = $("#ccBig"); if (bb) bb.onclick = () => cardBig ? bigClose() : bigOpen();
   const cm = $("#ccMatch"); if (cm) cm.onclick = () => S.profile ? setMode("match") : (location.hash = "#input");
   const cc = $("#ccConsult"); if (cc) cc.onclick = () => askBot("이 단지 월 부담은 어떻게 계산했어요?");
   $$("[data-ck]").forEach(i => i.addEventListener("change", () => S.chk[i.dataset.ck] = i.checked));
@@ -299,6 +335,7 @@ function openCard(id) {
 }
 function closeCard() {
   const p = $("#panelR"), was = p.classList.contains("is-open");
+  if (cardBig) bigReset();
   document.body.classList.remove("card-open"); p.classList.remove("is-open"); p.style.transform = ""; syncPl();
 }
 
@@ -970,7 +1007,8 @@ Consult.init();
 PHONE.addEventListener("change", () => { if (!VIEW) return; syncPl(); setTab(S.tab || "sum"); Consult.fit(); });
 /* Escape: 메뉴가 열려 있으면 메뉴만 닫히고(shell.js), 아니면 상담 서랍 → 단지 카드 순서로 닫는다 */
 addEventListener("keydown", e => {
-  if (e.key !== "Escape" || !VIEW || document.body.classList.contains("menu-open")) return;
+  /* 크게 보기 중에는 크게 보기만 닫는다(위의 크게 보기 처리) */
+  if (e.key !== "Escape" || !VIEW || cardBig || document.body.classList.contains("menu-open")) return;
   const p = $("#panelR");
   if (Consult.isOpen) Consult.close();
   else if (p.classList.contains("is-open")) { const u = MapView.units[S.sel], back = p.contains(document.activeElement); closeCard(); MapView.select(null); if (back && u) u.lbl.focus({ preventScroll: true }); }
