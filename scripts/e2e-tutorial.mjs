@@ -195,7 +195,7 @@ async function run(cdp) {
     const a = await ev(`({ mode: __q.mode(), chip: __q.chip('nav'), st: __q.store(), api: [typeof MH.tutorial.open, typeof MH.tutorial.maybeStart, typeof MH.tutorial.reset, typeof MH.user.get, typeof MH.user.set, typeof MH.user.clear].join(), get: MH.user.get(), route: typeof MH.route })`)
     await hash('#guide'); const g = await ev('__q.mode()'); await hash('#home')
     await shot('pc-home-first')
-    const ok = !a.mode && !g && !a.chip && a.st.user === null && a.st.tut === null && a.api === 'function,function,function,function,function,function' && a.get === null && a.route === 'function'
+    const ok = !a.mode && !g && a.chip === '이름 정하기' && a.st.user === null && a.st.tut === null && a.api === 'function,function,function,function,function,function' && a.get === null && a.route === 'function'
     return { ok, evidence: `홈: 뜬 창="${a.mode}", 이용 안내: 뜬 창="${g}", 이름 칩="${a.chip}", 저장=${J(a.st)}, MH.tutorial·MH.user 함수=${a.api}, MH.route 그대로=${a.route}` }
   })
   await check('PC 2. 홈 "그냥 둘러보기"로 지도에 들어가면 시작 화면: 가운데 카드, 이름 칸, 정직한 안내, 뒤 화면 막힘', async () => {
@@ -286,7 +286,7 @@ async function run(cdp) {
     await key('Escape'); await waitFor(`!__q.mode()`, '닫힘', 3000); await sleep(400)
     const end = await ev(`({ st: __q.store(), focus: (() => { const a = document.activeElement; return a && a.matches('a.nav__link[data-route="map"]') })(), chip: __q.chip('nav'), hash: location.hash })`)
     const ok = /지울까요/.test(ask.text) && J(ask.btns) === J(['지우기', '취소']) && ask.st.user !== null && back.items === 3 && back.st.user !== null
-      && gone.st.user === null && gone.st.tut === null && !gone.chip && gone.any === 0 && /지웠어요/.test(gone.toast) && gone.focus === '#menuOpen' && !gone.mode
+      && gone.st.user === null && gone.st.tut === null && gone.chip === '이름 정하기' && /지웠어요/.test(gone.toast) && gone.focus === '#menuOpen' && !gone.mode
       && s.mode === 'start' && s.value === '' && t.title === GREET && mid.user && mid.user.name === '' && mid.tut === null
       && end.st.tut === 'done' && end.st.user.name === '' && end.focus && end.chip === '이름 정하기' && end.hash === '#map'
     return { ok, evidence: `확인="${ask.text}" 단추=${J(ask.btns)}(아직 저장 있음=${ask.st.user !== null}) / 취소 → 항목 ${back.items}개 / 지우기 → 저장=${J(gone.st)}, 칩 ${gone.any}개, 알림="${gone.toast}", 커서=${gone.focus} / 다시 들어가면 창=${s.mode}(빈 칸=${s.value === ''}) → Esc → "${t.title}" 저장=${J(mid)} → Esc → 본 기록=${end.st.tut}, 커서가 "집 찾기"로=${end.focus}, 칩="${end.chip}"` }
@@ -329,7 +329,7 @@ async function run(cdp) {
     await ev(`history.replaceState(null, '', location.pathname + location.hash)`); const on = await ev('MH.tutorial.maybeStart()'); await sleep(600); const m1 = await ev('__q.mode()')
     await hash('#home'); const m2 = await ev('__q.mode()')
     await ev(`history.replaceState(null, '', location.pathname + '?tutorial=0' + location.hash)`); await hash('#map'); const m3 = await ev('__q.mode()'), off = await ev('MH.tutorial.maybeStart()')
-    const ok = !a && !b && !c && ask === false && st.user === null && st.tut === null && chips === 0 && on === true && m1 === 'start' && !m2 && !m3 && off === false
+    const ok = !a && !b && !c && ask === false && st.user === null && st.tut === null && chips >= 1 && on === true && m1 === 'start' && !m2 && !m3 && off === false
     return { ok, evidence: `?tutorial=0#map 뜬 창="${a}", #input "${b}", #house "${c}", maybeStart()=${ask}, 저장=${J(st)}, 칩 ${chips}개 / 주소에서 뗀 뒤 maybeStart()=${on} → 창=${m1} / 다시 붙이고 지도로 → 창="${m3}", maybeStart()=${off}` }
   })
 
@@ -381,7 +381,7 @@ async function run(cdp) {
     await tap(q('#menuClose'), '메뉴 닫기'); await sleep(600)
     const ok = !bar && p.chip === NAME3 + '님' && p.touch >= 44 && p.over.docW <= 390 && m.items.length === 3 && m.touch.every((h) => h >= 44) && m.panelOpen && !!m.box && m.box.r <= 390
       && r.mode === 'rename' && r.value === NAME3 && r.b === 844 && r.w === 390 && after.chip === NAME4 + '님' && after.st.user.name === NAME4 && after.panelOpen
-      && askTouch.every((h) => h >= 44) && gone.st.user === null && gone.st.tut === null && gone.any === 0 && gone.focus === '#menuClose'
+      && askTouch.every((h) => h >= 44) && gone.st.user === null && gone.st.tut === null && gone.any >= 1 && gone.focus === '#menuClose'
     return { ok, evidence: `위 막대의 칩="${bar}"(없어야 함), 패널 안 칩="${p.chip}" 닿는 높이 ${p.touch}px, 항목=${J(m.items)} 닿는 높이=${J(m.touch)} / 이름 바꾸기 시트: 칸="${r.value}" y=${r.y}~${r.b} → 저장 뒤 칩="${after.chip}"(패널 열린 채=${after.panelOpen}) / 지우기 확인 단추 ${J(askTouch)}px → 저장=${J(gone.st)}, 칩 ${gone.any}개, 커서=${gone.focus}` }
   })
 

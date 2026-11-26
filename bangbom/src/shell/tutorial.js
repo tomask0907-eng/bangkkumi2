@@ -260,7 +260,8 @@
   const SLOTS = [["nav", "#menuOpen", "beforebegin"], ["panel", "#panel .panel__list", "afterend"]];
   const chip = {};
   function chips() {
-    const u = user.get(), on = !!u || seen(), named = !!(u && u.name);
+    /* 칩은 늘 둔다. 지운 뒤에도 "이름 정하기"로 남아서 다시 이름을 적을 수 있다 */
+    const u = user.get(), on = true, named = !!(u && u.name);
     SLOTS.forEach(([where, sel, pos]) => {
       let w = chip[where];
       if (!on) { if (w) { w.remove(); chip[where] = null; } return; }
@@ -297,9 +298,9 @@
     else if (act === "ask") { m.querySelector(".bbu__items").hidden = true; m.querySelector(".bbu__ask").hidden = false; m.querySelector('[data-bbu="cancel"]').focus(); }
     else if (act === "cancel") { menu(w, true); m.querySelector('[data-bbu="ask"]').focus(); }
     else if (act === "clear") {
-      /* 칩이 사라지므로 커서는 바로 옆 단추(메뉴 열기·닫기)로 옮긴다 */
+      /* 메뉴를 접고 칩은 "이름 정하기"로 돌아간다. 커서는 바로 옆 단추(메뉴 열기·닫기)로 옮긴다 */
       const next = document.getElementById(w.classList.contains("bbu--panel") ? "menuClose" : "menuOpen");
-      user.clear(); if (next) next.focus();
+      menu(w, false); user.clear(); if (next) next.focus();
       say("이름과 튜토리얼 기록을 이 브라우저에서 지웠어요.");
     } else {
       /* 이름 바꾸기 · 사용법 다시 보기: 창을 닫으면 칩으로 돌아오게 칩에 커서를 두고 연다 */
