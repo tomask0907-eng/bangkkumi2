@@ -831,6 +831,19 @@ async function runAll(cdp) {
       await dragPx({ x: p.x, y: p.y }, { x: p.x + dxCm * k, y: p.y + dyCm * k })
     }
 
+    /** 가구를 골라 둔 채, 가구 안쪽 왼쪽 가장자리 6px 안을 눌러 40cm·20cm 끈다. 크기는 그대로이고 자리만 바뀌어야 한다 @param {string} id */
+    async function dragSelectedNearEdge(id) {
+      await selectPiece(id)
+      const p = await piecePoint(id)
+      const k = await ev('__e2e.pxPerCm()')
+      // 벽에 붙은 가구는 벽 쪽으로 못 가니, 방 안쪽으로 끈다
+      const before = p.piece, dx = before.x > 100 ? -40 : 40, dy = before.y > 100 ? -20 : 20
+      const fx = p.x - (before.w * k) / 2 + Math.min(6, (before.w * k) / 4)
+      await dragPx({ x: fx, y: p.y }, { x: fx + dx * k, y: p.y + dy * k })
+      const after = (await piecePoint(id)).piece
+      return { before, after, dx, dy }
+    }
+
     /** 가구의 왼쪽 위가 (xCm, yCm)에 오도록 끈다 @param {string} id @param {number} xCm @param {number} yCm */
     async function dragPieceTo(id, xCm, yCm) {
       const p = await piecePoint(id)

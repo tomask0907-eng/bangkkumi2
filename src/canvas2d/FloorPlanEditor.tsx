@@ -38,6 +38,8 @@ const NO_GUIDES: SnapGuides = { x: null, y: null }
 const WALL_PX = 5
 const HANDLE_PX = 9
 const HANDLE_HIT_PX = 28
+/** 손가락으로 쓰는 화면인지 (휴대폰·태블릿) */
+const COARSE = typeof matchMedia === "function" && matchMedia("(pointer: coarse)").matches
 const LABEL_FONT_PX = 11
 const TOOLBAR_HALF_PX = 124
 /** 떠 있는 도구 막대의 높이(px). 휴대폰 틀에서는 단추가 44px라 더 높다 */
@@ -883,12 +885,16 @@ export default function FloorPlanEditor() {
               const hyPos = selectedRect.yCm + ((handle.hy + 1) / 2) * selectedRect.depthCm
               // 누르는 자리: 바깥으로는 넉넉하게, 안쪽으로는 가구를 다 덮지 않게 (가운데는 옮기기용으로 남긴다)
               const out = px(HANDLE_HIT_PX / 2)
-              const inX = Math.min(out, selectedRect.widthCm / 4)
-              const inY = Math.min(out, selectedRect.depthCm / 4)
-              const left = hxPos - (handle.hx === -1 ? out : inX)
-              const right = hxPos + (handle.hx === 1 ? out : inX)
-              const top = hyPos - (handle.hy === -1 ? out : inY)
-              const bottom = hyPos + (handle.hy === 1 ? out : inY)
+              // 모서리를 따라서는 이만큼 넓게 잡힌다
+              const alongX = Math.min(out, selectedRect.widthCm / 4)
+              const alongY = Math.min(out, selectedRect.depthCm / 4)
+              // 가구 안쪽으로 들어오는 깊이. 손가락 화면에서는 0: 가구 위를 누르면 늘 옮기기가 되게 한다 (손잡이는 바깥쪽에서 잡는다)
+              const inX = COARSE ? 0 : alongX
+              const inY = COARSE ? 0 : alongY
+              const left = hxPos - (handle.hx === -1 ? out : handle.hx === 1 ? inX : alongX)
+              const right = hxPos + (handle.hx === 1 ? out : handle.hx === -1 ? inX : alongX)
+              const top = hyPos - (handle.hy === -1 ? out : handle.hy === 1 ? inY : alongY)
+              const bottom = hyPos + (handle.hy === 1 ? out : handle.hy === -1 ? inY : alongY)
               const half = px(HANDLE_PX / 2)
               return (
                 <g
