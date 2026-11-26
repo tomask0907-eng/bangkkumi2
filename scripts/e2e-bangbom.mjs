@@ -144,7 +144,9 @@ async function run(cdp) {
   const shot = async (name) => { if (!SHOTS) return; mkdirSync(SHOTS, { recursive: true }); const r = await cdp.send('Page.captureScreenshot', { format: 'png' }); writeFileSync(path.join(SHOTS, name + '.png'), Buffer.from(r.data, 'base64')) }
   // 진짜로 누른다(PC 는 마우스, 휴대폰은 터치). 가려져 있으면 실패로 본다
   const tap = async (expr, label) => {
-    const p = await ev(`__q.pt(${expr})`)
+    // 화면 전환 효과(view transition) 중에는 잠깐 아무것도 안 잡힌다: 최대 1.5초 동안 다시 본다
+    let p = await ev(`__q.pt(${expr})`)
+    for (let i = 0; i < 10 && p && !p.hit; i++) { await sleep(150); p = await ev(`__q.pt(${expr})`) }
     if (!p) throw new Error(`${label}: 화면에서 찾지 못했어요`)
     if (!p.hit) throw new Error(`${label}: 누를 자리(${Math.round(p.x)},${Math.round(p.y)})가 ${p.by} 에 가려져 있어요`)
     if (touch) { await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: p.x, y: p.y }] }); await sleep(40); await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] }) }
@@ -184,6 +186,16 @@ async function run(cdp) {
   const key = async (k, vk) => { for (const type of ['keyDown', 'keyUp']) await cdp.send('Input.dispatchKeyEvent', { type, key: k, code: k, windowsVirtualKeyCode: vk, nativeVirtualKeyCode: vk }); await sleep(70) }
   // 칸을 비우고 글자를 하나씩 친다 (input 이벤트가 진짜처럼 난다)
   const typeIn = async (sel, text) => { await ev(`(() => { const i = ${q(sel)}; i.focus(); i.value = '' })()`); for (const ch of String(text)) await cdp.send('Input.dispatchKeyEvent', { type: 'char', text: ch }); await sleep(80) }
+  // 조건 입력 8문항을 한 칸씩 채운다 (선택형은 누르면 다음으로 넘어간다). 금액은 원 단위
+  const fillAll = async () => {
+    const next = async () => { await waitFor(`(__q.pt(${q('#stNext')}) || {}).hit`, '다음 단추가 눌릴 수 있게', 5000); await tap(q('#stNext'), '다음'); await sleep(250) }
+    await typeIn('#f-age', 27); await next()
+    await typeIn('#f-income', 2500000); await next()
+    await next() // 세전 연소득(선택) 비움
+    await typeIn('#f-assets', 10000000); await next()
+    for (const k of ['homeless', 'lives_with_parents', 'daegu_resident_or_moving']) { await tap(`${q('.seg[data-k="' + k + '"]')}.querySelector('button.is-on') || ${q('.seg[data-k="' + k + '"] button')}`, k); await sleep(400) }
+    await typeIn('#f-budget', 600000)
+  }
   // ms 동안 지도가 그린 횟수
   const gl = async (ms = 450) => { const a = await ev('__gl'); await sleep(ms); return (await ev('__gl')) - a }
   // 계산 내역 표의 합계 줄과 그 윗줄의 칸 자리
@@ -199,21 +211,24 @@ async function run(cdp) {
       await shot(`nogl-${w}-map`)
       await ev(`location.hash = '#house'`); await sleep(900)
       const c = await ev(`${q('#houseView')}.classList.contains('is-on') && __q.vis(${q('#houseView')})`)
-      const ok = !a.gl && a.form && a.fields >= 4 && /지도를 그릴 수 없어요/.test(b.msg) && !!b.box && b.free && b.panel && b.clash.length === 0 && b.over.docW <= w && c
+      const ok = !a.gl && a.form && a.fields >= 1 && /지도를 그릴 수 없어요/.test(b.msg) && !!b.box && b.free && b.panel && b.clash.length === 0 && b.over.docW <= w && c
       return { ok, evidence: `WebGL 됨=${a.gl}, 조건 입력 칸 보임=${a.form}(${a.fields}칸), 지도 안내="${b.msg.slice(0, 40)}…" 자리 ${b.box ? `y=${b.box.y}~${b.box.b}` : '없음'} 가려지지 않음=${b.free} 겹침=${J(b.clash)}, 왼쪽 패널 보임=${b.panel}, 집 보기 열림=${c}` }
     } finally { await ev(`sessionStorage.removeItem('e2e-nogl')`).catch(() => {}) }
   })
 
   // ═════════ PC 1440x900 (마우스) ═════════
   await size(1440, 900, false)
-  await check('PC 1. 조건 입력: 한 화면에 모두 → 예시 페르소나 → 판정 결과 보기 → 지도', async () => {
+  await check('PC 1. 조건 입력: 한 문항씩(8문항) → 금액 쉼표 → 판정 결과 보기 → 지도', async () => {
     await fresh('#input')
-    const a = await ev(`({ title: document.title, fields: __q.fields(), steps: __q.vis(${q('#fSteps')}), next: __q.vis(${q('#fNext')}), tabbar: __q.vis(${q('.tabbar')}) })`)
+    const a = await ev(`({ fields: __q.fields(), no: __q.txt(${q('#stpNo')}), persona: !!${q('#fillPersona')}, tabbar: __q.vis(${q('.tabbar')}) })`)
     await shot('pc-input')
-    await tap(q('#fillPersona'), '예시 페르소나 넣기'); await tap(q('#form button[type=submit]'), '판정 결과 보기')
+    await fillAll()
+    const money = await ev(`[${q('#f-income')}.value, ${q('#f-assets')}.value, ${q('#f-budget')}.value]`)
+    await tap(q('#stSubmit'), '판정 결과 보기')
     await waitFor(`location.hash === '#map'`, '#map', 6000); await sleep(1800)
     const bar = await ev(`__q.txt(${q('#panelL .bar3-txt')})`), top = await ev(`__q.txt(${q('#topRight')})`)
-    return { ok: a.fields.length === 9 && !a.steps && !a.next && /요건 충족 \d+ · .*확인 필요 \d+ · .*미충족 \d+/.test(bar) && top.includes('조건 바꾸기'), evidence: `보이는 칸 ${a.fields.length}개, 걸음 칩 보임=${a.steps}, 다음 단추 보임=${a.next}, 왼쪽 패널="${bar}", 오른쪽 위="${top}"` }
+    const ok = J(a.fields) === J(['f-age']) && a.no === '1 / 8' && !a.persona && J(money) === J(['2,500,000', '10,000,000', '600,000']) && /요건 충족 \d+ · .*확인 필요 \d+ · .*미충족 \d+/.test(bar) && top.includes('조건 바꾸기')
+    return { ok, evidence: `보이는 칸 ${J(a.fields)} 진행 "${a.no}", 예시 단추 있음=${a.persona}, 금액 칸=${J(money)}, 왼쪽 패널="${bar}", 오른쪽 위="${top}"` }
   })
   let living = null
   await check('PC 2. 단지 카드(접는 목록) → 집 보기', async () => {
@@ -268,10 +283,10 @@ async function run(cdp) {
     await calm(); await tap(q('#fab'), '24시간 상담'); await waitFor(drOpen, '상담 서랍', 3000); await sleep(400)
     const cr = await ev(`__q.contrast(${q('#drawer .dr-note')})`)
     await ev(`location.hash = '#input'`); await sleep(800)
-    const a = await ev(`({ open: ${drOpen}, submit: __q.free(${q('#fSubmit')}) })`); await shot('pc-input-after-drawer')
+    const a = await ev(`({ open: ${drOpen}, submit: __q.free(${q('#stNext')}) })`); await shot('pc-input-after-drawer')
     await ev('history.back()'); await sleep(900)
     const b = await ev(`({ hash: location.hash, open: ${drOpen} })`)
-    return { ok: !a.open && a.submit && b.hash === '#map' && !b.open && cr >= 4.5, evidence: `#input 으로 옮긴 뒤 서랍 열림=${a.open}·[판정 결과 보기] 가려지지 않음=${a.submit}, 뒤로 가기 → ${b.hash} 서랍 열림=${b.open}, 안내 문구 대비 ${cr}:1` }
+    return { ok: !a.open && a.submit && b.hash === '#map' && !b.open && cr >= 4.5, evidence: `#input 으로 옮긴 뒤 서랍 열림=${a.open}·[다음] 가려지지 않음=${a.submit}, 뒤로 가기 → ${b.hash} 서랍 열림=${b.open}, 안내 문구 대비 ${cr}:1` }
   })
   await check('PC 8. 한글이 낱말 가운데에서 줄바꿈되지 않음 (판정 패널, 홈 첫 문단), 펼친 뒤 초점 유지', async () => {
     await calm(); await tap(q('#jpFold'), '대출·지원 보기'); await sleep(300)
@@ -291,8 +306,7 @@ async function run(cdp) {
   await size(600, 800, false)
   await check('좁은 PC 창 600x800(마우스). 평면 줄의 앞뒤 단추와 빠른 질문 모두에 닿음', async () => {
     await ev(`location.hash = '#home'`); await sleep(1300)
-    await ev(`(() => { const r = ${q('#homeCats')}; scrollTo(0, r.getBoundingClientRect().top + scrollY - 72) })()`); await sleep(400)
-    await tap(`${q('#homeCats')}.querySelector('[data-cat="plan"]')`, '칩 평면'); await sleep(700)
+    await ev(`${q('#plansTrack')}.scrollIntoView({ block: 'center' })`); await sleep(900)
     const x0 = await ev(`${q('#plansTrack')}.scrollLeft`); await tap(q('#plansNext'), '다음 구조'); await sleep(800); const x1 = await ev(`${q('#plansTrack')}.scrollLeft`); await shot('narrow-600-plans')
     await ev(`location.hash = '#map'`); await sleep(1500)
     await tap(q('#fab'), '24시간 상담'); await waitFor(drOpen, '상담 서랍', 3000); await sleep(500)
@@ -307,23 +321,21 @@ async function run(cdp) {
   for (const [w, h] of [[390, 844], [360, 740]]) {
     const P = `휴대폰 ${w}x${h}`
     await size(w, h, true)
-    await check(`${P} 1. 조건 입력 첫 걸음이 한 화면에`, async () => {
+    await check(`${P} 1. 조건 입력 첫 문항이 한 화면에`, async () => {
       await fresh('#input')
-      const a = await ev(`({ over: __q.over(), chips: [...document.querySelectorAll('#fSteps button')].filter(__q.vis).map(b => __q.txt(b) + (b.classList.contains('is-on') ? '*' : '')), chipTouch: __q.touchH(${q('#fSteps button')}), fields: __q.fields(), tabbar: __q.vis(${q('.tabbar')}), wrap: (() => { const s = ${q('#vInput .form-wrap')}; return [s.scrollHeight, s.clientHeight] })(), btns: [...document.querySelectorAll('.form-btns button')].filter(__q.vis).map(b => __q.txt(b)), btnBottom: __q.rect('.form-btns').b, inFs: getComputedStyle(${q('#f-age')}).fontSize, persona: __q.rect('#fillPersona'), gridW: __q.rect('.fgrid').w, btnsW: __q.rect('.form-btns').w, cut: [...document.querySelectorAll('.form-btns button')].filter(__q.vis).some(b => b.scrollWidth > b.clientWidth + 1) })`)
+      const a = await ev(`({ over: __q.over(), fields: __q.fields(), no: __q.txt(${q('#stpNo')}), tabbar: __q.vis(${q('.tabbar')}), btns: [...document.querySelectorAll('.form-btns button')].filter(__q.vis).map(b => __q.txt(b)), btnBottom: __q.rect('.form-btns').b, inFs: getComputedStyle(${q('#f-age')}).fontSize, nextTouch: __q.touchH(${q('#stNext')}) })`)
       await shot(`m${w}-input-1`)
-      const ok = a.over.docW <= w && a.over.bodyW <= w && J(a.chips) === J(['기본 정보*', '주거 상황', '예산·시설']) && a.chipTouch >= 44 && J(a.fields) === J(['f-age', 'f-income', 'f-gross', 'f-assets']) && !a.tabbar && a.wrap[0] <= a.wrap[1] + 1 && J(a.btns) === J(['그냥 둘러보기', '다음 →']) && a.btnBottom <= h && parseFloat(a.inFs) >= 16 && !!a.persona && a.gridW >= w - 40 && a.btnsW === w && !a.cut
-      return { ok, evidence: `가로 ${a.over.docW}/${w}, 칩=${J(a.chips)} 닿는 높이 ${a.chipTouch}px, 보이는 칸=${J(a.fields)}, 아래 탭 막대 보임=${a.tabbar}, 내용 높이/보이는 높이=${a.wrap[0]}/${a.wrap[1]}, 단추=${J(a.btns)}(막대 폭 ${a.btnsW}px, 글자 넘침=${a.cut}), 칸 폭 ${a.gridW}px, 입력 글자 ${a.inFs}` }
+      const ok = a.over.docW <= w && J(a.fields) === J(['f-age']) && a.no === '1 / 8' && !a.tabbar && J(a.btns) === J(['이전', '다음']) && a.btnBottom <= h && parseFloat(a.inFs) >= 16 && a.nextTouch >= 44
+      return { ok, evidence: `가로 ${a.over.docW}/${w}, 보이는 칸=${J(a.fields)} 진행 "${a.no}", 아래 탭 막대 보임=${a.tabbar}, 단추=${J(a.btns)} 아래 끝 ${a.btnBottom}px, [다음] 닿는 높이 ${a.nextTouch}px, 입력 글자 ${a.inFs}` }
     })
-    await check(`${P} 2. 빈 값으로 다음 → 그 칸으로, 채우면 세 걸음 → 지도`, async () => {
-      await tap(q('#fNext'), '다음'); const e1 = await ev(`({ step: ${q('#vInput')}.dataset.step, err: __q.txt(${q('#e-age')}), focus: document.activeElement && document.activeElement.id })`)
+    await check(`${P} 2. 빈 값으로 다음 → 알림, 채우면 8문항 → 지도`, async () => {
+      await tap(q('#stNext'), '다음'); const e1 = await ev(`({ no: __q.txt(${q('#stpNo')}), err: __q.txt(${q('#e-age')}), focus: document.activeElement && document.activeElement.id })`)
       await ev('document.activeElement && document.activeElement.blur()')
-      await tap(q('#fillPersona'), '예시 페르소나 넣기'); await tap(q('#fNext'), '다음')
-      const s2 = await ev(`({ step: ${q('#vInput')}.dataset.step, fields: __q.fields(), btns: [...document.querySelectorAll('.form-btns button')].filter(__q.vis).map(b => __q.txt(b)), wrap: (() => { const s = ${q('#vInput .form-wrap')}; return [s.scrollHeight, s.clientHeight] })() })`); await shot(`m${w}-input-2`)
-      await tap(`${q('#fSteps')}.querySelector('[data-step="3"]')`, '예산·시설 칩')
-      const s3 = await ev(`({ step: ${q('#vInput')}.dataset.step, fields: __q.fields(), btns: [...document.querySelectorAll('.form-btns button')].filter(__q.vis).map(b => __q.txt(b)), wrap: (() => { const s = ${q('#vInput .form-wrap')}; return [s.scrollHeight, s.clientHeight] })(), over: __q.over() })`); await shot(`m${w}-input-3`)
-      await tap(q('#fSubmit'), '판정 결과 보기'); await waitFor(`location.hash === '#map'`, '#map', 6000); await sleep(2200)
-      const ok = e1.step === '1' && !!e1.err && e1.focus === 'f-age' && s2.step === '2' && s2.fields.length === 3 && J(s2.btns) === J(['← 이전', '다음 →']) && s3.step === '3' && J(s3.fields) === J(['f-budget', 'prio']) && J(s3.btns) === J(['← 이전', '판정 결과 보기 →']) && s2.wrap[0] <= s2.wrap[1] + 1 && s3.wrap[0] <= s3.wrap[1] + 1 && s3.over.docW <= w
-      return { ok, evidence: `빈 값: 걸음 ${e1.step}, 알림="${e1.err}", 커서=${e1.focus} / 2걸음 칸=${J(s2.fields)} 단추=${J(s2.btns)} 높이 ${s2.wrap.join('/')} / 3걸음 칸=${J(s3.fields)} 단추=${J(s3.btns)} 높이 ${s3.wrap.join('/')} / hash=${await ev('location.hash')}` }
+      await fillAll()
+      const last = await ev(`({ no: __q.txt(${q('#stpNo')}), btns: [...document.querySelectorAll('.form-btns button')].filter(__q.vis).map(b => __q.txt(b)), over: __q.over() })`); await shot(`m${w}-input-8`)
+      await tap(q('#stSubmit'), '판정 결과 보기'); await waitFor(`location.hash === '#map'`, '#map', 6000); await sleep(2200)
+      const ok = e1.no === '1 / 8' && !!e1.err && e1.focus === 'f-age' && last.no === '8 / 8' && J(last.btns) === J(['이전', '판정 결과 보기']) && last.over.docW <= w
+      return { ok, evidence: `빈 값: 진행 "${e1.no}", 알림="${e1.err}", 커서=${e1.focus} / 마지막 진행 "${last.no}" 단추=${J(last.btns)} / hash=${await ev('location.hash')}` }
     })
     await check(`${P} 3. 지도: 한 줄 요약·펼치기, 겹침 없음, 가로 스크롤 없음`, async () => {
       const a = await ev(`({ over: __q.over(), line: __q.txt(${q('#jpLine span')}), panel: __q.rect('#panelL'), clash: __q.clash(['#dnav', '#panelL', '#fab', '#mapHint', '#mh .notice', '.tabbar', '.nav']), dnavTouch: __q.touchH(${q('#dnav button')}), topRight: __q.vis(${q('#topRight')}), canvas: __q.rect('#mapCanvas'), fab: __q.rect('#fab'), notice: __q.rect('#mh .notice'), hint: __q.rect('#mapHint') })`)
