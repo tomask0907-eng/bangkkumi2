@@ -277,7 +277,7 @@ body.card-open #mh .map-hint,#mh .map-hint.is-gone{opacity:0}
 }
 '''
 # 휴대폰 화면용 CSS (가장 마지막에 붙여서 위의 규칙을 덮어쓴다). 홈·이용 안내는 mobile_home.css, 입력·지도·집 보기·상담은 mobile_app.css
-mobile=''.join(open(os.path.join(HERE,n),encoding='utf-8').read() for n in ('mobile_home.css','mobile_app.css','house_overview.css','tutorial.css'))
+mobile=''.join(open(os.path.join(HERE,n),encoding='utf-8').read() for n in ('mobile_home.css','mobile_app.css','house_overview.css','tutorial.css','chat.css'))
 h=R(h,'</style>\n</head>', mscoped+over+mobile+'\n</style>\n</head>')
 
 # ---------- BODY ----------
@@ -307,7 +307,10 @@ b=R(b,'''    <a href="#map" class="btn">내 조건 넣기</a>
 # 히어로 버튼
 b=R(b,'''        <a href="#sim" class="btn btn--white">우리 집 걸어보기 →</a>
         <a href="#guide" class="btn btn--ghost">이용 방법 보기</a>''','''        <a href="#input" class="btn btn--white" data-go="input">기본정보 입력하고 더 알아보기 →</a>
-        <a href="#map" class="btn btn--ghost" data-go="browse">그냥 둘러보기</a>''')
+        <a href="#map" class="btn btn--ghost" data-go="browse">그냥 둘러보기</a>
+      </div>
+      <form class="hero__ask" id="homeAsk" role="search"><label for="homeAskIn">어떤 집을 찾으세요?</label><div><input id="homeAskIn" name="preference" placeholder="달서구, 전세 2억 5천 이하" autocomplete="off" maxlength="200"><button class="btn btn--white" type="submit">찾아보기</button></div></form>
+      <div hidden>''')
 # 평면 갤러리
 b=R(b,'''          <span class="eyebrow">Plans</span>
           <h2 class="title">우리 집과 비슷한 구조부터 골라보세요</h2>
@@ -352,7 +355,7 @@ faq_new='''<div class="faq">
         <details><summary>지도와 평면도는 어디서 가져왔나요?<i aria-hidden="true"></i></summary><p>지도는 실제 배치를 참고해 단순한 블록으로 직접 그렸고, 지도 화면을 복사하지 않았어요. 평면도도 공고 평면도 원본 이미지를 쓰지 않고 표준 구조로 단순화해 그렸어요.</p></details>
         <details><summary>아이 눈높이는 왜 90cm인가요?<i aria-hidden="true"></i></summary><p>만 3~5세 아이의 눈높이가 대략 이 정도라서 잡은 참고값이에요. 법적·안전 기준은 아니에요. 집 보기의 3D에서 [아이 눈높이]를 누르면 그 높이로 방 안을 둘러볼 수 있고, 아이 얼굴 높이에 오는 가구 모서리를 빨간 점으로 짚어줘요. 참고용 안전 체크예요.</p></details>
         <details><summary>24시간 상담은 AI가 판정하나요?<i aria-hidden="true"></i></summary><p>판정은 규칙이 하고, 상담은 그 결과를 쉬운 말로 설명만 해요. 판정을 바꾸거나 새 숫자를 만들지 않고, 링크는 공식 주소만 붙여요. AI 연결이 안 되면 규칙으로 만든 기본 안내로 답해요.</p></details>
-        <details><summary>무료인가요?<i aria-hidden="true"></i></summary><p>네, 지금 시연 버전은 모두 무료예요. 입력한 값은 이 브라우저에만 저장해요. 24시간 상담에 질문할 때만 질문과 판정 요약을 AI 답변을 만드는 데 보내요.</p></details>
+        <details><summary>무료인가요?<i aria-hidden="true"></i></summary><p>네, 지금 시연 버전은 모두 무료예요. 입력한 값은 이 브라우저에만 저장해요. 판정 설명(이 단지 상담하기, 판정 쉽게 설명)을 누를 때만 질문과 판정 요약을 AI 답변을 만드는 데 보내요. 집찾기 대화는 이 화면 안에서만 조건을 정리하고, 대화창에서 AI 해석을 켰을 때만 그 문장을 보내요.</p></details>
       </div>'''
 b=b.replace(faq_old,faq_new)
 # 탭바
@@ -380,9 +383,9 @@ HOUSE_MARK='/* [house_view.js] 집 보기(House)는 house_view.js 에 있다. bu
 APP_BB=open(os.path.join(HERE,'app_bb.js'),encoding='utf-8').read()
 assert APP_BB.count(HOUSE_MARK)==1, 'app_bb.js 에 집 보기 표시 줄이 없어요'
 APP_BB=APP_BB.replace(HOUSE_MARK, open(os.path.join(HERE,'house_view.js'),encoding='utf-8').read())
-mjs=open(M+'data.js',encoding='utf-8').read()+open(M+'data2.js',encoding='utf-8').read()+open(M+'engine.js',encoding='utf-8').read().replace('if (typeof module !== "undefined") module.exports = { profileResult, evaluate, breakdown, appliedLists };','')+open(M+'house.js',encoding='utf-8').read()+open(os.path.join(HERE,'backend.js'),encoding='utf-8').read().replace('if (typeof module !== "undefined") module.exports = { createBackend };','')+APP_BB+open(os.path.join(HERE,'tutorial.js'),encoding='utf-8').read()
+mjs=open(M+'data.js',encoding='utf-8').read()+open(M+'data2.js',encoding='utf-8').read()+open(M+'engine.js',encoding='utf-8').read().replace('if (typeof module !== "undefined") module.exports = { profileResult, evaluate, breakdown, appliedLists };','')+open(M+'house.js',encoding='utf-8').read()+open(os.path.join(HERE,'backend.js'),encoding='utf-8').read().replace('if (typeof module !== "undefined") module.exports = { createBackend };','')+APP_BB+open(os.path.join(HERE,'tutorial.js'),encoding='utf-8').read()+open(os.path.join(HERE,'chat_connect.js'),encoding='utf-8').read()
 shell=open(os.path.join(HERE,'shell.js'),encoding='utf-8').read()
-tail='<script src="vendor/three.min.js"></script>\n<script>\n{\n'+mjs+'\n}\n</script>\n<script>\n'+shell+'\nBB.route();\n</script>\n</body>\n</html>\n'
+tail='<script src="vendor/three.min.js"></script>\n<script src="vendor/bangbom-chat.js"></script>\n<script>\n{\n'+mjs+'\n}\n</script>\n<script>\n'+shell+'\nBB.route();\n</script>\n</body>\n</html>\n'
 out=h+b.replace('</body>','').replace('</html>','')+tail
 open(os.path.join(HERE,'../../index.html'),'w',encoding='utf-8').write(out)
 print('ok', len(out))

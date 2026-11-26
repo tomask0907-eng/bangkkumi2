@@ -10,7 +10,7 @@ const House = {
     if (this.ok) return; this.ok = true;
     $("#hvBack").onclick = () => { location.hash = "#map"; };
     /* 집 보기 화면이 24시간 상담 단추를 가리므로 위쪽 줄에 상담 단추를 따로 둔다 */
-    $("#hvConsult").onclick = () => Consult.open();
+    $("#hvConsult").onclick = () => (window.MH && MH.chat ? MH.chat.open() : Consult.open());
     /* [전체 구조]: 전체 구조에서 들어온 방이면 뒤로 가기와 같다. 방 주소로 바로 들어왔으면 돌아갈 기록이 없어서 주소만 바꾼다 */
     $("#hvPlan").onclick = () => { if (history.state && history.state.mhOver) history.back(); else this.go("#house", false); };
     /* 평면도와 목록의 방 단추: 새 기록을 쌓아서 뒤로 가면 전체 구조로 돌아온다 */
