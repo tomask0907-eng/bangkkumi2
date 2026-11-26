@@ -56,16 +56,16 @@
     <p class="small muted gets-note">입력값은 이 브라우저에만 저장해요. 판정 설명(이 단지 상담하기, 판정 쉽게 설명)을 누를 때만 질문과 판정 요약을 AI 답변을 만드는 데 보내요. 집찾기 대화는 이 화면 안에서만 조건을 정리하고, 대화창에서 AI 해석을 켰을 때만 그 문장을 보내요. 최종 판정과 승인은 각 기관이 해요.</p>
   </div>
   <form class="card form" id="form" novalidate aria-labelledby="fTitle">
-    <div class="persona"><button type="button" class="chip" id="fillPersona">예시 페르소나 넣기 · 김지훈(27)</button><span class="sample">시연용</span><span class="muted small" style="margin-left:auto">금액은 만 원 단위</span></div>
+    <div class="persona"><button type="button" class="chip" id="fillPersona">예시 페르소나 넣기 · 김지훈(27)</button><span class="sample">시연용</span><span class="muted small" style="margin-left:auto">금액은 원 단위</span></div>
     <div class="fgrid">
       <div class="f" data-step="1"><label for="f-age">나이 <small>만 나이, 19~70</small></label><div class="in"><input id="f-age" type="number" inputmode="numeric" min="19" max="70" required><span>세</span></div><p class="err" id="e-age"></p></div>
-      <div class="f" data-step="1"><label for="f-income">월 소득 <small>세후 실수령</small></label><div class="in"><input id="f-income" type="number" inputmode="numeric" min="0" step="10" required><span>만 원</span></div><p class="err" id="e-income"></p></div>
-      <div class="f" data-step="1"><label for="f-gross">세전 연소득 <small>선택 · 알면 더 정확해요</small></label><div class="in"><input id="f-gross" type="number" inputmode="numeric" min="0" step="100" placeholder="모르면 비워두세요"><span>만 원</span></div></div>
-      <div class="f" data-step="1"><label for="f-assets">모은 돈 <small>보증금에 쓸 수 있는 돈</small></label><div class="in"><input id="f-assets" type="number" inputmode="numeric" min="0" step="100" required><span>만 원</span></div><p class="err" id="e-assets"></p></div>
+      <div class="f" data-step="1"><label for="f-income">월 소득 <small>세후 실수령</small></label><div class="in"><input id="f-income" type="number" inputmode="numeric" min="0" step="10000" required><span>원</span></div><p class="err" id="e-income"></p></div>
+      <div class="f" data-step="1"><label for="f-gross">세전 연소득 <small>선택 · 알면 더 정확해요</small></label><div class="in"><input id="f-gross" type="number" inputmode="numeric" min="0" step="100" placeholder="모르면 비워두세요"><span>원</span></div></div>
+      <div class="f" data-step="1"><label for="f-assets">모은 돈 <small>보증금에 쓸 수 있는 돈</small></label><div class="in"><input id="f-assets" type="number" inputmode="numeric" min="0" step="100" required><span>원</span></div><p class="err" id="e-assets"></p></div>
       <div class="f" data-step="2"><span class="lb">무주택인가요?</span><div class="seg" data-k="homeless"><button type="button" data-v="1">무주택</button><button type="button" data-v="0">집 있음</button></div></div>
       <div class="f" data-step="2"><span class="lb">부모님과 따로 사나요?</span><div class="seg" data-k="lives_with_parents"><button type="button" data-v="0">따로 살아요</button><button type="button" data-v="1">함께 살아요</button></div></div>
       <div class="f" data-step="2"><span class="lb">대구 거주 또는 전입 예정</span><div class="seg" data-k="daegu_resident_or_moving"><button type="button" data-v="1">예</button><button type="button" data-v="0">아니요</button></div></div>
-      <div class="f" data-step="3"><label for="f-budget">월 예산 <small>월세+관리비+대출이자</small></label><div class="in"><input id="f-budget" type="number" inputmode="numeric" min="0" step="5" required><span>만 원</span></div><p class="err" id="e-budget"></p></div>
+      <div class="f" data-step="3"><label for="f-budget">월 예산 <small>월세+관리비+대출이자</small></label><div class="in"><input id="f-budget" type="number" inputmode="numeric" min="0" step="5" required><span>원</span></div><p class="err" id="e-budget"></p></div>
       <div class="f full" data-step="3"><span class="lb">중요한 시설 <small>선택 · 여러 개 · 가까운 시설 목록에서 먼저 보여줘요</small></span><div class="persona" id="prioChips" style="margin-top:0"></div></div>
     </div>
     <div class="form-btns">

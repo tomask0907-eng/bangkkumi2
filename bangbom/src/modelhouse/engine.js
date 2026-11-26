@@ -6,23 +6,24 @@ const LIGHT_KO = { on: "요건 충족", dim: "확인 필요", off: "미충족" }
 const LIGHT_ICON = { on: "●", dim: "◐", off: "○" };
 /* 일반 반올림(0.05 → 올림). docs/조사/data/calc3.py 의 round(x+1e-9, 1)과 같은 결과 */
 const r1 = v => Math.round(v * 10 + 1e-9) / 10;
-function wonK(v) { v = Math.round(v); const eok = Math.floor(v / 10000), man = v % 10000; if (eok && man) return `${eok}억 ${man.toLocaleString("ko-KR")}만 원`; if (eok) return `${eok}억 원`; return `${man.toLocaleString("ko-KR")}만 원`; }
+function wonK(v) { return wonFull(v); }
+const wonFull = v => v == null || !isFinite(v) ? "—" : Math.round(v * 10000).toLocaleString("ko-KR") + "원";
 function worse(a, b) { const o = { eligible: 0, needs_check: 1, ineligible: 2 }; return o[a] >= o[b] ? a : b; }
 const fmtN = n => Number(n).toLocaleString("ko-KR");
 
 function incomeStatus(p, annualMax, monthlyMax, deduction) {
   const est = RULES.income_estimate, gross = p.annual_income_gross;
   if (annualMax != null) {
-    if (gross != null) return gross <= annualMax ? [ELIG, "입력한 연소득이 기준 이하"] : [NO, `연소득이 기준(${fmtN(annualMax)}만 원) 초과`];
+    if (gross != null) return gross <= annualMax ? [ELIG, "입력한 연소득이 기준 이하"] : [NO, `연소득이 기준(${wonFull(annualMax)}) 초과`];
     const high = p.monthly_income * 12 * est.gross_multiplier_high, low = p.monthly_income * 12;
-    if (high <= annualMax) return [ELIG, `월 실수령 기준 추정 연소득이 기준(${fmtN(annualMax)}만 원) 이하`];
-    if (low > annualMax) return [NO, `월 실수령만으로도 연소득 기준(${fmtN(annualMax)}만 원) 초과`];
+    if (high <= annualMax) return [ELIG, `월 실수령 기준 추정 연소득이 기준(${wonFull(annualMax)}) 이하`];
+    if (low > annualMax) return [NO, `월 실수령만으로도 연소득 기준(${wonFull(annualMax)}) 초과`];
     return [CHECK, "월 실수령만으로는 연소득 기준을 판단할 수 없어요"];
   }
   if (monthlyMax != null) {
     const m = p.monthly_income, low = m * est.gross_multiplier_low * (1 - deduction), high = m * est.gross_multiplier_high * (1 - deduction);
     if (high <= monthlyMax) return [ELIG, "추정 소득인정액이 기준 이하"];
-    if (low > monthlyMax) return [NO, `추정 소득인정액이 기준(월 ${monthlyMax}만 원) 초과`];
+    if (low > monthlyMax) return [NO, `추정 소득인정액이 기준(월 ${wonFull(monthlyMax)}) 초과`];
     return [CHECK, "소득인정액은 복지로 모의계산으로 확인이 필요해요"];
   }
   return [ELIG, ""];
@@ -90,12 +91,12 @@ function evaluate(p, c, pr) {
   const maxCap = Math.max(0, ...caps), shortfall = combos.length ? 0 : loan_needed - maxCap;
   const budget = p.monthly_budget;
   let light, reason, chosen;
-  if (eBest && eBest.net <= budget) { light = "on"; chosen = eBest; reason = `${eBest.label} 요건 충족 기준으로 월 ${eBest.net}만 원, 예산 안이에요`; }
-  else if (best && best.net <= budget) { light = "dim"; chosen = best; reason = `${best.label}(확인 필요)을 받으면 월 ${best.net}만 원으로 예산 안이에요`; }
+  if (eBest && eBest.net <= budget) { light = "on"; chosen = eBest; reason = `${eBest.label} 요건 충족 기준으로 월 ${wonFull(eBest.net)}, 예산 안이에요`; }
+  else if (best && best.net <= budget) { light = "dim"; chosen = best; reason = `${best.label}(확인 필요)을 받으면 월 ${wonFull(best.net)}으로 예산 안이에요`; }
   else {
     light = "off"; chosen = best;
     reason = !combos.length ? `자기자금이 ${wonK(shortfall)} 부족해요 (보증금 ${wonK(c.deposit)} 중 대출은 최대 ${wonK(maxCap)}까지 기준)`
-      : `지원을 모두 받아도 월 ${best.net}만 원으로 예산보다 ${r1(best.net - budget)}만 원 많아요`;
+      : `지원을 모두 받아도 월 ${wonFull(best.net)}으로 예산보다 ${wonFull(best.net - budget)} 많아요`;
   }
   if (c.supply_type === "lh_dundeun") reason += ` · ${RULES.badges.dundeun}`;
   /* 다른 선택: 고른 조합과 다른 대출·지원 묶음 중 가장 낮은 것부터 */
@@ -115,7 +116,7 @@ function appliedLists(c, ev, pr) {
   pr.policies.forEach(po => {
     if (used.includes(po.id)) return;
     if (po.status === NO) { not_applied.push({ id: po.id, name: po.name, reason: po.reason }); return; }
-    if (po.id === "daegu_interest" && c.deposit > RULES.policies.find(x => x.id === po.id).deposit_max) not_applied.push({ id: po.id, name: po.name, reason: "보증금이 대구 이자지원 기준(2억5천만 원)을 넘어요" });
+    if (po.id === "daegu_interest" && c.deposit > RULES.policies.find(x => x.id === po.id).deposit_max) not_applied.push({ id: po.id, name: po.name, reason: "보증금이 대구 이자지원 기준(250,000,000원)을 넘어요" });
     else if (po.id === "daegu_interest" && (used.includes("youth_beotimok") || used.includes("hf_youth_guarantee"))) not_applied.push({ id: po.id, name: po.name, reason: "버팀목·HF 특례보증과는 둘 중 하나만 받을 수 있어요" });
     else if (po.id === "daegu_interest" && ev.loan_needed === 0) not_applied.push({ id: po.id, name: po.name, reason: "대출이 필요 없어 해당 없음" });
     else if (po.id === "youth_monthly_rent" && c.rent === 0) not_applied.push({ id: po.id, name: po.name, reason: "월세가 없는 전세 단지라 해당 없음" });

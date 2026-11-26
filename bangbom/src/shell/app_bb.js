@@ -99,7 +99,7 @@ function renderPanels() {
     $("#panelL").dataset.mode = "match";
     $("#jpConsult").onclick = () => { Consult.open(); Consult.ask("내 판정 결과 쉽게 설명해 줘"); };
     const mn = minNet();
-    $("#pillsR").innerHTML = `<span class="pill-n">모은 돈 <b>${won(S.profile.assets)}만</b></span><span class="pill-n">월 예산 <b>${won(S.profile.monthly_budget)}만</b></span>${mn != null ? `<span class="pill-n">지원 반영 최저 <b>월 ${man1(mn)}만</b></span>` : ""}`;
+    $("#pillsR").innerHTML = `<span class="pill-n">모은 돈 <b>${wonFull(S.profile.assets)}</b></span><span class="pill-n">월 예산 <b>${wonFull(S.profile.monthly_budget)}</b></span>${mn != null ? `<span class="pill-n">지원 반영 최저 <b>월 ${wonFull(mn)}</b></span>` : ""}`;
     $("#legend").innerHTML = "";
   } else {
     $("#panelL").innerHTML = `<button class="x pl-x" aria-label="패널 닫기"><svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 3l10 10M13 3L3 13"/></svg></button><div class="jp jp--browse"><span class="eyebrow-s">Browse</span><h2>대구 미분양 ${COMPLEX.length}곳</h2><p class="muted small" style="margin-top:4px">${MapView.ok ? "단지를 누르면 주변 시설과 집 정보가 보여요" : "조건을 넣으면 대출·지원 판정은 볼 수 있어요"}</p><p class="muted small" style="margin-top:4px"><i style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#c99a6b;margin-right:6px"></i>작은 점 ${UNSOLD_LIST.length}곳: 대구시 공개 미분양 목록(2026.9.30) + 언론 보도 단지, 판정 없음</p>
@@ -125,7 +125,7 @@ function whyLine(c) {
 function cardHTML(id) {
   const c = COMPLEX.find(x => x.id === id), ev = S.evals[id], match = S.mode === "match" && ev;
   const pr = (S.profile && S.profile.priorities) || [], near = c.nearby.slice().sort((a, b) => pr.includes(b.category) - pr.includes(a.category)).map(n => `<li><span><i style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${CAT_DARK[n.category]};margin-right:6px"></i>${esc(n.name)} · ${n.walk_min != null ? `도보 ${n.walk_min}분` : `차 ${n.drive_min}분`}</span></li>`).join("");
-  const mg = c.mgmt_known ? `${c.mgmt}만 원` : `미확인 (추정 ${c.mgmt}만 원)`;
+  const mg = c.mgmt_known ? `${wonFull(c.mgmt)}` : `미확인 (추정 ${wonFull(c.mgmt)})`;
   const noteText = c.room_id === "room_84a" && c.area_m2 !== 84 ? `집 보기는 ${c.area_m2}㎡ 평면이 아직 없어 84㎡ 구조로 대신 보여줘요.` : "";
   const roomNote = noteText ? `<p class="small muted pc-only" style="margin-top:6px">${noteText}</p>` : "", roomNoteM = noteText ? `<p class="small muted m-only" style="margin-top:10px">${noteText}</p>` : "";
   const bd = match ? breakdown(c, ev) : null;
@@ -139,15 +139,15 @@ function cardHTML(id) {
     const al = appliedLists(c, ev, S.pr);
     const main = ev.net_monthly != null ? ev.net_monthly : ev.net_monthly_best;
     body += ev.shortfall ? `<div class="cc-sum" data-pane="sum"><p class="big">자기자금이 모자라요<b class="is-off">${wonK(ev.shortfall)} 부족</b>보증금 ${wonK(c.deposit)} − 모은 돈 ${wonK(S.profile.assets)} = 필요 대출 ${wonK(ev.loan_needed)}</p>`
-      : `<p class="big">지원 반영 후 월 부담<b class="${ev.light === "off" ? "is-off" : ""}">월 ${man1(main)}만 원</b>
-      ${ev.net_monthly == null && ev.net_monthly_best != null ? "요건 충족 지원만으로는 어려워요 · 확인 필요까지 받을 때 기준<br>" : ""}지원 모두 받으면 ${man1(ev.net_monthly_best)}만 · 하나도 못 받으면 ${man1(ev.net_monthly_worst)}만 원</p>
-      ${ev.alts.length ? `<p class="small muted" style="margin-top:6px">다른 선택: ${ev.alts.slice(0, 2).map(a => `${esc(a.label)} 월 ${man1(a.net)}만(${ST_KO[a.status]})`).join(" · ")}</p>` : ""}`;
+      : `<p class="big">지원 반영 후 월 부담<b class="${ev.light === "off" ? "is-off" : ""}">월 ${wonFull(main)}</b>
+      ${ev.net_monthly == null && ev.net_monthly_best != null ? "요건 충족 지원만으로는 어려워요 · 확인 필요까지 받을 때 기준<br>" : ""}지원 모두 받으면 ${wonFull(ev.net_monthly_best)} · 하나도 못 받으면 ${wonFull(ev.net_monthly_worst)}</p>
+      ${ev.alts.length ? `<p class="small muted" style="margin-top:6px">다른 선택: ${ev.alts.slice(0, 2).map(a => `${esc(a.label)} 월 ${wonFull(a.net)}(${ST_KO[a.status]})`).join(" · ")}</p>` : ""}`;
     body += `<p class="why">${esc(ev.light_reason)}</p>${roomNoteM}</div>`;
     if (bd) body += `<details class="fold" data-pane="calc"><summary>계산 내역</summary><table class="calc"><tbody>
-      <tr><td>월세</td><td>${man1(bd.rent)}만</td></tr><tr><td>관리비${c.mgmt_known ? "" : " (추정)"}</td><td>${man1(bd.mgmt)}만</td></tr>
-      <tr><td>보증금 대출이자<br><span class="muted">${esc(bd.calc)}</span></td><td>${man1(bd.loan_interest)}만</td></tr>
-      <tr><td>월세 지원</td><td class="neg">−${man1(bd.rent_support)}만</td></tr>
-      <tr class="tot"><td>월 실부담 · ${esc(bd.financing)}</td><td>${man1(bd.total)}만</td></tr></tbody></table>
+      <tr><td>월세</td><td>${wonFull(bd.rent)}</td></tr><tr><td>관리비${c.mgmt_known ? "" : " (추정)"}</td><td>${wonFull(bd.mgmt)}</td></tr>
+      <tr><td>보증금 대출이자<br><span class="muted">${esc(bd.calc)}</span></td><td>${wonFull(bd.loan_interest)}</td></tr>
+      <tr><td>월세 지원</td><td class="neg">−${wonFull(bd.rent_support)}</td></tr>
+      <tr class="tot"><td>월 실부담 · ${esc(bd.financing)}</td><td>${wonFull(bd.total)}</td></tr></tbody></table>
       <p class="small muted" style="margin-top:6px">실부담 = 월세 + 관리비 + 보증금 대출이자 − 월세지원 − 이자지원 (이자지원은 금리에서 빼서 계산). 중개수수료 지원은 1회라 월 부담에 넣지 않고 배지로만 보여줘요.</p></details>`;
     body += `<details class="fold" data-pane="sup"><summary>적용 지원 · 빠진 지원</summary><ul class="lst">${al.applied.map(a => `<li><span>${esc(a.name)}</span><span class="st st--${a.status}">${ST_KO[a.status]}</span></li>`).join("") || "<li><span>대출·지원 없이 계산</span><span></span></li>"}
       ${al.not_applied.map(a => `<li><span class="muted">${esc(a.name)}</span><span style="white-space:normal;text-align:right">${esc(a.reason)}</span></li>`).join("")}</ul></details>`;
@@ -155,7 +155,7 @@ function cardHTML(id) {
     const links = [...(APPLY_LINKS[c.supply_type] || []), ...al.applied.map(a => ({ label: a.name.replace("(시연용)", "") + " 안내", url: a.source_url }))];
     body += `<details class="fold" data-pane="link"><summary>신청·문의 링크</summary><div class="links">${links.map(l => l.url ? `<a href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.label)} ↗</a>` : `<span>${esc(l.label)} · 공고 확인 중</span>`).join("")}</div></details>`;
   } else {
-    body += `<div class="cc-sum" data-pane="sum"><p class="big">보증금<b>${wonK(c.deposit)}</b>${c.rent ? `월세 ${c.rent}만 원` : "월세 없음 (전세)"} · 관리비 ${mg}</p><p class="why">내 조건을 넣으면 대출·지원을 반영한 실제 월 부담을 계산해 드려요.</p>${roomNoteM}</div>`;
+    body += `<div class="cc-sum" data-pane="sum"><p class="big">보증금<b>${wonK(c.deposit)}</b>${c.rent ? `월세 ${wonFull(c.rent)}` : "월세 없음 (전세)"} · 관리비 ${mg}</p><p class="why">내 조건을 넣으면 대출·지원을 반영한 실제 월 부담을 계산해 드려요.</p>${roomNoteM}</div>`;
   }
   body += safetyHTML(c) + saleHTML(c, match ? (ev.shortfall ? null : (ev.net_monthly != null ? ev.net_monthly : ev.net_monthly_best)) : null);
   body += `<details class="fold" data-pane="near"><summary>가까운 시설</summary><p class="pane-h m-only">가까운 시설</p><ul class="lst">${near}</ul><p class="small muted" style="margin-top:6px">거리는 직선거리 × 1.3으로 추정했어요. 시설 위치는 실제 위치예요(OpenStreetMap·Wikidata).</p></details>`;
@@ -189,21 +189,21 @@ function saleHTML(c, jeonse) {
   const lp = sc.loanP;
   return `<details class="fold" data-pane="sale"><summary>매매로 보면</summary>
     ${sc.shortfall ? `<p class="big">사려면 자기자금이 모자라요<b class="is-off">${wonK(sc.shortfall)} 부족</b>필요한 자기자금 ${wonK(sc.own_needed)} · 모은 돈 ${wonK(S.profile.assets)}</p>` : ""}
-    <p class="why">전세로 살 때 월 ${jeonse != null ? man1(jeonse) + "만" : "—"} / 사서 살 때 월 ${man1(sc.monthly)}만(원리금+관리비)</p>
+    <p class="why">전세로 살 때 월 ${jeonse != null ? man1(jeonse) + "만" : "—"} / 사서 살 때 월 ${wonFull(sc.monthly)}(원리금+관리비)</p>
     <p class="small" style="margin-top:8px">지방 준공 후 미분양이라 금리 0.2%p 우대 대상이에요</p>
     <table class="calc"><tbody>
       <tr><td>디딤돌대출</td><td><span class="st st--${sc.didimdol.status}">${ST_KO[sc.didimdol.status]}</span></td></tr>
       <tr><td colspan="2" class="muted small" style="text-align:left">${esc(sc.didimdol.reason)}</td></tr>
       ${lp ? `<tr><td>계산에 쓴 대출 · ${esc(lp.name)}<br><span class="muted">${esc(lp.rate_label)}</span></td><td>${wonK(sc.loan)}</td></tr>
-      <tr><td>월 원리금 (${RULES.sale.years}년)</td><td>${man1(sc.pmt)}만</td></tr>` : `<tr><td>정책 대출</td><td>해당 없음</td></tr>`}
-      <tr><td>관리비${c.mgmt_known ? "" : " (추정)"}</td><td>${man1(c.mgmt)}만</td></tr>
+      <tr><td>월 원리금 (${RULES.sale.years}년)</td><td>${wonFull(sc.pmt)}</td></tr>` : `<tr><td>정책 대출</td><td>해당 없음</td></tr>`}
+      <tr><td>관리비${c.mgmt_known ? "" : " (추정)"}</td><td>${wonFull(c.mgmt)}</td></tr>
       <tr><td>취득세 1.1%</td><td>${wonK(sc.tax)}</td></tr>
       <tr><td>감면<br><span class="muted">${esc(sc.cutLabel)}</span></td><td class="neg">−${wonK(sc.cut)}</td></tr>
     </tbody></table>
     <p class="small muted" style="margin-top:6px">${esc(sc.notes.join(" · "))}. 보금자리론은 상태가 늘 확인 필요예요. 최종 대출 한도·금리는 은행과 기관이 정해요.</p>${src}</details>`;
 }
 /* 공개 목록 단지의 최근 실거래가(국토부) + 그 가격으로 본 매매 대출 요건(참고) */
-const eok = n => n >= 10000 ? `${Math.floor(n / 10000)}억${n % 10000 ? " " + won(n % 10000) + "만" : ""}` : `${won(n)}만`;
+const eok = n => wonFull(n);
 const ymTxt = ym => `${ym.slice(0, 4)}.${ym.slice(4)}`;
 function unsoldPriceHTML(u) {
   const e = typeof UNSOLD_PRICE !== "undefined" && UNSOLD_PRICE[u.name];
@@ -217,7 +217,7 @@ function unsoldPriceHTML(u) {
     if (sc) judge = `<table class="calc" style="margin-top:8px"><tbody>
       <tr><td>디딤돌대출 · 전용 ${main.area}㎡ ${eok(main.median)} 기준</td><td><span class="st st--${sc.didimdol.status}">${ST_KO[sc.didimdol.status]}</span></td></tr>
       <tr><td colspan="2" class="muted small" style="text-align:left">${esc(sc.didimdol.reason)}</td></tr>
-      ${sc.loanP ? `<tr><td>계산에 쓴 대출 · ${esc(sc.loanP.name)}</td><td>${wonK(sc.loan)}</td></tr><tr><td>월 원리금 (${RULES.sale.years}년)</td><td>${man1(sc.pmt)}만</td></tr>` : `<tr><td>정책 대출</td><td>해당 없음</td></tr>`}
+      ${sc.loanP ? `<tr><td>계산에 쓴 대출 · ${esc(sc.loanP.name)}</td><td>${wonK(sc.loan)}</td></tr><tr><td>월 원리금 (${RULES.sale.years}년)</td><td>${wonFull(sc.pmt)}</td></tr>` : `<tr><td>정책 대출</td><td>해당 없음</td></tr>`}
       <tr><td>자기자금</td><td${sc.shortfall ? ' class="neg"' : ""}>${sc.shortfall ? wonK(sc.shortfall) + " 부족" : "모은 돈으로 돼요"}</td></tr>
     </tbody></table><p class="small muted" style="margin-top:6px">실거래 중간값으로 계산한 참고값이에요. 관리비는 빼고 계산했어요. 최종 대출 한도·금리는 은행과 기관이 정해요.</p>`;
   } else judge = `<p class="why" style="margin-top:8px">내 조건을 넣으면 이 가격으로 디딤돌·보금자리론 요건을 따져 봐요.</p>`;
@@ -268,10 +268,12 @@ function closeCard() {
 /* ─── S1 입력 ─── */
 const fval = { homeless: 1, lives_with_parents: 0, daegu_resident_or_moving: 1 };
 let prio = [];
+/* 입력 칸은 원, 저장·계산은 만 원 */
+const toWon = v => v == null || v === "" ? "" : Math.round(v * 10000);
 function fillForm(p) {
   p = p || {};
-  $("#f-age").value = p.age ?? ""; $("#f-income").value = p.monthly_income ?? ""; $("#f-gross").value = p.annual_income_gross ?? "";
-  $("#f-assets").value = p.assets ?? ""; $("#f-budget").value = p.monthly_budget ?? "";
+  $("#f-age").value = p.age ?? ""; $("#f-income").value = toWon(p.monthly_income); $("#f-gross").value = toWon(p.annual_income_gross);
+  $("#f-assets").value = toWon(p.assets); $("#f-budget").value = toWon(p.monthly_budget);
   fval.homeless = p.homeless === false ? 0 : 1; fval.lives_with_parents = p.lives_with_parents ? 1 : 0; fval.daegu_resident_or_moving = p.daegu_resident_or_moving === false ? 0 : 1;
   prio = [...(p.priorities || [])]; syncSeg(); renderPrio(); $$(".err").forEach(e => e.textContent = "");
 }
@@ -289,7 +291,7 @@ $("#formBack").onclick = () => { S.mode = "browse"; location.hash = "#map"; };
    걸음을 넘길 때 그 걸음의 값만 검사하고, 틀리면 그 칸으로 간다 */
 const STEP_OF = { age: 1, income: 1, assets: 1, budget: 3 };
 let fstep = 1;
-const num = id => { const v = $("#" + id).value.trim(); return v === "" ? null : Number(v); };
+const num = id => { const v = $("#" + id).value.trim().replace(/[,\s원]/g, ""); if (v === "") return null; return id === "f-age" ? Number(v) : Number(v) / 10000; };
 function readForm() {
   return { age: num("f-age"), monthly_income: num("f-income"), annual_income_gross: num("f-gross"), assets: num("f-assets"), monthly_budget: num("f-budget"),
     homeless: !!fval.homeless, lives_with_parents: !!fval.lives_with_parents, daegu_resident_or_moving: !!fval.daegu_resident_or_moving, priorities: prio };
@@ -747,11 +749,11 @@ const Consult = {
     else [...S.pr.loans, ...S.pr.policies].forEach(x => L.push(`- ${x.name}: ${ST_KO[x.status]} · 이유: ${x.reason} · 최종 결정: ${x.approval_by}`));
     const c = S.sel && COMPLEX.find(x => x.id === S.sel), ev = c && S.evals[c.id];
     if (c) {
-      L.push("", "[선택한 단지]", `- 이름: ${c.name} · ${SUPPLY_KO[c.supply_type]} · ${c.area_m2}㎡ · 보증금 ${wonK(c.deposit)} · 관리비 ${c.mgmt}만 원${c.mgmt_known ? "" : "(추정)"}`);
+      L.push("", "[선택한 단지]", `- 이름: ${c.name} · ${SUPPLY_KO[c.supply_type]} · ${c.area_m2}㎡ · 보증금 ${wonK(c.deposit)} · 관리비 ${wonFull(c.mgmt)}${c.mgmt_known ? "" : "(추정)"}`);
       if (ev) {
         L.push(`- 이 단지 판정: ${LIGHT_KO[ev.light]} · ${ev.light_reason}`);
         const bd = breakdown(c, ev);
-        if (bd) L.push(`- 월 부담 내역: 월세 ${man1(bd.rent)}만, 관리비 ${man1(bd.mgmt)}만, 대출이자 ${man1(bd.loan_interest)}만(${wonK(bd.loan_needed)} × ${bd.rate}% ÷ 12), 월세지원 -${man1(bd.rent_support)}만, 합계 월 ${man1(bd.total)}만 원 (${bd.financing} 기준)`);
+        if (bd) L.push(`- 월 부담 내역: 월세 ${wonFull(bd.rent)}, 관리비 ${wonFull(bd.mgmt)}, 대출이자 ${wonFull(bd.loan_interest)}(${wonK(bd.loan_needed)} × ${bd.rate}% ÷ 12), 월세지원 -${wonFull(bd.rent_support)}, 합계 월 ${wonFull(bd.total)} (${bd.financing} 기준)`);
       } else L.push("- 월 부담: 조건을 입력하지 않아 계산하지 않았어요");
     }
     L.push("", "[공고 요약] (시연용 요약이에요. 여기에 없는 내용은 공고에서 확인이 필요해요)");
@@ -786,7 +788,7 @@ const Consult = {
       if (!S.pr) return needP();
       const id = S.sel || Object.keys(S.evals)[0], c = COMPLEX.find(x => x.id === id), ev = S.evals[id], bd = breakdown(c, ev);
       if (!bd) return [`${c.name}은 ${ev.light_reason}`, []];
-      return [`${c.name} 기준이에요.\n관리비 ${man1(bd.mgmt)}만${bd.rent ? ` + 월세 ${man1(bd.rent)}만` : ""} + 대출이자 ${man1(bd.loan_interest)}만(${bd.calc})${bd.rent_support ? ` − 월세지원 ${man1(bd.rent_support)}만` : ""} = 월 ${man1(bd.total)}만 원 (${bd.financing}).\n${ev.light === "on" ? "요건 충족 지원만으로 계산한 값이에요." : "확인 필요 지원까지 받을 때 값이에요."} 다른 단지를 보려면 지도에서 단지를 눌러 주세요.`, []];
+      return [`${c.name} 기준이에요.\n관리비 ${wonFull(bd.mgmt)}${bd.rent ? ` + 월세 ${wonFull(bd.rent)}` : ""} + 대출이자 ${wonFull(bd.loan_interest)}(${bd.calc})${bd.rent_support ? ` − 월세지원 ${wonFull(bd.rent_support)}` : ""} = 월 ${wonFull(bd.total)} (${bd.financing}).\n${ev.light === "on" ? "요건 충족 지원만으로 계산한 값이에요." : "확인 필요 지원까지 받을 때 값이에요."} 다른 단지를 보려면 지도에서 단지를 눌러 주세요.`, []];
     }
     if (/계약|특약|전에/.test(q)) return ["계약 전에 꼭 확인하세요.\n1. 계약금 내기 전 은행 대출 사전 상담\n2. 대출 불가 시 계약 해제 특약 확인\n3. 등기부등본으로 소유자·근저당 확인\n4. 전세보증보험 가입 가능 여부 확인\n먼저 1번부터 해보세요.", []];
     return ["그 질문은 아직 답을 준비하지 못했어요. 관련 기관 상담으로 연결해 드릴게요.", this.polLinks(["youth_beotimok", "daegu_interest", "youth_monthly_rent"])];
