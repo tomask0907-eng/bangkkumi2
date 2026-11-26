@@ -50,7 +50,7 @@
 │   ├── furniture.js       # 자연어/사진/링크 가구 치수·색상 추정
 │   ├── style.js           # 커스텀 스타일 팔레트 생성
 │   ├── floorplan.js       # 평면도 사진 → 방/문/창문 인식
-│   ├── render-photo.js    # 3D 캡처 → AI 포토리얼 연출 이미지 (지금은 항상 기본 답)
+│   ├── render-photo.js    # 3D 캡처 → AI 포토리얼 연출 이미지 (Gemini, server/gemini.js. 열쇠 GEMINI_API_KEY 가 없거나 실패하면 받은 그림 그대로)
 │   └── health.js          # GET /api/health (AI 키가 연결됐는지)
 ├── server/                # 서버 함수들이 같이 쓰는 도우미 (http.js, ai.js). 브라우저 코드에서 가져오지 않는다
 ├── src/

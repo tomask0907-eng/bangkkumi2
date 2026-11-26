@@ -334,7 +334,7 @@ export default function Header() {
             <path d="M20 20a7 7 0 0 0-7 7" strokeWidth="1.25" />
             <path d="M6 14h9" />
           </svg>
-          {EMBEDDED ? '집 꾸미기' : '방봄'}
+          {EMBEDDED ? '집 꾸미기' : <>방봄 <span className="en text-muted">Bangbom</span></>}
         </h1>
 
         <button type="button" className="btn btn-quiet px-2 sm:px-3" onClick={() => setConfirming(true)}>

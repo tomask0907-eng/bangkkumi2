@@ -37,6 +37,8 @@ const STYLE_NOTE: string = (NOTICES as Record<string, string | undefined>).aiSty
 
 /** 브라우저 쪽 제한 시간 (절대 규칙 7) */
 export const API_TIMEOUT_MS = 15000
+/** AI 렌더링(그림 만들기)만 더 기다린다. 서버(server/gemini.js)는 40초에서 끊고 기본 답을 준다 */
+export const RENDER_TIMEOUT_MS = 45000
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value)
@@ -60,12 +62,13 @@ async function post<T>(
   body: unknown,
   sanitize: (raw: Record<string, unknown>) => T | null,
   fallback: () => T,
+  timeoutMs: number = API_TIMEOUT_MS,
 ): Promise<T> {
   try {
     if (shouldSkipNetwork()) return fallback()
     const base: string = import.meta.env.VITE_API_BASE_URL || ''
     const controller = new AbortController()
-    const timer = setTimeout(() => controller.abort(), API_TIMEOUT_MS)
+    const timer = setTimeout(() => controller.abort(), timeoutMs)
     try {
       const response = await fetch(`${base}${path}`, {
         method: 'POST',
@@ -158,5 +161,6 @@ export function requestRenderPhoto(request: RenderPhotoRequest): Promise<RenderP
       return { imageUrlOrBase64: image, disclaimer: isFallback ? PLAIN_SNAPSHOT_NOTE : NOTICES.aiImageDisclaimer, isFallback }
     },
     () => ({ ...fallbackRenderPhoto({ snapshotBase64: request.snapshotBase64 }), disclaimer: PLAIN_SNAPSHOT_NOTE }),
+    RENDER_TIMEOUT_MS,
   )
 }

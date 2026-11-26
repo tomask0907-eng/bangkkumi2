@@ -10,6 +10,8 @@ import { eyeHeightCm } from '../engine/eyeLevel.js'
 import { actions, useActiveRoom, useAppState } from '../state/store.ts'
 import type { EyeMode } from '../state/store.ts'
 import { createSceneEngine } from './sceneEngine.ts'
+import { requestRenderPhoto } from '../lib/api.ts'
+import type { RenderPhotoResponse } from '../types/schema.ts'
 import type { EyeInfo, Quality, SceneEngine, ViewPreset } from './sceneEngine.ts'
 
 type Problem = 'none' | 'unsupported' | 'lost'
@@ -54,6 +56,9 @@ export default function Room3DView() {
   const [notice, setNotice] = useState('')
   const [markerCount, setMarkerCount] = useState(0)
   const [eyeMoved, setEyeMoved] = useState(false)
+  /** AI 렌더링: 만드는 중이면 true, 받은 사진이 있으면 창으로 보여 준다 */
+  const [rendering, setRendering] = useState(false)
+  const [rendered, setRendered] = useState<RenderPhotoResponse | null>(null)
 
   // 장면 만들기와 정리. 개발 모드(StrictMode)에서 두 번 실행돼도 앞의 것은 깨끗이 지워진다.
   useEffect(() => {
@@ -128,6 +133,27 @@ export default function Room3DView() {
   const handleSave = () => {
     const ok = engineRef.current?.savePng(SAVE_FILE_NAME) ?? false
     setNotice(ok ? '그림을 저장했어요.' : '그림을 저장하지 못했어요. 다시 눌러 주세요.')
+  }
+
+  /* 지금 화면을 찍어 서버로 보낸다. 서버가 AI를 못 쓰면 받은 그림 그대로(AI 연출 아님)가 온다 */
+  const handleRender = async () => {
+    const shot = engineRef.current?.snapshot() ?? ''
+    if (!shot) { setNotice('화면을 찍지 못했어요. 다시 눌러 주세요.'); return }
+    setRendering(true)
+    try {
+      setRendered(await requestRenderPhoto({ snapshotBase64: shot, styleName: room.style?.name ?? '', timeOfDay: 'noon' }))
+    } finally {
+      setRendering(false)
+    }
+  }
+  const saveRendered = () => {
+    if (!rendered) return
+    const link = document.createElement('a')
+    link.href = rendered.imageUrlOrBase64
+    link.download = rendered.isFallback ? '방봄_3D.jpg' : '방봄_AI렌더링.jpg'
+    document.body.appendChild(link)
+    link.click()
+    link.remove()
   }
 
   const ready = problem === 'none'
@@ -209,7 +235,7 @@ export default function Room3DView() {
                     aria-pressed={active}
                     title={option.title}
                     onClick={() => actions.setEyeMode(option.key)}
-                    className={`btn min-w-0 px-1 @[33rem]:px-3 ${active ? 'border-accent-soft bg-accent-soft text-accent hover:bg-accent-soft' : 'btn-quiet text-muted'}`}
+                    className={`btn min-w-0 px-1 @[33rem]:px-3 ${active ? 'border-ink bg-ink text-white hover:bg-ink' : 'btn-quiet text-muted'}`}
                   >
                     {EYE_MODE_LABELS[option.key]}
                   </button>
@@ -244,7 +270,7 @@ export default function Room3DView() {
                     type="button"
                     aria-pressed={active}
                     onClick={() => setQuality(option.key)}
-                    className={`btn max-lg:min-w-11 max-lg:px-2.5 ${active ? 'border-accent-soft bg-accent-soft text-accent hover:bg-accent-soft' : 'btn-quiet text-muted'}`}
+                    className={`btn max-lg:min-w-11 max-lg:px-2.5 ${active ? 'border-ink bg-ink text-white hover:bg-ink' : 'btn-quiet text-muted'}`}
                   >
                     {option.label}
                   </button>
@@ -262,9 +288,29 @@ export default function Room3DView() {
                 </svg>
                 고화질 저장
               </button>
+              <button type="button" className="btn" onClick={handleRender} disabled={rendering} aria-busy={rendering} title="지금 보이는 배치를 AI가 실사 느낌 사진으로 만들어요 (20~40초)">
+                {rendering ? '만드는 중…' : 'AI 렌더링'}
+              </button>
             </div>
           </div>
         </>
+      )}
+      {rendered && (
+        <div role="dialog" aria-modal="true" aria-label="AI 렌더링 결과" className="absolute inset-0 z-30 flex items-center justify-center bg-ink/55 p-4" onClick={(e) => { if (e.target === e.currentTarget) setRendered(null) }}>
+          <div className="w-full max-w-3xl overflow-hidden rounded-[24px] bg-surface shadow-2xl">
+            <div className="relative bg-sunken">
+              <img src={rendered.imageUrlOrBase64} alt="지금 배치를 실사 느낌으로 그린 사진" className="block max-h-[65vh] w-full object-contain" />
+              <span className="chip absolute bottom-3 left-3 bg-surface/95">{rendered.isFallback ? rendered.disclaimer : NOTICES.aiImageBadge}</span>
+            </div>
+            <div className="flex flex-wrap items-center justify-between gap-2 p-4">
+              <p className="text-sm text-muted">{rendered.isFallback ? 'AI 렌더링을 지금 쓸 수 없어서 3D 화면을 그대로 보여 드려요.' : rendered.disclaimer}</p>
+              <div className="flex gap-2">
+                <button type="button" className="btn btn-quiet" onClick={saveRendered}>사진 저장</button>
+                <button type="button" className="btn btn-primary" onClick={() => setRendered(null)} autoFocus>닫기</button>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   )

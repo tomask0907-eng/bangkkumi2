@@ -60,10 +60,12 @@ export default function StartScreen() {
         <header className="mb-6 lg:mb-10">
           <div className="flex items-center gap-2.5">
             <BrandMark />
-            <h1 className="text-2xl font-semibold tracking-tight text-ink">방봄</h1>
+            <span className="text-xl font-bold tracking-tight text-ink">방봄 <span className="en text-muted">Bangbom</span></span>
           </div>
-          <p className="mt-2 text-[15px] leading-relaxed text-muted">
-            방 크기만 넣으면 가구 배치를 바로 해 볼 수 있어요.
+          <span className="eyebrow mt-8 lg:mt-12">Your room</span>
+          <h1 className="text-[32px] leading-[1.2] font-bold tracking-[-0.05em] text-ink lg:text-[44px]">방 크기만 넣으면,<br />바로 꾸며 볼 수 있어요</h1>
+          <p className="mt-3 text-[15px] leading-relaxed text-muted lg:text-base">
+            가구를 놓고 2D·3D로 보면서, 문제와 개선 제안을 바로 확인해요.
           </p>
         </header>
 

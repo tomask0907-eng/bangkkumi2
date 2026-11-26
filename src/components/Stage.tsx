@@ -37,8 +37,8 @@ function MobileBar({ viewMode, roomName }: { viewMode: ViewMode; roomName: strin
   return (
     <Bar className="relative z-30 shrink-0 border-b border-line bg-surface pt-[env(safe-area-inset-top)]">
       <div className="flex h-12 items-center gap-2 max-[320px]:gap-0.5 pr-[max(0.25rem,env(safe-area-inset-right))] pl-[max(0.75rem,env(safe-area-inset-left))]">
-        {EMBEDDED ? null : <h1 className="shrink-0 text-[17px] font-semibold tracking-tight text-ink">방봄</h1>}
-        <div role="group" aria-label="보기 방식" className="inline-flex h-10 shrink-0 items-center rounded-lg bg-sunken px-0.5">
+        {EMBEDDED ? null : <h1 className="shrink-0 text-[17px] font-bold tracking-tight text-ink">방봄</h1>}
+        <div role="group" aria-label="보기 방식" className="inline-flex h-10 shrink-0 items-center rounded-full bg-sunken px-0.5">
           {VIEW_MODES.map((mode) => {
             const active = viewMode === mode.key
             return (
@@ -48,11 +48,11 @@ function MobileBar({ viewMode, roomName }: { viewMode: ViewMode; roomName: strin
                 type="button"
                 aria-pressed={active}
                 onClick={() => actions.setViewMode(mode.key)}
-                className="flex h-11 min-w-12 cursor-pointer items-center rounded-md max-[320px]:min-w-11"
+                className="flex h-11 min-w-12 cursor-pointer items-center rounded-full max-[320px]:min-w-11"
               >
                 <span
-                  className={`flex h-9 w-full items-center justify-center rounded-md border px-3 text-[15px] font-medium transition-colors ${
-                    active ? 'border-line bg-surface text-accent' : 'border-transparent text-muted'
+                  className={`flex h-9 w-full items-center justify-center rounded-full border px-3 max-[320px]:px-2.5 text-[15px] font-semibold transition-colors ${
+                    active ? 'border-ink bg-ink text-white' : 'border-transparent text-muted'
                   }`}
                 >
                   {mode.label}
@@ -95,7 +95,7 @@ export default function Stage() {
         <MobileBar viewMode={viewMode} roomName={room.name} />
       ) : (
         <div className="flex h-12 shrink-0 items-center justify-between gap-3 border-b border-line bg-surface px-3">
-          <div role="group" aria-label="보기 방식" className="inline-flex rounded-lg bg-sunken p-0.5">
+          <div role="group" aria-label="보기 방식" className="inline-flex rounded-full bg-sunken p-0.5">
             {VIEW_MODES.map((mode) => {
               const active = viewMode === mode.key
               return (
@@ -105,8 +105,8 @@ export default function Stage() {
                   title={mode.title}
                   aria-pressed={active}
                   onClick={() => actions.setViewMode(mode.key)}
-                  className={`h-9 min-w-14 cursor-pointer rounded-md px-3 text-sm font-medium transition-colors ${
-                    active ? 'border border-line bg-surface text-accent' : 'border border-transparent text-muted hover:text-ink'
+                  className={`h-9 min-w-14 cursor-pointer rounded-full px-4 text-sm font-semibold transition-colors ${
+                    active ? 'border border-ink bg-ink text-white' : 'border border-transparent text-muted hover:text-ink'
                   }`}
                 >
                   {mode.label}

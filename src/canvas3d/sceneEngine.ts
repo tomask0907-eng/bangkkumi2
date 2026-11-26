@@ -74,6 +74,8 @@ export interface SceneEngine {
   setEyeMode(mode: EyeMode): void
   /** 지금 보이는 장면을 2400×1500 PNG로 내려받는다. 성공하면 true */
   savePng(fileName: string): boolean
+  /** AI 렌더링에 보낼 지금 장면(1600×1000 JPEG data URL). 실패하면 빈 글자 */
+  snapshot(): string
   dispose(): void
 }
 
@@ -1107,6 +1109,43 @@ export function createSceneEngine(container: HTMLElement, options: SceneEngineOp
   const observer = new ResizeObserver(resize)
   observer.observe(container)
 
+  /** 장면을 w×h 로 한 번 그려 그림 글자(data URL)로 읽는다. 실패하면 빈 글자 */
+  function capture(w: number, h: number, type: string, quality?: number): string {
+    const ratio = renderer.getPixelRatio()
+    const outlineWasVisible = outline.visible
+    const ringWasVisible = ring.visible
+    const markersWereVisible = markerGroup.visible
+    let dataUrl = ''
+    try {
+      outline.visible = false
+      ring.visible = false
+      // 저장한 그림에는 "참고용" 안내 글이 없으므로 빨간 점은 빼고 그린다
+      markerGroup.visible = false
+      renderer.setPixelRatio(1)
+      renderer.setSize(w, h, false)
+      camera.aspect = w / h
+      camera.updateProjectionMatrix()
+      if (eyeMode !== 'off') applyEyeCamera()
+      updateWallCut()
+      renderer.render(scene, camera)
+      // 그린 직후에 바로 읽어야 그림이 남아 있다
+      dataUrl = canvas.toDataURL(type, quality)
+    } catch {
+      dataUrl = ''
+    } finally {
+      // 원래 크기로 되돌린다
+      outline.visible = outlineWasVisible
+      ring.visible = ringWasVisible
+      markerGroup.visible = markersWereVisible
+      renderer.setPixelRatio(ratio)
+      renderer.setSize(width, height, false)
+      camera.aspect = width / height
+      camera.updateProjectionMatrix()
+      renderNow()
+    }
+    return dataUrl
+  }
+
   return {
     setRoom(room) {
       if (disposed) return
@@ -1194,40 +1233,14 @@ export function createSceneEngine(container: HTMLElement, options: SceneEngineOp
       requestRender()
     },
 
+    snapshot() {
+      if (disposed) return ''
+      return capture(1600, 1000, 'image/jpeg', 0.88)
+    },
+
     savePng(fileName) {
       if (disposed) return false
-      const ratio = renderer.getPixelRatio()
-      const outlineWasVisible = outline.visible
-      const ringWasVisible = ring.visible
-      const markersWereVisible = markerGroup.visible
-      let dataUrl = ''
-      try {
-        outline.visible = false
-        ring.visible = false
-        // 저장한 그림에는 "참고용" 안내 글이 없으므로 빨간 점은 빼고 저장한다
-        markerGroup.visible = false
-        renderer.setPixelRatio(1)
-        renderer.setSize(SAVE_WIDTH, SAVE_HEIGHT, false)
-        camera.aspect = SAVE_WIDTH / SAVE_HEIGHT
-        camera.updateProjectionMatrix()
-        if (eyeMode !== 'off') applyEyeCamera()
-        updateWallCut()
-        renderer.render(scene, camera)
-        // 그린 직후에 바로 읽어야 그림이 남아 있다
-        dataUrl = canvas.toDataURL('image/png')
-      } catch {
-        dataUrl = ''
-      } finally {
-        // 원래 크기로 되돌린다
-        outline.visible = outlineWasVisible
-        ring.visible = ringWasVisible
-        markerGroup.visible = markersWereVisible
-        renderer.setPixelRatio(ratio)
-        renderer.setSize(width, height, false)
-        camera.aspect = width / height
-        camera.updateProjectionMatrix()
-        renderNow()
-      }
+      const dataUrl = capture(SAVE_WIDTH, SAVE_HEIGHT, 'image/png')
       const comma = dataUrl.indexOf(',')
       if (!dataUrl.startsWith('data:image/png') || comma < 0) return false
       try {

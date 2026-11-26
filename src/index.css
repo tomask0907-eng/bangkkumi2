@@ -113,7 +113,19 @@
     @apply rounded-2xl border border-line bg-surface;
   }
   .panel-title {
-    @apply text-base font-semibold tracking-[-0.03em] text-ink;
+    @apply text-lg leading-snug font-bold tracking-[-0.04em] text-ink;
+  }
+  /* 방봄 홈(B)의 영문 기울임 글씨: 이름 옆 "Bangbom", 소제목 "Your room" 같은 곳 */
+  .en {
+    font-family: Georgia, "Times New Roman", serif;
+    font-style: italic;
+    font-weight: 400;
+    letter-spacing: 0;
+  }
+  .eyebrow {
+    @apply mb-1.5 block text-[15px] text-accent;
+    font-family: Georgia, "Times New Roman", serif;
+    font-style: italic;
   }
   .label {
     @apply mb-1 block text-[13px] font-medium text-muted phone:text-sm;
