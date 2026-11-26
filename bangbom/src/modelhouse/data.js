@@ -97,7 +97,7 @@ const RULES = {
   }
  ],
  "badges": {
-  "brokerage": { "name": "대구 청년 중개수수료 지원", "text": "1회 지원 참고: 최대 30만(11.30 마감)", "deal_max": 15000, "age_min": 19, "age_max": 39, "_note": "월 실부담에는 넣지 않음(팀 결정). 2026.1.1 이후 대구 전입", "source_url": "https://dk.breaknews.com/207104", "checked_at": "2026-11-26" },
+  "brokerage": { "name": "대구 청년 중개수수료 지원", "text": "1회 지원 참고: 최대 300,000원(11.30 마감)", "deal_max": 15000, "age_min": 19, "age_max": 39, "_note": "월 실부담에는 넣지 않음(팀 결정). 2026.1.1 이후 대구 전입", "source_url": "https://dk.breaknews.com/207104", "checked_at": "2026-11-26" },
   "guarantee_fee": { "name": "전세보증금 반환보증 보증료 지원", "text": "보증료 환급 지원이 있어요. 금액은 확인 필요(대구시 발표 최대 40만 / 국토부 기준 30만으로 출처가 달라요)", "source_url": "https://www.twig24.com/news/2026/01/12/20260112500219", "checked_at": "2026-11-26" },
   "dundeun": "든든전세는 공고 기간에 신청하고 배점·추첨으로 정해져요"
  },

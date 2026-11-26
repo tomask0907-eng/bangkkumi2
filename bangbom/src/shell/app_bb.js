@@ -291,7 +291,7 @@ function bigOpen() {
   const p = $("#panelR"); if (cardBig || !p.classList.contains("is-open") || !S.sel) return;
   cardBig = true; let sc = $("#cardScrim"); if (!sc) { sc = document.createElement("div"); sc.id = "cardScrim"; sc.addEventListener("click", () => bigClose()); $("#mh").appendChild(sc); }
   /* 오른쪽 칸에는 판정·계산 내역·지원·체크리스트·신청 링크를 펼친다. 보증·권리, 매매, 주변 시설은 접어 둔다(눌러서 펼침) */
-  $("details.fold", p).forEach(d => d.open = ["calc", "sup", "chk", "link"].includes(d.dataset.pane));
+  $$("details.fold", p).forEach(d => d.open = ["calc", "sup", "chk", "link"].includes(d.dataset.pane));
   p.classList.add("is-big"); document.body.classList.add("card-big"); p.setAttribute("role", "dialog"); p.setAttribute("aria-modal", "true");
   const b = $("#ccBig"); if (b) { b.setAttribute("aria-label", "작게 보기"); b.firstChild.textContent = "⤡"; }
   const h = $(".cc-top h2", p); if (h) { h.tabIndex = -1; h.id = "ccTitle"; p.setAttribute("aria-labelledby", "ccTitle"); h.focus({ preventScroll: true }); }
@@ -308,7 +308,7 @@ addEventListener("keydown", e => {
   if (!cardBig) return;
   if (e.key === "Escape") { e.preventDefault(); e.stopImmediatePropagation(); bigClose(); return; }
   if (e.key !== "Tab") return;
-  const f = $('#panelR a[href], #panelR button:not([disabled]), #panelR input, #panelR summary, #panelR [tabindex]:not([tabindex="-1"])').filter(x => x.offsetParent !== null);
+  const f = $$('#panelR a[href], #panelR button:not([disabled]), #panelR input, #panelR summary, #panelR [tabindex]:not([tabindex="-1"])').filter(x => x.offsetParent !== null);
   if (!f.length) return; const a = f[0], z = f[f.length - 1];
   if (e.shiftKey && (document.activeElement === a || !$("#panelR").contains(document.activeElement))) { e.preventDefault(); z.focus(); }
   else if (!e.shiftKey && document.activeElement === z) { e.preventDefault(); a.focus(); }

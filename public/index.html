@@ -2385,7 +2385,7 @@ const RULES = {
   }
  ],
  "badges": {
-  "brokerage": { "name": "대구 청년 중개수수료 지원", "text": "1회 지원 참고: 최대 30만(11.30 마감)", "deal_max": 15000, "age_min": 19, "age_max": 39, "_note": "월 실부담에는 넣지 않음(팀 결정). 2026.1.1 이후 대구 전입", "source_url": "https://dk.breaknews.com/207104", "checked_at": "2026-11-26" },
+  "brokerage": { "name": "대구 청년 중개수수료 지원", "text": "1회 지원 참고: 최대 300,000원(11.30 마감)", "deal_max": 15000, "age_min": 19, "age_max": 39, "_note": "월 실부담에는 넣지 않음(팀 결정). 2026.1.1 이후 대구 전입", "source_url": "https://dk.breaknews.com/207104", "checked_at": "2026-11-26" },
   "guarantee_fee": { "name": "전세보증금 반환보증 보증료 지원", "text": "보증료 환급 지원이 있어요. 금액은 확인 필요(대구시 발표 최대 40만 / 국토부 기준 30만으로 출처가 달라요)", "source_url": "https://www.twig24.com/news/2026/01/12/20260112500219", "checked_at": "2026-11-26" },
   "dundeun": "든든전세는 공고 기간에 신청하고 배점·추첨으로 정해져요"
  },
@@ -6465,7 +6465,7 @@ function bigOpen() {
   const p = $("#panelR"); if (cardBig || !p.classList.contains("is-open") || !S.sel) return;
   cardBig = true; let sc = $("#cardScrim"); if (!sc) { sc = document.createElement("div"); sc.id = "cardScrim"; sc.addEventListener("click", () => bigClose()); $("#mh").appendChild(sc); }
   /* 오른쪽 칸에는 판정·계산 내역·지원·체크리스트·신청 링크를 펼친다. 보증·권리, 매매, 주변 시설은 접어 둔다(눌러서 펼침) */
-  $("details.fold", p).forEach(d => d.open = ["calc", "sup", "chk", "link"].includes(d.dataset.pane));
+  $$("details.fold", p).forEach(d => d.open = ["calc", "sup", "chk", "link"].includes(d.dataset.pane));
   p.classList.add("is-big"); document.body.classList.add("card-big"); p.setAttribute("role", "dialog"); p.setAttribute("aria-modal", "true");
   const b = $("#ccBig"); if (b) { b.setAttribute("aria-label", "작게 보기"); b.firstChild.textContent = "⤡"; }
   const h = $(".cc-top h2", p); if (h) { h.tabIndex = -1; h.id = "ccTitle"; p.setAttribute("aria-labelledby", "ccTitle"); h.focus({ preventScroll: true }); }
@@ -6482,7 +6482,7 @@ addEventListener("keydown", e => {
   if (!cardBig) return;
   if (e.key === "Escape") { e.preventDefault(); e.stopImmediatePropagation(); bigClose(); return; }
   if (e.key !== "Tab") return;
-  const f = $('#panelR a[href], #panelR button:not([disabled]), #panelR input, #panelR summary, #panelR [tabindex]:not([tabindex="-1"])').filter(x => x.offsetParent !== null);
+  const f = $$('#panelR a[href], #panelR button:not([disabled]), #panelR input, #panelR summary, #panelR [tabindex]:not([tabindex="-1"])').filter(x => x.offsetParent !== null);
   if (!f.length) return; const a = f[0], z = f[f.length - 1];
   if (e.shiftKey && (document.activeElement === a || !$("#panelR").contains(document.activeElement))) { e.preventDefault(); z.focus(); }
   else if (!e.shiftKey && document.activeElement === z) { e.preventDefault(); a.focus(); }
