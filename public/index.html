@@ -6204,7 +6204,7 @@ function cardHTML(id) {
   const noteText = c.room_id === "room_84a" && c.area_m2 !== 84 ? `집 보기는 ${c.area_m2}㎡ 평면이 아직 없어 84㎡ 구조로 대신 보여줘요.` : "";
   const roomNote = noteText ? `<p class="small muted pc-only" style="margin-top:6px">${noteText}</p>` : "", roomNoteM = noteText ? `<p class="small muted m-only" style="margin-top:10px">${noteText}</p>` : "";
   const bd = match ? breakdown(c, ev) : null;
-  const panes = [["sum", "요약"], bd && ["calc", "계산 내역"], match && ["sup", "지원"], match && ["chk", "체크리스트"], ["safe", "전세 안전"], c.sale_price && ["sale", "매매"], ["near", "주변 시설"], match && ["link", "링크"], ["plan", "평면"]].filter(Boolean);
+  const panes = [["sum", "요약"], bd && ["calc", "계산 내역"], match && ["sup", "지원"], match && ["chk", "체크리스트"], ["safe", "보증·권리 확인"], c.sale_price && ["sale", "매매"], ["near", "주변 시설"], match && ["link", "링크"], ["plan", "평면"]].filter(Boolean);
   let head = `<div class="cc-plan" data-pane="plan">${planSVG(buildLayout(c.room_id || "room_84a"))}<span class="cc-plan-tag">평면 예시 · ${c.area_m2}㎡</span></div><div class="cc-top"><div><span class="eyebrow-s">${c.is_sample ? "Sample complex" : "Complex"}</span>${match ? `<span class="st st--${ev.light}">${LIGHT_ICON[ev.light]} ${LIGHT_KO[ev.light]}</span>` : ""}<h2 style="margin-top:${match ? 8 : 0}px">${esc(c.name)}</h2>
     <div class="tags"><span class="tag">${SUPPLY_KO[c.supply_type]}</span><span class="tag">${esc(c.district)}</span><span class="tag">${c.area_m2}㎡</span>${c.supply_type === "lh_dundeun" ? '<span class="tag">공고·추첨</span>' : ""}${c.is_sample ? '<span class="sample">예시</span>' : ""}${match && brokerageBadge(S.profile, c) ? `<span class="tag">${esc(RULES.badges.brokerage.text)}</span>` : ""}</div>${!c.is_sample && c.source_url ? `<p class="small muted" style="margin-top:6px">보증금 출처: <a href="${esc(c.source_url)}" target="_blank" rel="noopener">${esc(c.source)}</a> · 확인일 ${esc(c.checked_at)}</p>` : ""}${whyLine(c)}</div>
     <button class="x" id="ccX" aria-label="카드 닫기"><svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 3l10 10M13 3L3 13"/></svg></button></div>
@@ -6253,7 +6253,7 @@ function setTab(t) {
 }
 function safetyHTML(c) {
   const sc = safetyCheck(c);
-  return `<details class="fold" data-pane="safe"><summary>전세 안전 확인</summary>${sc ? `<p class="small" style="margin-bottom:8px"><span class="st st--${sc.status}">${ST_KO[sc.status]}</span> 보증금 + 선순위채권이 시세의 ${sc.ratio}%예요</p>` : `<p class="small muted" style="margin-bottom:8px">이 단지는 시세·선순위채권 자료가 없어 판정하지 않고 체크리스트만 보여줘요.</p>`}
+  return `<details class="fold" data-pane="safe"><summary>보증·권리 확인</summary>${sc ? `<p class="small" style="margin-bottom:8px"><span class="st st--${sc.status}">${ST_KO[sc.status]}</span> 보증금 + 선순위채권이 시세의 ${sc.ratio}%예요</p>` : `<p class="small muted" style="margin-bottom:8px">이 단지는 시세·선순위채권 자료가 없어 판정하지 않고 체크리스트만 보여줘요.</p>`}
     <ul class="lst">${RULES.safety_checklist.map(t => `<li><span>${esc(t)}</span></li>`).join("")}<li><span>${esc(RULES.badges.guarantee_fee.text)} <a href="${esc(RULES.badges.guarantee_fee.source_url)}" target="_blank" rel="noopener">출처</a></span></li></ul>
     <p class="small muted" style="margin-top:6px">대구 전세사기 피해 결정 1,013건(국토부 2026.10 발표 누적), 대구경북 피해자 76%가 40세 미만(경북매일 2026.9.7)</p></details>`;
 }
