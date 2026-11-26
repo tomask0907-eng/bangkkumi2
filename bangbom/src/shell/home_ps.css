@@ -1,0 +1,122 @@
+/* ═══════ 홈 5화면 (히어로 → 문제 → 해결 1 → 해결 2 → 시작하기) ═══════ */
+/* 섹션 틀은 p1_head.html 의 .section / .container 를 그대로 쓴다. 여기는 6화면에만 필요한 것만 둔다 */
+.hs__head{max-width:720px}
+.hs__body{margin-top:var(--s6)}
+.hs__body:empty{display:none}
+.hs__close{margin-top:var(--s6);font-size:clamp(18px,1.6vw,22px);font-weight:600;letter-spacing:-.03em;line-height:1.5}
+.hs__cta{margin-top:var(--s6);display:flex;justify-content:center}
+/* 판정 표시: 모든 홈 화면에서 같은 기호·색. 색만으로 구분하지 않게 모양(채움·반 채움·테두리)과 글자를 같이 쓴다 */
+:root{--jd-on:#1f6b4f;--jd-dim:#c7891d;--jd-off:#a9a7a0}
+.jd{display:inline-flex;align-items:center;gap:6px;height:26px;padding:0 10px;border-radius:999px;font-size:12px;font-weight:600;letter-spacing:-.01em;white-space:nowrap}
+.jd i,.jd-dot{display:inline-block;width:10px;height:10px;border-radius:50%;flex:none;box-sizing:border-box;vertical-align:-1px}
+.jd--on{background:var(--green-soft);color:var(--jd-on)}.jd--on i,.jd-dot--on{background:var(--jd-on)}
+.jd--dim{background:#fbf1de;color:#835a10}.jd--dim i,.jd-dot--dim{border:1.5px solid var(--jd-dim);background:linear-gradient(90deg,var(--jd-dim) 50%,transparent 50%)}
+.jd--off{background:var(--gray);color:var(--sub)}.jd--off i,.jd-dot--off{border:1.5px solid var(--jd-off);background:transparent}
+/* 2. 문제: 큰 숫자 두 개를 맞대고(테두리·배경 없이), 아래에 이유 두 줄. PC 1440×900 한 화면에 들어가게 위아래 여백을 줄인다 */
+#home-problem.section{padding:calc(var(--nav-h) + 40px) 0 48px}
+.pb-big{display:grid;grid-template-columns:1fr 1fr;margin-top:var(--s5);border-top:1px solid var(--line)}
+.pb-big__item{padding:var(--s4) var(--s4) 0 0}
+.pb-big__item + .pb-big__item{padding-left:var(--s5);border-left:1px solid var(--line)}
+.pb-num{display:flex;align-items:baseline;gap:6px;color:var(--green);font-weight:500;font-size:clamp(64px,7vw,100px);line-height:1;letter-spacing:-.045em;font-variant-numeric:tabular-nums}
+.pb-num small{font-size:clamp(20px,1.8vw,26px);font-weight:600;color:var(--ink);letter-spacing:-.02em}
+.pb-ref{font-size:15px;font-weight:600;color:var(--sub);letter-spacing:0;line-height:1;vertical-align:super;margin-left:2px}
+.pb-num .pb-ref{align-self:flex-start;margin-top:.3em}
+.pb-lbl{margin-top:var(--s2);font-size:clamp(18px,1.5vw,21px);font-weight:600;letter-spacing:-.03em}
+.pb-sub{margin-top:4px;font-size:14px;color:var(--sub)}
+.pb-why{margin-top:var(--s5);padding-top:var(--s3);border-top:1px solid var(--line)}
+.pb-why__t{font-size:15px;font-weight:600;color:var(--sub);letter-spacing:-.02em}
+.pb-why__list{list-style:none;margin:var(--s2) 0 0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:var(--s1) var(--s5)}
+.pb-why__list li{display:flex;align-items:center;gap:var(--s3)}
+.pb-why__num{flex:none;min-width:150px;font-size:40px;font-weight:500;line-height:1.1;letter-spacing:-.04em;color:var(--ink);font-variant-numeric:tabular-nums}
+.pb-why__num small{font-size:18px;font-weight:600;margin-left:2px}
+.pb-why__list li > p:last-child{font-size:16px;line-height:1.5}
+.pb-close{margin-top:var(--s5);font-size:clamp(22px,2.1vw,30px);line-height:1.4;letter-spacing:-.04em}
+.pb-more{margin-top:var(--s3);font-size:13px;line-height:1.6;color:var(--sub)}
+.pb-src a{text-decoration:underline;text-underline-offset:2px}
+.sf{display:grid;grid-template-columns:1fr 32px 1fr 32px 1fr;align-items:stretch}
+.sf__step{position:relative;padding:var(--s3);border-radius:var(--r-photo);background:var(--card);border:1px solid var(--line);min-width:0}
+.sf__h{display:flex;align-items:baseline;gap:10px;padding-right:56px}
+.sf__h .tag-example{position:absolute;top:var(--s3);right:var(--s3)}
+.sf__no{font-family:var(--en);font-style:italic;font-size:20px;color:var(--green);line-height:1}
+.sf__h b{font-size:18px;font-weight:600;letter-spacing:-.03em}
+.sf__arrow{align-self:center;justify-self:center;width:14px;height:14px;border-top:1.5px solid var(--sub);border-right:1.5px solid var(--sub);transform:rotate(45deg)}
+.sf__chips{list-style:none;margin:var(--s3) 0 0;padding:0;display:flex;flex-wrap:wrap;gap:8px}
+.sf__chips li{height:36px;padding:0 14px;border-radius:999px;background:#fff;border:1px solid var(--line);font-size:14px;font-weight:600;display:inline-flex;align-items:center;white-space:nowrap}
+.sf__note{margin-top:var(--s2);font-size:13px;color:var(--sub)}
+.sf__list{list-style:none;margin:var(--s2) 0 0;padding:0}
+.sf__list li{display:flex;align-items:center;justify-content:space-between;gap:var(--s1);padding:8px 0;border-bottom:1px solid var(--line);font-size:14px;line-height:1.4}
+.sf__list li:last-child{border-bottom:0}
+.sf__pair{margin-top:var(--s3)}
+.sf__keep,.sf__drop{padding:10px 14px;border-radius:12px;background:#fff;border:1px solid var(--line);font-size:14px;font-weight:600;line-height:1.4}
+.sf__drop{display:flex;align-items:center;justify-content:space-between;gap:var(--s1);color:var(--sub);font-weight:500}
+.sf__drop em{flex:none;font-style:normal;font-size:12px;font-weight:600;color:var(--sub);padding:3px 8px;border-radius:999px;background:var(--gray)}
+.sf__or{position:relative;height:32px;display:flex;align-items:center;justify-content:center}
+.sf__or::before{content:"";position:absolute;top:0;bottom:0;left:50%;border-left:1.5px dashed #b9b7b0}
+.sf__or span{position:relative;font-size:12px;font-weight:600;padding:2px 10px;border-radius:999px;background:var(--card);border:1px solid var(--line)}
+.sf-result{margin-top:var(--s4);display:flex;align-items:center;flex-wrap:wrap;gap:var(--s2) var(--s4)}
+.sf-result__t{font-size:clamp(20px,1.8vw,24px);font-weight:600;letter-spacing:-.03em}
+.sf-result__houses{display:flex;gap:6px}
+.hi{width:34px;height:34px;flex:none}
+.hi path{fill:none;stroke-width:1.6;stroke-linejoin:round}
+.hi--on path{fill:var(--jd-on);stroke:var(--jd-on)}
+.hi--dim path{stroke:var(--jd-dim)}.hi--dim .hi__half{fill:var(--jd-dim);stroke:none}
+.hi--off path{stroke:var(--jd-off)}
+.sf-result__n{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:16px;color:var(--sub)}
+.sf-result__n span{display:inline-flex;align-items:center;gap:6px}
+.sf-foot{margin-top:var(--s3);display:flex;flex-wrap:wrap;align-items:center;gap:var(--s1) var(--s3);font-size:15px;color:#3d413d}
+.sf-foot .link{margin-top:0}
+@media (max-width:1100px){.sf{grid-template-columns:1fr;gap:0}.sf__arrow{transform:rotate(135deg);margin:10px 0}}
+@media (max-width:820px){
+  #home-support.section{padding:56px 0 48px}
+  #homeSupport.hs__body{margin-top:var(--s3)}
+  .sf__step{padding:var(--s2)}
+  .sf__h .tag-example{top:var(--s2);right:var(--s2)}
+  .sf__chips{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-top:var(--s2)}
+  .sf__chips::-webkit-scrollbar{display:none}
+  .sf__chips li{flex:none}
+  .sf__note{margin-top:var(--s1)}
+  .sf__list{margin-top:var(--s1)}
+  .sf__list li{padding:6px 0;font-size:13px}
+  .sf__pair{margin-top:var(--s2)}
+  .sf-result{margin-top:var(--s3);gap:var(--s1) var(--s2)}
+  .hi{width:28px;height:28px}
+  .sf-result__houses{gap:4px}
+  .sf-foot{font-size:14px}
+}
+@media (max-width:820px){
+  #home-problem.section{padding:56px 0 48px}
+  .pb-big{grid-template-columns:1fr;margin-top:var(--s3)}
+  .pb-big__item{padding:var(--s3) 0}
+  .pb-big__item + .pb-big__item{padding-left:0;border-left:0;border-top:1px solid var(--line)}
+  .pb-num{font-size:60px}
+  .pb-why{margin-top:var(--s2)}
+  .pb-why__list{grid-template-columns:1fr;gap:var(--s2)}
+  .pb-why__num{min-width:104px;font-size:32px}
+  .pb-why__list li > p:last-child{font-size:15px}
+  .pb-close{margin-top:var(--s4);font-size:21px}
+}
+/* 3. 해결 1: 01 조건 → 02 하나씩 따지기 → 03 같이 못 받는 것 거르기, 칸 사이 화살표. 아래에 결과(작은 집 8채) */
+/* ── 홈 5화면 맞추기 (문제 → 해결): 화면 틀은 풀페이지(.fp)를 쓰고, 해결 2는 칩으로 그림과 설명을 바꾼다 ── */
+.fp--white{background:#fff}
+.fp.hs .hs__head{max-width:860px}
+.fp.hs .hs__body{margin-top:var(--s4)}
+#home-problem .pb-big{margin-top:var(--s4)}
+#home-problem .pb-why,#home-problem .pb-close{margin-top:var(--s4)}
+.pb-src{margin-top:var(--s2);font-size:13px;color:var(--sub)}
+.pb-src summary{cursor:pointer;display:inline-flex;gap:6px;text-decoration:underline;text-underline-offset:3px}
+.pb-src p{margin-top:8px;display:grid;gap:4px}
+.s2-tabs{display:flex;flex-wrap:wrap;gap:8px;margin-top:var(--s3)}
+.s2-tab{height:40px;padding:0 16px;border-radius:var(--r-pill);border:1px solid var(--line);background:#fff;font-size:15px;font-weight:600;color:var(--ink)}
+.s2-tab.is-on{background:var(--ink);border-color:var(--ink);color:#fff}
+.s2-pane{margin-top:var(--s2)}
+.s2-pane .fp__desc{margin-top:0}
+.s2-pane .btn{margin-top:var(--s3)}
+.s2-btns{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s2) var(--s3)}
+.s2-btns .link{margin-top:var(--s3)}
+.s2-media{position:absolute;inset:0}
+.s2-media[hidden]{display:none}
+.s2-media>video,.s2-media>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.s2-media .ba{position:absolute;inset:0}
+.s2-media .tag-example{position:absolute;top:auto;right:14px;bottom:14px;z-index:4}
+.plans__cta{margin-left:auto}
+@media (max-width:820px){.fp.hs .hs__body{margin-top:var(--s3)}.plans__cta{margin-left:0}.s2-tab{height:38px;padding:0 14px;font-size:14px}}

@@ -11,14 +11,14 @@
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="방봄 BANGBOM">
-<meta property="og:title" content="방봄 BANGBOM · 가 보기 전에, 먼저 살아보는 집">
+<meta property="og:title" content="방봄 BANGBOM · 따져 보고, 살아 보고, 고르는 집">
 <meta property="og:description" content="대구에서 집을 구하는 청년이 내 조건을 넣으면 받을 수 있는 대출·지원을 따져 주고, 요건이 맞는 집을 지도에서 밝혀 주고, 평면도·3D로 방 안까지 미리 살아 보게 해요.">
 <meta property="og:image" content="thumb.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:locale" content="ko_KR">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="방봄 BANGBOM · 가 보기 전에, 먼저 살아보는 집">
+<meta name="twitter:title" content="방봄 BANGBOM · 따져 보고, 살아 보고, 고르는 집">
 <meta name="twitter:description" content="대구에서 집을 구하는 청년이 내 조건을 넣으면 받을 수 있는 대출·지원을 따져 주고, 요건이 맞는 집을 지도에서 밝혀 주고, 평면도·3D로 방 안까지 미리 살아 보게 해요.">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1175,6 +1175,128 @@ body.fp-on .fp-dots{display:flex}
 .g-flow li:first-child::before{content:"·"}
 .steps3 .s5 .link{margin-top:var(--s3);align-self:flex-start}
 @media (max-width:1100px){.steps5.steps3{grid-template-columns:1fr}.steps3 .s5 + .s5{padding-left:0;border-left:0;border-top:1px solid var(--line)}.steps3 .s5:nth-child(n+4){border-top:0}}
+/* ═══════ 홈 5화면 (히어로 → 문제 → 해결 1 → 해결 2 → 시작하기) ═══════ */
+/* 섹션 틀은 p1_head.html 의 .section / .container 를 그대로 쓴다. 여기는 6화면에만 필요한 것만 둔다 */
+.hs__head{max-width:720px}
+.hs__body{margin-top:var(--s6)}
+.hs__body:empty{display:none}
+.hs__close{margin-top:var(--s6);font-size:clamp(18px,1.6vw,22px);font-weight:600;letter-spacing:-.03em;line-height:1.5}
+.hs__cta{margin-top:var(--s6);display:flex;justify-content:center}
+/* 판정 표시: 모든 홈 화면에서 같은 기호·색. 색만으로 구분하지 않게 모양(채움·반 채움·테두리)과 글자를 같이 쓴다 */
+:root{--jd-on:#1f6b4f;--jd-dim:#c7891d;--jd-off:#a9a7a0}
+.jd{display:inline-flex;align-items:center;gap:6px;height:26px;padding:0 10px;border-radius:999px;font-size:12px;font-weight:600;letter-spacing:-.01em;white-space:nowrap}
+.jd i,.jd-dot{display:inline-block;width:10px;height:10px;border-radius:50%;flex:none;box-sizing:border-box;vertical-align:-1px}
+.jd--on{background:var(--green-soft);color:var(--jd-on)}.jd--on i,.jd-dot--on{background:var(--jd-on)}
+.jd--dim{background:#fbf1de;color:#835a10}.jd--dim i,.jd-dot--dim{border:1.5px solid var(--jd-dim);background:linear-gradient(90deg,var(--jd-dim) 50%,transparent 50%)}
+.jd--off{background:var(--gray);color:var(--sub)}.jd--off i,.jd-dot--off{border:1.5px solid var(--jd-off);background:transparent}
+/* 2. 문제: 큰 숫자 두 개를 맞대고(테두리·배경 없이), 아래에 이유 두 줄. PC 1440×900 한 화면에 들어가게 위아래 여백을 줄인다 */
+#home-problem.section{padding:calc(var(--nav-h) + 40px) 0 48px}
+.pb-big{display:grid;grid-template-columns:1fr 1fr;margin-top:var(--s5);border-top:1px solid var(--line)}
+.pb-big__item{padding:var(--s4) var(--s4) 0 0}
+.pb-big__item + .pb-big__item{padding-left:var(--s5);border-left:1px solid var(--line)}
+.pb-num{display:flex;align-items:baseline;gap:6px;color:var(--green);font-weight:500;font-size:clamp(64px,7vw,100px);line-height:1;letter-spacing:-.045em;font-variant-numeric:tabular-nums}
+.pb-num small{font-size:clamp(20px,1.8vw,26px);font-weight:600;color:var(--ink);letter-spacing:-.02em}
+.pb-ref{font-size:15px;font-weight:600;color:var(--sub);letter-spacing:0;line-height:1;vertical-align:super;margin-left:2px}
+.pb-num .pb-ref{align-self:flex-start;margin-top:.3em}
+.pb-lbl{margin-top:var(--s2);font-size:clamp(18px,1.5vw,21px);font-weight:600;letter-spacing:-.03em}
+.pb-sub{margin-top:4px;font-size:14px;color:var(--sub)}
+.pb-why{margin-top:var(--s5);padding-top:var(--s3);border-top:1px solid var(--line)}
+.pb-why__t{font-size:15px;font-weight:600;color:var(--sub);letter-spacing:-.02em}
+.pb-why__list{list-style:none;margin:var(--s2) 0 0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:var(--s1) var(--s5)}
+.pb-why__list li{display:flex;align-items:center;gap:var(--s3)}
+.pb-why__num{flex:none;min-width:150px;font-size:40px;font-weight:500;line-height:1.1;letter-spacing:-.04em;color:var(--ink);font-variant-numeric:tabular-nums}
+.pb-why__num small{font-size:18px;font-weight:600;margin-left:2px}
+.pb-why__list li > p:last-child{font-size:16px;line-height:1.5}
+.pb-close{margin-top:var(--s5);font-size:clamp(22px,2.1vw,30px);line-height:1.4;letter-spacing:-.04em}
+.pb-more{margin-top:var(--s3);font-size:13px;line-height:1.6;color:var(--sub)}
+.pb-src a{text-decoration:underline;text-underline-offset:2px}
+.sf{display:grid;grid-template-columns:1fr 32px 1fr 32px 1fr;align-items:stretch}
+.sf__step{position:relative;padding:var(--s3);border-radius:var(--r-photo);background:var(--card);border:1px solid var(--line);min-width:0}
+.sf__h{display:flex;align-items:baseline;gap:10px;padding-right:56px}
+.sf__h .tag-example{position:absolute;top:var(--s3);right:var(--s3)}
+.sf__no{font-family:var(--en);font-style:italic;font-size:20px;color:var(--green);line-height:1}
+.sf__h b{font-size:18px;font-weight:600;letter-spacing:-.03em}
+.sf__arrow{align-self:center;justify-self:center;width:14px;height:14px;border-top:1.5px solid var(--sub);border-right:1.5px solid var(--sub);transform:rotate(45deg)}
+.sf__chips{list-style:none;margin:var(--s3) 0 0;padding:0;display:flex;flex-wrap:wrap;gap:8px}
+.sf__chips li{height:36px;padding:0 14px;border-radius:999px;background:#fff;border:1px solid var(--line);font-size:14px;font-weight:600;display:inline-flex;align-items:center;white-space:nowrap}
+.sf__note{margin-top:var(--s2);font-size:13px;color:var(--sub)}
+.sf__list{list-style:none;margin:var(--s2) 0 0;padding:0}
+.sf__list li{display:flex;align-items:center;justify-content:space-between;gap:var(--s1);padding:8px 0;border-bottom:1px solid var(--line);font-size:14px;line-height:1.4}
+.sf__list li:last-child{border-bottom:0}
+.sf__pair{margin-top:var(--s3)}
+.sf__keep,.sf__drop{padding:10px 14px;border-radius:12px;background:#fff;border:1px solid var(--line);font-size:14px;font-weight:600;line-height:1.4}
+.sf__drop{display:flex;align-items:center;justify-content:space-between;gap:var(--s1);color:var(--sub);font-weight:500}
+.sf__drop em{flex:none;font-style:normal;font-size:12px;font-weight:600;color:var(--sub);padding:3px 8px;border-radius:999px;background:var(--gray)}
+.sf__or{position:relative;height:32px;display:flex;align-items:center;justify-content:center}
+.sf__or::before{content:"";position:absolute;top:0;bottom:0;left:50%;border-left:1.5px dashed #b9b7b0}
+.sf__or span{position:relative;font-size:12px;font-weight:600;padding:2px 10px;border-radius:999px;background:var(--card);border:1px solid var(--line)}
+.sf-result{margin-top:var(--s4);display:flex;align-items:center;flex-wrap:wrap;gap:var(--s2) var(--s4)}
+.sf-result__t{font-size:clamp(20px,1.8vw,24px);font-weight:600;letter-spacing:-.03em}
+.sf-result__houses{display:flex;gap:6px}
+.hi{width:34px;height:34px;flex:none}
+.hi path{fill:none;stroke-width:1.6;stroke-linejoin:round}
+.hi--on path{fill:var(--jd-on);stroke:var(--jd-on)}
+.hi--dim path{stroke:var(--jd-dim)}.hi--dim .hi__half{fill:var(--jd-dim);stroke:none}
+.hi--off path{stroke:var(--jd-off)}
+.sf-result__n{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:16px;color:var(--sub)}
+.sf-result__n span{display:inline-flex;align-items:center;gap:6px}
+.sf-foot{margin-top:var(--s3);display:flex;flex-wrap:wrap;align-items:center;gap:var(--s1) var(--s3);font-size:15px;color:#3d413d}
+.sf-foot .link{margin-top:0}
+@media (max-width:1100px){.sf{grid-template-columns:1fr;gap:0}.sf__arrow{transform:rotate(135deg);margin:10px 0}}
+@media (max-width:820px){
+  #home-support.section{padding:56px 0 48px}
+  #homeSupport.hs__body{margin-top:var(--s3)}
+  .sf__step{padding:var(--s2)}
+  .sf__h .tag-example{top:var(--s2);right:var(--s2)}
+  .sf__chips{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-top:var(--s2)}
+  .sf__chips::-webkit-scrollbar{display:none}
+  .sf__chips li{flex:none}
+  .sf__note{margin-top:var(--s1)}
+  .sf__list{margin-top:var(--s1)}
+  .sf__list li{padding:6px 0;font-size:13px}
+  .sf__pair{margin-top:var(--s2)}
+  .sf-result{margin-top:var(--s3);gap:var(--s1) var(--s2)}
+  .hi{width:28px;height:28px}
+  .sf-result__houses{gap:4px}
+  .sf-foot{font-size:14px}
+}
+@media (max-width:820px){
+  #home-problem.section{padding:56px 0 48px}
+  .pb-big{grid-template-columns:1fr;margin-top:var(--s3)}
+  .pb-big__item{padding:var(--s3) 0}
+  .pb-big__item + .pb-big__item{padding-left:0;border-left:0;border-top:1px solid var(--line)}
+  .pb-num{font-size:60px}
+  .pb-why{margin-top:var(--s2)}
+  .pb-why__list{grid-template-columns:1fr;gap:var(--s2)}
+  .pb-why__num{min-width:104px;font-size:32px}
+  .pb-why__list li > p:last-child{font-size:15px}
+  .pb-close{margin-top:var(--s4);font-size:21px}
+}
+/* 3. 해결 1: 01 조건 → 02 하나씩 따지기 → 03 같이 못 받는 것 거르기, 칸 사이 화살표. 아래에 결과(작은 집 8채) */
+/* ── 홈 5화면 맞추기 (문제 → 해결): 화면 틀은 풀페이지(.fp)를 쓰고, 해결 2는 칩으로 그림과 설명을 바꾼다 ── */
+.fp--white{background:#fff}
+.fp.hs .hs__head{max-width:860px}
+.fp.hs .hs__body{margin-top:var(--s4)}
+#home-problem .pb-big{margin-top:var(--s4)}
+#home-problem .pb-why,#home-problem .pb-close{margin-top:var(--s4)}
+.pb-src{margin-top:var(--s2);font-size:13px;color:var(--sub)}
+.pb-src summary{cursor:pointer;display:inline-flex;gap:6px;text-decoration:underline;text-underline-offset:3px}
+.pb-src p{margin-top:8px;display:grid;gap:4px}
+.s2-tabs{display:flex;flex-wrap:wrap;gap:8px;margin-top:var(--s3)}
+.s2-tab{height:40px;padding:0 16px;border-radius:var(--r-pill);border:1px solid var(--line);background:#fff;font-size:15px;font-weight:600;color:var(--ink)}
+.s2-tab.is-on{background:var(--ink);border-color:var(--ink);color:#fff}
+.s2-pane{margin-top:var(--s2)}
+.s2-pane .fp__desc{margin-top:0}
+.s2-pane .btn{margin-top:var(--s3)}
+.s2-btns{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s2) var(--s3)}
+.s2-btns .link{margin-top:var(--s3)}
+.s2-media{position:absolute;inset:0}
+.s2-media[hidden]{display:none}
+.s2-media>video,.s2-media>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.s2-media .ba{position:absolute;inset:0}
+.s2-media .tag-example{position:absolute;top:auto;right:14px;bottom:14px;z-index:4}
+.plans__cta{margin-left:auto}
+@media (max-width:820px){.fp.hs .hs__body{margin-top:var(--s3)}.plans__cta{margin-left:0}.s2-tab{height:38px;padding:0 14px;font-size:14px}}
 /* ═══════ 단지 카드: 순서(이름 → 왜 이 집? → 태그 → 보증금 → 출처), 크게 보기 ═══════ */
 #mh .cc-dep{margin-top:10px;font-size:15px;color:#3d413d}
 #mh .cc-dep b{font-size:20px;font-weight:600;color:var(--green);letter-spacing:-.03em}
@@ -1954,6 +2076,8 @@ body.house-mode .nav{background:var(--bg)}
 
 <!-- ═══════════════ #home ═══════════════ -->
 <section class="page" id="page-home" data-page="home" aria-label="홈">
+  <!-- 홈은 5화면(문제 → 해결): 처음 · 문제 · 해결 1(지원 찾기) · 해결 2(지도·집 보기·가구, 칩으로 바꿔 보기) · 시작하기.
+       예시 페르소나 숫자는 쓰지 않는다. 해결 1은 이 브라우저에 저장된 내 조건이 있을 때만 실제 판정을 보여 준다(home_ps.js) -->
 
   <div class="hero fp" data-fp="처음">
     <video class="hero__media" autoplay muted playsinline preload="auto" poster="img/hero.jpg" aria-label="새 집 거실을 천천히 둘러보는 예시 영상">
@@ -1962,10 +2086,10 @@ body.house-mode .nav{background:var(--bg)}
     <div class="hero__shade" aria-hidden="true"></div>
     <span class="tag-example">예시 영상</span>
     <div class="container hero__inner">
-      <h1 class="hero__title"><span>가 보기 전에,</span><span class="thin">먼저 살아보는 집</span></h1>
-      <p class="hero__desc">대구에 좋은 매물 있는데, 함께 보시겠어요?</p>
+      <h1 class="hero__title"><span>따져 보고, 살아 보고,</span><span class="thin">고르는 집</span></h1>
+      <p class="hero__desc">대구에서 내 조건에 맞는 집과 받을 수 있는 지원을 한 번에 보여드려요.</p>
       <div class="hero__btns">
-        <a href="#input" class="btn btn--white" data-go="input">기본정보 입력하고 더 알아보기 →</a>
+        <a href="#input" class="btn btn--white" data-go="input">내 조건으로 따져 보기 →</a>
         <a href="#map" class="btn btn--ghost" data-go="browse">그냥 둘러보기</a>
       </div>
       <form class="hero__ask" id="homeAsk" role="search" aria-label="방봄 AI 상담에게 묻기">
@@ -1978,82 +2102,113 @@ body.house-mode .nav{background:var(--bg)}
     <div class="scroll-cue" aria-hidden="true">Scroll<i></i></div>
   </div>
 
-  <div class="fp fp--light" data-fp="3D 집 보기">
-    <div class="container fp__grid">
-      <div class="fp__text reveal">
-        <p class="fp__no">01 · 3D Model house</p>
-        <h2 class="fp__title">집 안까지<br>3D로 둘러봐요</h2>
-        <p class="fp__desc">미분양 단지 면적(59㎡·84㎡)에 맞춘 구조예요. 계약하기 전에 방 크기와 동선을 화면으로 먼저 확인할 수 있어요.</p>
-        <ul class="fp__chips" aria-label="볼 수 있는 시점"><li>평면도</li><li>조감도</li><li>방 안</li></ul>
-        <div class="kid">
-          <div class="kid__media">
-            <video muted playsinline preload="none" poster="img/child.jpg" data-autoplay aria-label="아이 눈높이 90cm에서 거실을 걸어보는 예시 영상"><source src="vid/child.mp4" type="video/mp4"></video>
-          </div>
-          <div class="kid__text">
-            <b>아이 시점으로도 볼 수 있어요</b>
-            <span>눈높이를 90cm로 낮추면 탁자 모서리가 어디쯤 오는지 보여요.</span>
-            <a href="#house" class="link" data-eye="child">아이 눈높이로 보기 →</a>
-          </div>
+  <!-- 2. 문제: 숫자·출처는 docs/인수인계_혜원.md 3번 표 그대로. 숫자 옆 작은 번호가 출처 번호. 보도 숫자에는 "보도 기준" -->
+  <div class="fp fp--white hs" id="home-problem" data-fp="문제">
+    <div class="container">
+      <div class="hs__head reveal">
+        <span class="eyebrow">Why it's hard</span>
+        <h2 class="title">청년은 떠나고, 집은 비어 있어요</h2>
+      </div>
+      <div class="pb-big reveal">
+        <div class="pb-big__item">
+          <p class="pb-num"><b>67.6</b><small>%</small><sup class="pb-ref">①</sup></p>
+          <p class="pb-lbl">대구를 떠난 사람 중 20~39세</p>
+          <p class="pb-sub">2026년 6월, 822명 중 556명</p>
         </div>
-        <a href="#house" class="btn">3D로 집 보기 →</a>
-      </div>
-      <div class="fp__media reveal">
-        <video muted playsinline preload="none" poster="img/move.jpg" data-autoplay aria-label="새 집 거실 안으로 천천히 들어가는 예시 영상"><source src="vid/move.mp4" type="video/mp4"></video>
-        <span class="tag-example">예시 영상</span>
-      </div>
-    </div>
-  </div>
-
-  <div class="fp fp--gray" data-fp="가구 옮기기">
-    <div class="container fp__grid fp__grid--rev">
-      <div class="fp__media reveal">
-        <div class="ba" id="ba">
-          <img src="img/furn_after.jpg" alt="침대, 책상, 원목 수납장, 러그를 놓은 새 집 작은방" loading="lazy">
-          <img class="ba__before" src="img/furn_before.jpg" alt="가구가 하나도 없는 새 집 작은방" loading="lazy">
-          <span class="ba__line" aria-hidden="true"></span>
-          <span class="ba__knob" aria-hidden="true">⟷</span>
-          <input class="ba__range" type="range" min="0" max="100" value="100" aria-label="가구 놓기 전과 놓은 후 비교 위치">
+        <div class="pb-big__item">
+          <p class="pb-num"><b>3,077</b><small>세대</small><sup class="pb-ref">②</sup></p>
+          <p class="pb-lbl">다 짓고도 비어 있는 집</p>
+          <p class="pb-sub">준공 후 미분양, 전국 시·도 중 가장 많아요</p>
         </div>
-        <span class="pill-label pill-label--l">가구 놓기 전</span>
-        <span class="pill-label pill-label--r">가구 놓은 후</span>
-        <span class="tag-example">예시 이미지</span>
       </div>
-      <div class="fp__text reveal">
-        <p class="fp__no">02 · Your furniture</p>
-        <h2 class="fp__title">빈 집에 가구를<br>미리 놓아봐요</h2>
-        <p class="fp__desc">침대, 책상, 수납장을 새 집 방에 놓아 보고 들어가는지 확인해요. 새로 살 가구는 예산에 맞춰 구매 목록으로 정리돼요.</p>
-        <span class="fp__hint">사진을 좌우로 밀어 보세요</span>
-        <a href="#house" class="btn">새 집에 가구 놓아보기 →</a>
-      </div>
-    </div>
-  </div>
-
-  <div class="fp fp--dark" data-fp="불 켜지는 지도">
-    <div class="container fp__grid">
-      <div class="fp__text reveal">
-        <p class="fp__no">03 · Match</p>
-        <h2 class="fp__title">내 조건에 맞는 집에<br>불이 켜져요</h2>
-        <p class="fp__desc">나이, 소득, 모은 돈을 넣으면 대출·지원 요건을 단지마다 따져 봐요. 요건이 맞는 단지는 지도에서 불이 켜져요.</p>
-        <ul class="lights">
-          <li><i class="on"></i><b>요건 충족</b>불이 켜져요</li>
-          <li><i class="dim"></i><b>확인 필요</b>깜빡여요</li>
-          <li><i class="off"></i><b>미충족</b>꺼져요</li>
+      <div class="pb-why reveal">
+        <h3 class="pb-why__t">왜 혼자 찾기 어려울까요?</h3>
+        <ul class="pb-why__list">
+          <li><p class="pb-why__num">58.5<small>%</small><sup class="pb-ref">③</sup></p><p>고용률, 전국 시·도 중 가장 낮아요 (보도 기준)</p></li>
+          <li><p class="pb-why__num">84.5<small>%</small><sup class="pb-ref">④</sup></p><p>청년 열 명 중 여덟 명은 청년정책을 잘 몰라요</p></li>
         </ul>
-        <a href="#input" class="btn btn--white">내 조건 넣기 →</a>
+      </div>
+      <p class="pb-close reveal">집은 있는데, 내 조건에 맞는 집과 지원을 한 번에 보여주는 곳이 없어요.</p>
+      <details class="pb-src">
+        <summary>출처 보기 <span>①~④</span></summary>
+        <p>
+        <span>① 국가데이터처 국내인구이동통계, 동북지방통계청 분석 · <a href="https://kbmaeil.com/article/20260730500246" target="_blank" rel="noopener">경북매일 2026.7.30</a></span>
+        <span>② 국토교통부 주택통계 · 2026.9 기준</span>
+        <span>③ 보도 기준 · <a href="https://www.hankyung.com/article/202607243355H" target="_blank" rel="noopener">한국경제 2026.7.24</a></span>
+        <span>④ 청년정책 플랫폼 설문(521명) · <a href="https://view.asiae.co.kr/article/2026022011075035575" target="_blank" rel="noopener">아시아경제 2026.2.20</a></span>
+        </p>
+      </details>
+    </div>
+  </div>
+
+  <!-- 3. 해결 1: 01 조건 → 02 하나씩 따지기 → 03 같이 못 받는 것 거르기 → 결과. 내용은 home_ps.js 가 판정 코드로 채운다 -->
+  <div class="fp fp--light hs" id="home-support" data-fp="지원 찾기">
+    <div class="container">
+      <div class="hs__head reveal">
+        <span class="eyebrow">Solution 01</span>
+        <h2 class="title">받을 수 있는 지원을 대신 찾아줘요</h2>
+      </div>
+      <div class="hs__body" id="homeSupport"></div>
+    </div>
+  </div>
+
+  <!-- 4. 해결 2: 지도 · 평면도와 3D · 가구 놓기를 한 화면에. 칩으로 그림과 설명을 바꾼다 -->
+  <div class="fp fp--gray" id="home-house" data-fp="지도·집 보기">
+    <div class="container fp__grid">
+      <div class="fp__text reveal">
+        <span class="eyebrow">Solution 02</span>
+        <h2 class="fp__title">지도에서 고르고,<br>방 안까지 들어가 봐요</h2>
+        <div class="s2-tabs" role="tablist" aria-label="해결 2 보기">
+          <button type="button" role="tab" class="s2-tab is-on" aria-selected="true" aria-controls="s2-map" data-s2="map">불 켜지는 지도</button>
+          <button type="button" role="tab" class="s2-tab" aria-selected="false" aria-controls="s2-flow" data-s2="flow">평면도 → 3D</button>
+          <button type="button" role="tab" class="s2-tab" aria-selected="false" aria-controls="s2-furn" data-s2="furn">가구 놓기</button>
+        </div>
+        <div class="s2-pane is-on" data-s2p="map">
+          <p class="fp__desc">내 조건으로 들어갈 수 있는 단지에만 불이 켜져요. 단지를 누르면 가까이 다가가고, 지하철역·병원·공원 같은 주변 시설까지 선으로 이어져요.</p>
+          <a href="#map" class="btn" data-go="browse">지도 둘러보기 →</a>
+        </div>
+        <div class="s2-pane" data-s2p="flow" hidden>
+          <p class="fp__desc">집 전체 평면도에서 시작해 3D로 위에서 보고, 방 안을 걸어 볼 수 있어요. 아이 눈높이(90cm)로 보면 얼굴 높이에 닿는 가구 모서리를 짚어 줘요. 참고값이에요(법적·안전 기준 아님).</p>
+          <div class="s2-btns"><a href="#house" class="btn">단지 고르고 집 보기 →</a><a href="#house" class="link" data-eye="child">아이 눈높이 90cm로 보기 →</a></div>
+        </div>
+        <div class="s2-pane" data-s2p="furn" hidden>
+          <p class="fp__desc">침대, 책상, 수납장을 방에 놓아 보면 부딪히는 곳과 지나다닐 통로를 먼저 알려 줘요. 다 놓으면 AI 렌더링으로 실사 느낌 사진도 만들 수 있어요.</p>
+          <span class="fp__hint">사진을 좌우로 밀어 보세요</span>
+          <a href="#house" class="btn">새 집에 가구 놓아보기 →</a>
+        </div>
       </div>
       <div class="fp__media reveal">
-        <video muted playsinline preload="none" poster="img/match.jpg" data-autoplay aria-label="불이 켜진 단지를 누르면 다른 단지는 사라지고 주변 시설까지 선이 이어지는 방봄 지도 화면"><source src="vid/match.mp4" type="video/mp4"></video>
-        <span class="tag-example">방봄 화면 · 샘플 데이터</span>
+        <div class="s2-media is-on" id="s2-map" role="tabpanel" data-s2m="map">
+          <video muted playsinline preload="none" poster="img/match.jpg" data-autoplay aria-label="불이 켜진 단지를 누르면 다른 단지는 사라지고 주변 시설까지 선이 이어지는 방봄 지도 화면"><source src="vid/match.mp4" type="video/mp4"></video>
+          <span class="tag-example">방봄 화면 · 샘플 데이터</span>
+        </div>
+        <div class="s2-media" id="s2-flow" role="tabpanel" data-s2m="flow" hidden>
+          <img src="img/house_flow.jpg" alt="평면도에서 3D 집, 방 안 모습으로 이어지는 설명 그림" loading="lazy">
+          <span class="tag-example">AI 연출 이미지</span>
+        </div>
+        <div class="s2-media" id="s2-furn" role="tabpanel" data-s2m="furn" hidden>
+          <div class="ba" id="ba">
+            <img src="img/furn_after.jpg" alt="침대, 책상, 원목 수납장, 러그를 놓은 새 집 작은방" loading="lazy">
+            <img class="ba__before" src="img/furn_before.jpg" alt="가구가 하나도 없는 새 집 작은방" loading="lazy">
+            <span class="ba__line" aria-hidden="true"></span>
+            <span class="ba__knob" aria-hidden="true">⟷</span>
+            <input class="ba__range" type="range" min="0" max="100" value="100" aria-label="가구 놓기 전과 놓은 후 비교 위치">
+          </div>
+          <span class="pill-label pill-label--l">가구 놓기 전</span>
+          <span class="pill-label pill-label--r">가구 놓은 후</span>
+          <span class="tag-example">예시 이미지</span>
+        </div>
       </div>
     </div>
   </div>
 
-  <div class="fp fp--light fp--plans" data-fp="단지 둘러보기">
+  <!-- 5. 시작하기: 단지 평면 카드 (판정 숫자 없이) -->
+  <div class="fp fp--light fp--plans" data-fp="시작하기">
     <div class="container">
       <div class="plans__head reveal">
         <div>
-          <p class="fp__no">04 · Plans</p>
-          <h2 class="fp__title">대구 미분양 단지,<br>평면부터 둘러봐요</h2>
+          <span class="eyebrow">Start</span>
+          <h2 class="fp__title">어디부터 볼지 골라보세요</h2>
         </div>
         <a href="#map" class="link" data-go="browse">지도에서 전체 보기 →</a>
       </div>
@@ -2061,6 +2216,7 @@ body.house-mode .nav{background:var(--bg)}
       <div class="plans__btns">
         <button class="round-btn" id="plansPrev" aria-label="이전 단지"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M11 4 6 9l5 5"/></svg></button>
         <button class="round-btn" id="plansNext" aria-label="다음 단지"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m7 4 5 5-5 5"/></svg></button>
+        <a href="#input" class="btn plans__cta">내 조건 넣기 →</a>
       </div>
     </div>
   </div>
@@ -8001,6 +8157,91 @@ window.MH = {
   };
   const go = () => { if (location.hash === "#rent") load().then(render); };
   addEventListener("hashchange", go); go();
+})();
+/* ═══════ 홈 해결 1(지원 찾기)과 해결 2(칩으로 바꿔 보기) ═══════
+   해결 1: 이 브라우저에 저장된 내 조건(mh-profile)이 있으면 판정 코드(engine.js 의 profileResult·evaluate·appliedLists)로 실제 결과를,
+   없으면 숫자 없이 "어떻게 따지는지"만 보여 준다. 예시 페르소나 숫자는 쓰지 않는다. 판정·개수는 이 파일에서 만들지 않는다 */
+(() => {
+  const sup = document.getElementById("homeSupport");
+  const h = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const LK = { on: "요건 충족", dim: "확인 필요", off: "미충족" }, SK = { eligible: "요건 충족", needs_check: "확인 필요", ineligible: "미충족" };
+  const ST_JD = { eligible: "on", needs_check: "dim", ineligible: "off" }, ORDER = { on: 0, dim: 1, off: 2 };
+  const jd = (k, label) => `<span class="jd jd--${k}"><i aria-hidden="true"></i>${h(label || LK[k])}</span>`;
+  const house = (k, title) => `<svg class="hi hi--${k}" viewBox="0 0 24 24" role="img" aria-label="${h(title)}">${k === "dim" ? `<path class="hi__half" d="M3.5 11 12 4.2V20H3.5z"/>` : ""}<path d="M3.5 11 12 4.2l8.5 6.8V20h-17z"/></svg>`;
+  const won = man => Math.round(man * 10000).toLocaleString("ko-KR") + "원";
+  const profile = () => { try { const p = JSON.parse(localStorage.getItem("mh-profile") || "null"); return p && typeof p.age === "number" && typeof p.monthly_income === "number" ? p : null; } catch (e) { return null; } };
+  /* 같이 못 받는 지원: 규칙(RULES)에 적힌 "둘 중 하나" 짝 */
+  const pairRule = () => { const p = RULES.policies.find(x => Array.isArray(x.exclusive_with) && x.exclusive_with.length); if (!p) return null; const other = RULES.loans.find(l => l.id === p.exclusive_with[0]); return other ? { kept: other.name, drop: p.name } : null; };
+
+  function fillSupport() {
+    if (!sup) return;
+    const P = profile();
+    if (!P) {
+      const names = [...RULES.loans, RULES.market_loan, ...RULES.policies].map(x => x.name);
+      const pr = pairRule();
+      sup.innerHTML = `
+      <div class="sf reveal is-in">
+        <div class="sf__step"><div class="sf__h"><span class="sf__no">01</span><b>조건만 넣으면</b></div>
+          <ul class="sf__chips" aria-label="넣는 조건"><li>나이</li><li>월 실수령</li><li>모은 돈</li><li>월 예산</li></ul>
+          <p class="sf__note">여덟 가지 질문에 하나씩 답해요. 입력값은 이 브라우저에만 저장해요.</p></div>
+        <span class="sf__arrow" aria-hidden="true"></span>
+        <div class="sf__step"><div class="sf__h"><span class="sf__no">02</span><b>하나씩 따져서</b></div>
+          <ul class="sf__list">${names.map(n => `<li><span>${h(n)}</span></li>`).join("")}</ul>
+          <p class="sf__note">${jd("on")} ${jd("dim")} ${jd("off")} 중 하나로 알려 줘요.</p></div>
+        <span class="sf__arrow" aria-hidden="true"></span>
+        <div class="sf__step"><div class="sf__h"><span class="sf__no">03</span><b>같이 못 받는 건 걸러요</b></div>
+          ${pr ? `<div class="sf__pair"><p class="sf__keep">${h(pr.kept)}</p><p class="sf__or"><span>둘 중 하나</span></p><p class="sf__drop"><s>${h(pr.drop)}</s><em>빠짐</em></p></div>` : ""}
+          <p class="sf__note">빠진 쪽은 월 부담 계산에 넣지 않아요.</p></div>
+      </div>
+      <div class="sf-result reveal is-in">
+        <p class="sf-result__t">대구 단지 ${COMPLEXES.length}곳 중 들어갈 수 있는 곳에 불이 켜져요</p>
+        <div class="sf-result__houses" aria-hidden="true">${COMPLEXES.map(() => house("off", "")).join("")}</div>
+      </div>
+      <p class="sf-foot reveal is-in">모르는 건 AI 상담에 물어보세요. <a href="#input" class="link">내 조건 넣기 →</a></p>`;
+      return;
+    }
+    const pr = profileResult(P), evs = COMPLEXES.map(c => ({ c, e: evaluate(P, c, pr) }));
+    const n = { on: 0, dim: 0, off: 0 }; evs.forEach(x => n[x.e.light]++);
+    const items = [...pr.loans, ...pr.policies].map((x, i) => ({ x, k: ST_JD[x.status], i })).sort((a, b) => ORDER[a.k] - ORDER[b.k] || a.i - b.i);
+    let clash = null;
+    for (const { c, e } of evs) {
+      const al = appliedLists(c, e, pr), na = al.not_applied.find(x => /하나만/.test(x.reason));
+      const kept = na && al.applied.find(x => x.id === "youth_beotimok" || x.id === "hf_youth_guarantee");
+      if (na && kept) { clash = { kept, drop: na }; break; }
+    }
+    const lights = evs.slice().sort((a, b) => ORDER[a.e.light] - ORDER[b.e.light]);
+    const chips = [`${P.age}세`, `월 실수령 ${won(P.monthly_income)}`, `모은 돈 ${won(P.assets)}`, `월 예산 ${won(P.monthly_budget)}`];
+    sup.innerHTML = `
+      <div class="sf reveal is-in">
+        <div class="sf__step"><div class="sf__h"><span class="sf__no">01</span><b>넣은 조건</b></div>
+          <ul class="sf__chips" aria-label="넣은 조건">${chips.map(t => `<li>${h(t)}</li>`).join("")}</ul>
+          <p class="sf__note">이 브라우저에 저장된 내 조건이에요. <a href="#input" class="link">바꾸기</a></p></div>
+        <span class="sf__arrow" aria-hidden="true"></span>
+        <div class="sf__step"><div class="sf__h"><span class="sf__no">02</span><b>하나씩 따져서</b></div>
+          <ul class="sf__list">${items.map(({ x, k }) => `<li><span>${h(x.name)}</span>${jd(k, SK[x.status])}</li>`).join("")}</ul></div>
+        <span class="sf__arrow" aria-hidden="true"></span>
+        <div class="sf__step"><div class="sf__h"><span class="sf__no">03</span><b>같이 못 받는 건 걸러요</b></div>
+          ${clash ? `<div class="sf__pair"><p class="sf__keep">${h(clash.kept.name)}</p><p class="sf__or"><span>둘 중 하나</span></p><p class="sf__drop"><s>${h(clash.drop.name)}</s><em>빠짐</em></p></div>
+          <p class="sf__note">빠진 쪽은 월 부담 계산에 넣지 않아요.</p>` : `<p class="sf__note">이 조건에서는 같이 못 받는 지원이 없어요.</p>`}</div>
+      </div>
+      <div class="sf-result reveal is-in">
+        <p class="sf-result__t">대구 단지 ${COMPLEXES.length}곳 중</p>
+        <div class="sf-result__houses">${lights.map(({ c, e }) => house(e.light, `${c.name.replace("(예시)", "").trim()} · ${LK[e.light]}`)).join("")}</div>
+        <p class="sf-result__n"><span><i class="jd-dot jd-dot--on" aria-hidden="true"></i>${LK.on} <b>${n.on}</b></span><span><i class="jd-dot jd-dot--dim" aria-hidden="true"></i>${LK.dim} <b>${n.dim}</b></span><span><i class="jd-dot jd-dot--off" aria-hidden="true"></i>${LK.off} <b>${n.off}</b></span></p>
+      </div>
+      <p class="sf-foot reveal is-in">판정은 규칙이 계산하고, 최종 결정은 각 기관이 해요. <a href="#map" class="link">지도에서 보기 →</a></p>`;
+  }
+  fillSupport();
+  addEventListener("hashchange", () => { if (location.hash === "#home" || location.hash === "") fillSupport(); });
+
+  /* 해결 2: 칩을 누르면 설명과 그림을 바꾼다. 보이는 영상만 재생된다(shell.js 의 영상 관찰) */
+  const tabs = Array.from(document.querySelectorAll(".s2-tab"));
+  tabs.forEach(b => b.addEventListener("click", () => {
+    const k = b.dataset.s2;
+    tabs.forEach(t => { const on = t === b; t.classList.toggle("is-on", on); t.setAttribute("aria-selected", on); });
+    document.querySelectorAll("[data-s2p]").forEach(p => { p.hidden = p.dataset.s2p !== k; });
+    document.querySelectorAll("[data-s2m]").forEach(m => { m.hidden = m.dataset.s2m !== k; m.classList.toggle("is-on", m.dataset.s2m === k); });
+  }));
 })();
 
 }

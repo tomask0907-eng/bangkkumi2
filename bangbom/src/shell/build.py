@@ -282,7 +282,7 @@ body.card-open #mh .map-hint,#mh .map-hint.is-gone{opacity:0}
 }
 '''
 # 휴대폰 화면용 CSS (가장 마지막에 붙여서 위의 규칙을 덮어쓴다). 홈·이용 안내는 mobile_home.css, 입력·지도·집 보기·상담은 mobile_app.css
-mobile=''.join(open(os.path.join(HERE,n),encoding='utf-8').read() for n in ('home.css','card.css','rent.css','mobile_home.css','mobile_app.css','step_input.css','house_overview.css','tutorial.css','chat.css'))
+mobile=''.join(open(os.path.join(HERE,n),encoding='utf-8').read() for n in ('home.css','home_ps.css','card.css','rent.css','mobile_home.css','mobile_app.css','step_input.css','house_overview.css','tutorial.css','chat.css'))
 h=R(h,'</style>\n</head>', mscoped+over+mobile+'\n</style>\n</head>')
 
 # ---------- BODY ----------
@@ -391,7 +391,7 @@ HOUSE_MARK='/* [house_view.js] 집 보기(House)는 house_view.js 에 있다. bu
 APP_BB=open(os.path.join(HERE,'app_bb.js'),encoding='utf-8').read()
 assert APP_BB.count(HOUSE_MARK)==1, 'app_bb.js 에 집 보기 표시 줄이 없어요'
 APP_BB=APP_BB.replace(HOUSE_MARK, open(os.path.join(HERE,'house_view.js'),encoding='utf-8').read())
-mjs=open(M+'data.js',encoding='utf-8').read()+open(M+'data2.js',encoding='utf-8').read()+open(M+'unsold_list.js',encoding='utf-8').read()+open(M+'unsold_price.js',encoding='utf-8').read()+open(M+'geo.js',encoding='utf-8').read()+open(M+'real_poi.js',encoding='utf-8').read()+open(M+'mapscale.js',encoding='utf-8').read()+open(M+'engine.js',encoding='utf-8').read().replace('if (typeof module !== "undefined") module.exports = { profileResult, evaluate, breakdown, appliedLists };','')+open(M+'house.js',encoding='utf-8').read()+open(os.path.join(HERE,'backend.js'),encoding='utf-8').read().replace('if (typeof module !== "undefined") module.exports = { createBackend };','')+APP_BB+open(os.path.join(HERE,'tutorial.js'),encoding='utf-8').read()+open(os.path.join(HERE,'chat_connect.js'),encoding='utf-8').read()+open(os.path.join(HERE,'rent.js'),encoding='utf-8').read()
+mjs=open(M+'data.js',encoding='utf-8').read()+open(M+'data2.js',encoding='utf-8').read()+open(M+'unsold_list.js',encoding='utf-8').read()+open(M+'unsold_price.js',encoding='utf-8').read()+open(M+'geo.js',encoding='utf-8').read()+open(M+'real_poi.js',encoding='utf-8').read()+open(M+'mapscale.js',encoding='utf-8').read()+open(M+'engine.js',encoding='utf-8').read().replace('if (typeof module !== "undefined") module.exports = { profileResult, evaluate, breakdown, appliedLists };','')+open(M+'house.js',encoding='utf-8').read()+open(os.path.join(HERE,'backend.js'),encoding='utf-8').read().replace('if (typeof module !== "undefined") module.exports = { createBackend };','')+APP_BB+open(os.path.join(HERE,'tutorial.js'),encoding='utf-8').read()+open(os.path.join(HERE,'chat_connect.js'),encoding='utf-8').read()+open(os.path.join(HERE,'rent.js'),encoding='utf-8').read()+open(os.path.join(HERE,'home_ps.js'),encoding='utf-8').read()
 shell=open(os.path.join(HERE,'shell.js'),encoding='utf-8').read()
 tail='<script src="vendor/three.min.js"></script>\n<script src="vendor/bangbom-chat.js"></script>\n<script>\n{\n'+mjs+'\n}\n</script>\n<script>\n'+shell+'\nBB.route();\n</script>\n</body>\n</html>\n'
 # 홈: 혜원(B) 풀페이지 5화면으로 통째 교체 (위의 홈 문구 치환은 옛 홈 기준이라 먼저 돌고, 여기서 홈 전체를 바꾼다)
@@ -405,7 +405,7 @@ h=h.replace('.tabbar{display:grid;grid-template-columns:repeat(4,1fr);','.tabbar
 # 공개 링크 미리보기: thumb.png(1200×630, public/ → dist 루트, bangbom/src/tools/make_thumb.mjs). <head> 맨 앞쪽(처음 8KB 안)에 두고,
 # og·twitter 문구와 설명은 지금 홈 히어로 문구으로 맞춘다. 앞의 R() 들이 예전 문장을 바꾼 뒤라 맨 끝에서 한다
 _desc='대구에서 집을 구하는 청년이 내 조건을 넣으면 받을 수 있는 대출·지원을 따져 주고, 요건이 맞는 집을 지도에서 밝혀 주고, 평면도·3D로 방 안까지 미리 살아 보게 해요.'
-_ttl='방봄 BANGBOM · 가 보기 전에, 먼저 살아보는 집'
+_ttl='방봄 BANGBOM · 따져 보고, 살아 보고, 고르는 집'
 for _pat,_new in [(r'<meta name="description" content="[^"]*">','<meta name="description" content="'+_desc+'">'),
                   (r'<meta property="og:title" content="[^"]*">','<meta property="og:title" content="'+_ttl+'">'),
                   (r'<meta property="og:description" content="[^"]*">','<meta property="og:description" content="'+_desc+'">'),
