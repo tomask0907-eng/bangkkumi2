@@ -1,0 +1,11 @@
+'use strict';const {test}=require('node:test'),assert=require('node:assert/strict');const {createHandler,take}=require('../server/interpret.cjs');
+const cfg={BANGBOM_AI_ENABLED:'1',BANGBOM_ORIGIN:'https://site.test',ANTHROPIC_API_KEY:'test-only',ANTHROPIC_MODEL:'test-only'};
+const req=()=>({method:'POST',headers:{origin:cfg.BANGBOM_ORIGIN,'content-type':'application/json'},body:{text:'이억 이하',step:'budget'}});const good={unsupported:false,patch:{maxDeposit:20000}};
+async function run({request=req(),env=cfg,response=good,fail=false,limiter=()=>true}={}){let called=false;const res={setHeader(){},end(t){this.body=JSON.parse(t);}};await createHandler({env,limiter,fetcher:async(url,opts)=>{called=true;if(fail)throw Error();assert.equal(JSON.parse(opts.body).messages.length,1);return {ok:true,json:async()=>({content:[{type:'tool_use',name:'propose_filters',input:response}]})};}})(request,res);return {code:res.statusCode,body:res.body,called};}
+test('비활성 기본값, 외부 호출 없음',async()=>{const r=await run({env:{}});assert.equal(r.code,503);assert.equal(r.called,false);});
+for(const [label,change,code] of [['메서드',r=>r.method='GET',405],['타 출처',r=>r.headers.origin='https://other.test',403],['콘텐츠 형식',r=>r.headers['content-type']='text/plain',415],['너무 긴 문장',r=>r.body.text='a'.repeat(401),400],['본문 크기',r=>r.headers['content-length']='4097',413],['개인 식별자',r=>r.body.text='전화 010-1234-0000',422],['추가 필드',r=>r.body.annualIncome=3000,400]])test('서버 거부: '+label,async()=>{const r=req();change(r);const v=await run({request:r});assert.equal(v.code,code);assert.equal(v.called,false);});
+test('모의 AI 조건만 전달',async()=>{const r=await run();assert.equal(r.code,200);assert.deepEqual(r.body,good);});
+test('불가능한 단지·필드 무시',async()=>assert.deepEqual((await run({response:{unsupported:false,patch:{id:'invented'}}})).body,{unsupported:true,patch:{}}));
+test('미지원 조건 결과 봉쇄',async()=>assert.deepEqual((await run({response:{unsupported:true,patch:{maxDeposit:1}}})).body,{unsupported:true,patch:{}}));
+test('모델 오류와 속도 제한',async()=>{assert.equal((await run({fail:true})).code,503);assert.equal((await run({limiter:()=>false})).code,429);});
+test('분당 백스톱',()=>{for(let i=0;i<6;i++)assert.ok(take('local',0));assert.equal(take('local',0),false);assert.ok(take('local',60000));});

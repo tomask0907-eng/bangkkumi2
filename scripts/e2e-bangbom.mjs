@@ -172,7 +172,8 @@ async function run(cdp) {
   }
   const waitFrame = async (wantSlotNot) => { await waitFor(`(() => { const f = __q.frame(); return !!f && f.slot !== ${J(wantSlotNot || '')} && f.liveSlot === f.slot && f.ready })()`, 'iframe 안 방 배치 도구', 20000); await sleep(900); return ev('__q.frame()') }
   // 시작 화면과 튜토리얼이 뜨지 않게 늘 tutorial=0 을 붙여 연다. 그 뒤에는 # 만 바꾸므로 이 값이 주소에 계속 남는다
-  const HOME = BASE + '/?tutorial=0'
+  // chat=0: 24시간 상담을 집찾기 대화로 바꾸지 않고 예전 상담 서랍을 그대로 검사한다 (집찾기 대화는 e2e-chat.mjs 가 본다)
+  const HOME = BASE + '/?tutorial=0&chat=0'
   // 저장된 조건을 지우고 새로 연다 (주소의 # 만 바꾸면 화면을 다시 읽지 않으므로 새로 고침을 한다)
   const fresh = async (hash) => { await nav(HOME); await ev('localStorage.clear()'); await loadThen(() => cdp.send('Page.reload')); await ev('location.hash = ' + J(hash)); await sleep(900) }
   // 예시 페르소나의 조건이 저장된 채로 지도부터 연다 (첫 화면이 지도면 판정 모드로 열린다)

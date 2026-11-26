@@ -831,6 +831,52 @@ async function runAll(cdp) {
       await dragPx({ x: p.x, y: p.y }, { x: p.x + dxCm * k, y: p.y + dyCm * k })
     }
 
+    /**
+     * 가구를 하나씩 골라 보며, 뜨는 도구 막대(회전·복사·삭제)가 다른 가구나 방 치수 글자를 가리는지, 단추가 44px보다 작은지 본다.
+     * 문제를 글로 모아 돌려준다 (빈 목록이면 통과). 인자는 어느 방에서 불렀는지 알려 주는 방 크기(cm)라 결과 글에만 쓴다
+     * @param {number} roomW @param {number} roomH
+     */
+    async function toolbarCovers(roomW, roomH) {
+      const ids = await ev(`__e2e.pieces().map((p) => p.id)`)
+      /** @type {string[]} */
+      const bad = []
+      for (const id of ids) {
+        await selectPiece(id)
+        const seen = await ev(`(() => {
+          const bar = __e2e.all('[role="toolbar"]')[0]
+          if (!bar) return null
+          const b = bar.getBoundingClientRect(), k = __e2e.pxPerCm()
+          const hit = (r) => r.left < b.right - 1 && r.right > b.left + 1 && r.top < b.bottom - 1 && r.bottom > b.top + 1
+          const others = __e2e.pieces().filter((p) => p.id !== ${J(id)}).map((p) => { const c = __e2e.piecePoint(p.id); return c ? { label: p.label, left: c.x - p.w * k / 2, right: c.x + p.w * k / 2, top: c.y - p.h * k / 2, bottom: c.y + p.h * k / 2 } : null }).filter(Boolean)
+          const dims = [...__e2e.svg().querySelectorAll('text')].filter((t) => /^\\d+\\s?cm$/.test(t.textContent.trim())).map((t) => ({ label: t.textContent.trim(), r: t.getBoundingClientRect() }))
+          return {
+            covered: others.filter(hit).map((o) => o.label),
+            dims: dims.filter((d) => hit(d.r)).map((d) => d.label),
+            small: [...bar.querySelectorAll('button')].filter((x) => { const r = x.getBoundingClientRect(); return r.width < 44 || r.height < 44 }).map((x) => x.getAttribute('aria-label') || x.textContent.trim()),
+          }
+        })()`)
+        await press('Escape')
+        if (!seen) { bad.push(`${id}: 도구 막대가 뜨지 않아요`); continue }
+        if (seen.covered.length) bad.push(`${id}의 도구 막대가 가구를 가려요: ${seen.covered.join(', ')}`)
+        if (seen.dims.length) bad.push(`${id}의 도구 막대가 치수 글자를 가려요: ${seen.dims.join(', ')}`)
+        if (seen.small.length) bad.push(`${id}의 도구 막대 단추가 44px보다 작아요: ${seen.small.join(', ')}`)
+      }
+      return bad.length ? [`(${roomW}×${roomH}cm 방) ${bad[0]}`, ...bad.slice(1)] : []
+    }
+
+    /** 가구를 골라 둔 채, 가구 안쪽 왼쪽 가장자리 6px 안을 눌러 40cm·20cm 끈다. 크기는 그대로이고 자리만 바뀌어야 한다 @param {string} id */
+    async function dragSelectedNearEdge(id) {
+      await selectPiece(id)
+      const p = await piecePoint(id)
+      const k = await ev('__e2e.pxPerCm()')
+      // 벽에 붙은 가구는 벽 쪽으로 못 가니, 방 안쪽으로 끈다
+      const before = p.piece, dx = before.x > 100 ? -40 : 40, dy = before.y > 100 ? -20 : 20
+      const fx = p.x - (before.w * k) / 2 + Math.min(6, (before.w * k) / 4)
+      await dragPx({ x: fx, y: p.y }, { x: fx + dx * k, y: p.y + dy * k })
+      const after = (await piecePoint(id)).piece
+      return { before, after, dx, dy }
+    }
+
     /** 가구의 왼쪽 위가 (xCm, yCm)에 오도록 끈다 @param {string} id @param {number} xCm @param {number} yCm */
     async function dragPieceTo(id, xCm, yCm) {
       const p = await piecePoint(id)

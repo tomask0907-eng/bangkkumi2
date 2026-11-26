@@ -131,7 +131,8 @@ const SIZE_ORDER: SheetSize[] = ['max', 'mid', 'min']
  */
 const SHEET_TOP: Record<SheetSize, string> = {
   max: 'calc(3rem + env(safe-area-inset-top))',
-  mid: 'calc(46dvh + 3rem + env(safe-area-inset-top))',
+  // 낮은 화면(가로로 돌린 휴대폰, 키보드가 올라온 화면)에서도 시트 내용이 보이게 시트 높이를 14rem 넘게 남긴다. 키보드로 더 낮아지면 평면도도 6rem은 남긴다
+  mid: 'min(calc(46dvh + 3rem + env(safe-area-inset-top)), max(calc(100% - 14rem), calc(9rem + env(safe-area-inset-top))))',
   min: 'calc(100% - 3.5rem)',
 }
 /** 이만큼(px) 넘게 끌어야 크기가 바뀐다 */
@@ -303,7 +304,7 @@ function MobileShell({ category }: { category: CategoryKey }) {
           <section
             ref={sheetRef}
             aria-label="조작 패널"
-            className="absolute inset-x-0 bottom-0 z-10 flex flex-col rounded-t-2xl border-t border-line-strong bg-surface transition-[top] duration-200 ease-out motion-reduce:transition-none"
+            className="absolute inset-x-0 bottom-0 z-10 flex flex-col rounded-t-[20px] border-t border-line bg-surface transition-[top] duration-200 ease-out motion-reduce:transition-none"
             style={{ top: SHEET_TOP[size] }}
             onPointerDown={onSheetPointerDown}
             onPointerMove={onSheetPointerMove}
@@ -393,7 +394,7 @@ function MobileShell({ category }: { category: CategoryKey }) {
               <Icon name="feedback" size={22} />
               {errorCount > 0 || tipCount > 0 ? (
                 <span
-                  className={`absolute -top-1 left-full -ml-2 flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[11px] leading-none font-semibold text-white tabular-nums ${
+                  className={`absolute -top-1 left-full -ml-2 flex h-4 min-w-4 items-center justify-center rounded-full px-1 whitespace-nowrap text-[11px] leading-none font-semibold text-white tabular-nums ${
                     errorCount > 0 ? 'bg-danger' : 'bg-tip'
                   }`}
                 >

@@ -3,7 +3,8 @@
   "framework": "vite",
   "functions": {
     "api/**/*.js": {
-      "maxDuration": 60
+      "maxDuration": 60,
+      "includeFiles": "vendor/bangbom-chat/{package.json,src/**,server/**}"
     }
   },
   "rewrites": [

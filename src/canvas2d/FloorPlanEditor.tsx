@@ -38,6 +38,8 @@ const NO_GUIDES: SnapGuides = { x: null, y: null }
 const WALL_PX = 5
 const HANDLE_PX = 9
 const HANDLE_HIT_PX = 28
+/** 손가락으로 쓰는 화면인지 (휴대폰·태블릿) */
+const COARSE = typeof matchMedia === "function" && matchMedia("(pointer: coarse)").matches
 const LABEL_FONT_PX = 11
 const TOOLBAR_HALF_PX = 124
 /** 떠 있는 도구 막대의 높이(px). 휴대폰 틀에서는 단추가 44px라 더 높다 */
@@ -405,7 +407,8 @@ export default function FloorPlanEditor() {
   }, [])
 
   // 화면 맞춤: 방 전체 + 바깥 여백(치수 글자 자리)이 항상 보이게 한다
-  const compact = size.w < 520
+  // 휴대폰 틀(1024px 미만)에서만 좁은 이름표 규칙을 쓴다. 평면도 너비로 고르면 PC의 좁은 평면도와 태블릿이 뒤바뀐다 (크기가 바뀌면 다시 그려져서 함께 바뀐다)
+  const compact = typeof window !== "undefined" && !window.matchMedia("(min-width: 1024px)").matches
   const outsidePx = compact ? 36 : 46
   const scale = Math.max(
     0.05,
@@ -712,15 +715,45 @@ export default function FloorPlanEditor() {
   let toolbarLeft = size.w / 2
   let toolbarTop = 8
   if (selectedRect && compact) {
-    const topPx = (selectedRect.yCm - vbY) * scale
-    const bottomPx = (selectedRect.yCm + selectedRect.depthCm - vbY) * scale
+    // 휴대폰: 도구 막대가 고른 가구·다른 가구·방 치수 글자를 가리지 않는 자리를 찾는다.
+    // 평면도 위의 여러 자리(가로 3곳 × 세로 여러 줄)를 재 보고 가장 덜 가리는 곳에 둔다
+    const toPx = (xCm: number, yCm: number) => ({ x: (xCm - vbX) * scale, y: (yCm - vbY) * scale })
+    const rectPx = (r: { xCm: number; yCm: number; widthCm: number; depthCm: number }) => {
+      const a = toPx(r.xCm, r.yCm)
+      return { l: a.x, t: a.y, r: a.x + r.widthCm * scale, b: a.y + r.depthCm * scale }
+    }
+    const roomPx = rectPx({ xCm: 0, yCm: 0, widthCm: room.widthCm, depthCm: room.depthCm })
+    const band = 30 // 치수 글자가 놓이는 방 바깥 띠(px)
+    const sel = rectPx(selectedRect)
+    const obstacles = [
+      // 고른 가구와 그 크기 글자는 절대 가리지 않는다
+      { ...sel, t: sel.t - 22, b: sel.b + 22, w: 100 },
+      ...room.furniture.filter((f) => f.id !== selected?.id).map((f) => ({ ...rectPx(footprint(f)), w: 10 })),
+      // 위쪽 가로 치수와 왼쪽 세로 치수
+      { l: roomPx.l, r: roomPx.r, t: roomPx.t - band, b: roomPx.t, w: 6 },
+      { l: roomPx.l - band, r: roomPx.l, t: roomPx.t, b: roomPx.b, w: 6 },
+    ]
+    const half = Math.min(TOOLBAR_HALF_PX, size.w / 2 - 6)
     const stageBottom = Math.max(8, size.h - toolbarPx - 2)
-    const roomForBottom = bottomPx + (sizeLabelSide === 'below' ? 22 : 0) + 6 <= stageBottom
-    const roomForTop = topPx - (sizeLabelSide === 'above' ? 20 : 0) - 6 >= 8 + toolbarPx - 6
-    // 아래에 자리가 있으면 아래, 없으면 위, 둘 다 없으면 가구를 덜 가리는 쪽
-    if (roomForBottom) toolbarTop = stageBottom
-    else if (roomForTop) toolbarTop = 8
-    else toolbarTop = size.h - bottomPx > topPx ? stageBottom : 8
+    let best = Infinity
+    for (const left of [size.w / 2, half + 6, size.w - half - 6]) {
+      for (let top = 8; top <= stageBottom; top += 12) {
+        const bar = { l: left - half, r: left + half, t: top, b: top + toolbarPx - 6 }
+        let cost = 0
+        for (const o of obstacles) {
+          const w = Math.max(0, Math.min(bar.r, o.r) - Math.max(bar.l, o.l))
+          const h = Math.max(0, Math.min(bar.b, o.b) - Math.max(bar.t, o.t))
+          cost += w * h * o.w
+        }
+        // 같으면 화면 위·아래 끝(엄지가 닿는 곳, 예전 자리)에 가까운 쪽
+        cost += Math.min(top - 8, stageBottom - top) * 0.01
+        if (cost < best) {
+          best = cost
+          toolbarLeft = left
+          toolbarTop = top
+        }
+      }
+    }
   }
   if (selectedRect && !compact) {
     const centerPx = (selectedRect.xCm + selectedRect.widthCm / 2 - vbX) * scale
@@ -883,12 +916,16 @@ export default function FloorPlanEditor() {
               const hyPos = selectedRect.yCm + ((handle.hy + 1) / 2) * selectedRect.depthCm
               // 누르는 자리: 바깥으로는 넉넉하게, 안쪽으로는 가구를 다 덮지 않게 (가운데는 옮기기용으로 남긴다)
               const out = px(HANDLE_HIT_PX / 2)
-              const inX = Math.min(out, selectedRect.widthCm / 4)
-              const inY = Math.min(out, selectedRect.depthCm / 4)
-              const left = hxPos - (handle.hx === -1 ? out : inX)
-              const right = hxPos + (handle.hx === 1 ? out : inX)
-              const top = hyPos - (handle.hy === -1 ? out : inY)
-              const bottom = hyPos + (handle.hy === 1 ? out : inY)
+              // 모서리를 따라서는 이만큼 넓게 잡힌다
+              const alongX = Math.min(out, selectedRect.widthCm / 4)
+              const alongY = Math.min(out, selectedRect.depthCm / 4)
+              // 가구 안쪽으로 들어오는 깊이. 손가락 화면에서는 0: 가구 위를 누르면 늘 옮기기가 되게 한다 (손잡이는 바깥쪽에서 잡는다)
+              const inX = COARSE ? 0 : alongX
+              const inY = COARSE ? 0 : alongY
+              const left = hxPos - (handle.hx === -1 ? out : handle.hx === 1 ? inX : alongX)
+              const right = hxPos + (handle.hx === 1 ? out : handle.hx === -1 ? inX : alongX)
+              const top = hyPos - (handle.hy === -1 ? out : handle.hy === 1 ? inY : alongY)
+              const bottom = hyPos + (handle.hy === 1 ? out : handle.hy === -1 ? inY : alongY)
               const half = px(HANDLE_PX / 2)
               return (
                 <g

@@ -17,7 +17,8 @@ const args = process.argv.slice(2)
 const shotAt = args.indexOf('--shots')
 const SHOTS = shotAt >= 0 ? args[shotAt + 1] : ''
 const BASE = (args.find((a, i) => !a.startsWith('--') && (shotAt < 0 || i !== shotAt + 1)) || 'http://localhost:4180').replace(/\/$/, '')
-const HOME = BASE + '/?tutorial=0'
+// chat=0: 예전 상담 서랍을 그대로 검사한다 (집찾기 대화는 e2e-chat.mjs 가 본다)
+const HOME = BASE + '/?tutorial=0&chat=0'
 const EDGE = [process.env.EDGE_PATH, 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe', 'C:/Program Files/Microsoft/Edge/Application/msedge.exe', '/usr/bin/microsoft-edge', '/usr/bin/google-chrome', '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'].find((p) => p && existsSync(p))
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
 const J = JSON.stringify
