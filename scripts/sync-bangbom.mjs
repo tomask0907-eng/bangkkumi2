@@ -14,6 +14,8 @@ fs.copyFileSync(path.join(from, 'index.html'), path.join(to, 'index.html'))
 for (const dir of ['img', 'fonts', 'vid', 'vendor']) {
   fs.cpSync(path.join(from, dir), path.join(to, dir), { recursive: true })
 }
+// data: 전월세 실거래 자료(collect_daegu_rent.py 가 만든다). 아직 없으면 건너뛰고, 화면은 '자료 준비 중'을 보여 준다
+if (fs.existsSync(path.join(from, 'data'))) fs.cpSync(path.join(from, 'data'), path.join(to, 'data'), { recursive: true })
 // 이용 현황 화면(따로 된 파일 하나)
 fs.copyFileSync(path.join(from, 'src', 'dashboard', 'dashboard.html'), path.join(to, 'dashboard.html'))
 console.log('방봄 화면을 public/으로 옮겼어요: index.html, img, fonts, vid, vendor')

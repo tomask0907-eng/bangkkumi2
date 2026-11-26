@@ -164,3 +164,6 @@
   :root{--zz-r:.5625}
   .stat{padding:18px var(--s2)}
 }
+
+/* 메뉴에 전월세가 더해져 한 줄 늘었다: 휴대폰에서는 줄 간격을 줄여 아래 이름 칩까지 가리지 않게 */
+@media (max-width:820px){.panel__list a{padding:14px 0}.panel__list b{font-size:22px}}

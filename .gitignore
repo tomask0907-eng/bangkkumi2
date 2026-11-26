@@ -71,4 +71,5 @@ bangbom/trace/art/
 
 # 실거래가 원자료 캐시 (fetch_rtms.py)
 .cache_rtms/
+.cache_rent/
 bangbom/trace/rtms_log.txt

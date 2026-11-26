@@ -282,7 +282,7 @@ body.card-open #mh .map-hint,#mh .map-hint.is-gone{opacity:0}
 }
 '''
 # 휴대폰 화면용 CSS (가장 마지막에 붙여서 위의 규칙을 덮어쓴다). 홈·이용 안내는 mobile_home.css, 입력·지도·집 보기·상담은 mobile_app.css
-mobile=''.join(open(os.path.join(HERE,n),encoding='utf-8').read() for n in ('home.css','mobile_home.css','mobile_app.css','step_input.css','house_overview.css','tutorial.css','chat.css'))
+mobile=''.join(open(os.path.join(HERE,n),encoding='utf-8').read() for n in ('home.css','rent.css','mobile_home.css','mobile_app.css','step_input.css','house_overview.css','tutorial.css','chat.css'))
 h=R(h,'</style>\n</head>', mscoped+over+mobile+'\n</style>\n</head>')
 
 # ---------- BODY ----------
@@ -388,12 +388,17 @@ HOUSE_MARK='/* [house_view.js] 집 보기(House)는 house_view.js 에 있다. bu
 APP_BB=open(os.path.join(HERE,'app_bb.js'),encoding='utf-8').read()
 assert APP_BB.count(HOUSE_MARK)==1, 'app_bb.js 에 집 보기 표시 줄이 없어요'
 APP_BB=APP_BB.replace(HOUSE_MARK, open(os.path.join(HERE,'house_view.js'),encoding='utf-8').read())
-mjs=open(M+'data.js',encoding='utf-8').read()+open(M+'data2.js',encoding='utf-8').read()+open(M+'unsold_list.js',encoding='utf-8').read()+open(M+'unsold_price.js',encoding='utf-8').read()+open(M+'geo.js',encoding='utf-8').read()+open(M+'real_poi.js',encoding='utf-8').read()+open(M+'mapscale.js',encoding='utf-8').read()+open(M+'engine.js',encoding='utf-8').read().replace('if (typeof module !== "undefined") module.exports = { profileResult, evaluate, breakdown, appliedLists };','')+open(M+'house.js',encoding='utf-8').read()+open(os.path.join(HERE,'backend.js'),encoding='utf-8').read().replace('if (typeof module !== "undefined") module.exports = { createBackend };','')+APP_BB+open(os.path.join(HERE,'tutorial.js'),encoding='utf-8').read()+open(os.path.join(HERE,'chat_connect.js'),encoding='utf-8').read()
+mjs=open(M+'data.js',encoding='utf-8').read()+open(M+'data2.js',encoding='utf-8').read()+open(M+'unsold_list.js',encoding='utf-8').read()+open(M+'unsold_price.js',encoding='utf-8').read()+open(M+'geo.js',encoding='utf-8').read()+open(M+'real_poi.js',encoding='utf-8').read()+open(M+'mapscale.js',encoding='utf-8').read()+open(M+'engine.js',encoding='utf-8').read().replace('if (typeof module !== "undefined") module.exports = { profileResult, evaluate, breakdown, appliedLists };','')+open(M+'house.js',encoding='utf-8').read()+open(os.path.join(HERE,'backend.js'),encoding='utf-8').read().replace('if (typeof module !== "undefined") module.exports = { createBackend };','')+APP_BB+open(os.path.join(HERE,'tutorial.js'),encoding='utf-8').read()+open(os.path.join(HERE,'chat_connect.js'),encoding='utf-8').read()+open(os.path.join(HERE,'rent.js'),encoding='utf-8').read()
 shell=open(os.path.join(HERE,'shell.js'),encoding='utf-8').read()
 tail='<script src="vendor/three.min.js"></script>\n<script src="vendor/bangbom-chat.js"></script>\n<script>\n{\n'+mjs+'\n}\n</script>\n<script>\n'+shell+'\nBB.route();\n</script>\n</body>\n</html>\n'
 # 홈: 혜원(B) 풀페이지 5화면으로 통째 교체 (위의 홈 문구 치환은 옛 홈 기준이라 먼저 돌고, 여기서 홈 전체를 바꾼다)
 _i=b.index('<section class="page" id="page-home"'); _j=b.index('<!-- ═══════════════ #guide')
-b=b[:_i]+open(os.path.join(HERE,'home.html'),encoding='utf-8').read()+b[_j:]
+b=b[:_i]+open(os.path.join(HERE,'home.html'),encoding='utf-8').read()+open(os.path.join(HERE,'rent.html'),encoding='utf-8').read()+b[_j:]
+# 전월세 메뉴: 위 메뉴·펼침 메뉴·아래 탭바(5칸)
+b=R(b,'<li><a class="nav__link" href="#house" data-route="house"><span>집 보기</span><small>HOUSE</small></a></li>','<li><a class="nav__link" href="#house" data-route="house"><span>집 보기</span><small>HOUSE</small></a></li>\n          <li><a class="nav__link" href="#rent" data-route="rent"><span>전월세</span><small>RENT</small></a></li>')
+b=R(b,'<li><a href="#house" data-route="house"><b>집 보기</b><i>House</i></a></li>','<li><a href="#house" data-route="house"><b>집 보기</b><i>House</i></a></li>\n      <li><a href="#rent" data-route="rent"><b>원룸·투룸·오피스텔</b><i>Rent</i></a></li>')
+b=R(b,'<path d="M4 7.5 12 12l8-4.5M12 12v9"/></svg>집 보기</a>','<path d="M4 7.5 12 12l8-4.5M12 12v9"/></svg>집 보기</a>\n  <a href="#rent" data-route="rent"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><path d="M5 20V8l7-4 7 4v12z"/><path d="M9 20v-5h6v5M9 10.5h.01M15 10.5h.01"/></svg>전월세</a>')
+h=h.replace('.tabbar{display:grid;grid-template-columns:repeat(4,1fr);','.tabbar{display:grid;grid-template-columns:repeat(5,1fr);')
 out=h+b.replace('</body>','').replace('</html>','')+tail
 open(os.path.join(HERE,'../../index.html'),'w',encoding='utf-8').write(out)
 print('ok', len(out))

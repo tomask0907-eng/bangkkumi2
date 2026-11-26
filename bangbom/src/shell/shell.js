@@ -5,9 +5,9 @@ if (/[?&](example|tab|view)=/.test(location.search)) location.replace("room.html
 const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 const REDUCED = matchMedia("(prefers-reduced-motion: reduce)").matches;
-const PAGES = ["home", "guide"], APP = ["input", "map", "house"];
-const NAVKEY = { home: "home", guide: "guide", input: "map", map: "map", house: "house" };
-const TITLES = { home: "방봄 BANGBOM", guide: "이용 안내 · 방봄", input: "기본정보 입력 · 방봄", map: "미분양 지도 · 방봄", house: "집 보기 · 방봄" };
+const PAGES = ["home", "rent", "guide"], APP = ["input", "map", "house"];
+const NAVKEY = { home: "home", rent: "rent", guide: "guide", input: "map", map: "map", house: "house" };
+const TITLES = { home: "방봄 BANGBOM", rent: "원룸·투룸·오피스텔 전월세 · 방봄", guide: "이용 안내 · 방봄", input: "기본정보 입력 · 방봄", map: "미분양 지도 · 방봄", house: "집 보기 · 방봄" };
 const nav = $("#nav");
 let current = null;
 function updateNav() { nav.classList.toggle("is-clear", current === "home" && scrollY < 24 && !document.body.classList.contains("menu-open")); }

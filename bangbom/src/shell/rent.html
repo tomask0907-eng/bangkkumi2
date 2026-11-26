@@ -1,0 +1,38 @@
+<!-- ═══════════════ #rent 원룸·투룸·오피스텔 전월세 실거래 (자료: data/daegu_rent.json, rent.js 가 그린다) ═══════════════ -->
+<section class="page" id="page-rent" data-page="rent" aria-label="원룸·투룸·오피스텔 전월세">
+  <div class="page-head">
+    <div class="container">
+      <span class="eyebrow">Rent records</span>
+      <h1 class="title">원룸·투룸·오피스텔 전월세</h1>
+      <p class="lead">대구에서 최근 신고된 전월세 계약이에요. 비슷한 집이 얼마에 계약됐는지 보고 예산을 잡아 보세요. 지금 나와 있는 매물은 아니에요.</p>
+      <p class="rent-src" id="rentSrc"></p>
+    </div>
+  </div>
+  <div class="container rent">
+    <form class="rent-bar" id="rentBar" role="search" aria-label="전월세 기록 고르기" onsubmit="return false">
+      <div class="rent-chips" role="group" aria-label="집 종류">
+        <button type="button" class="rent-chip is-on" data-room="all" aria-pressed="true">전체</button>
+        <button type="button" class="rent-chip" data-room="one" aria-pressed="false">원룸</button>
+        <button type="button" class="rent-chip" data-room="two" aria-pressed="false">투룸</button>
+        <button type="button" class="rent-chip" data-room="three" aria-pressed="false">쓰리룸 이상</button>
+        <button type="button" class="rent-chip" data-room="officetel" aria-pressed="false">오피스텔</button>
+      </div>
+      <div class="rent-fields">
+        <label class="rent-f"><span>구·군</span><select id="rentGu"><option value="">대구 전체</option><option>중구</option><option>동구</option><option>서구</option><option>남구</option><option>북구</option><option>수성구</option><option>달서구</option><option>달성군</option><option>군위군</option></select></label>
+        <label class="rent-f"><span>계약</span><select id="rentType"><option value="">전세·월세</option><option value="전세">전세만</option><option value="월세">월세만</option></select></label>
+        <label class="rent-f"><span>보증금 최대</span><span class="rent-in"><input id="rentDep" type="text" inputmode="numeric" autocomplete="off" placeholder="제한 없음"><i>원</i></span></label>
+        <label class="rent-f"><span>월세 최대</span><span class="rent-in"><input id="rentMon" type="text" inputmode="numeric" autocomplete="off" placeholder="제한 없음"><i>원</i></span></label>
+        <label class="rent-f"><span>정렬</span><select id="rentSort"><option value="latest">최근 계약순</option><option value="depositAsc">보증금 낮은순</option><option value="monthlyAsc">월세 낮은순</option><option value="areaDesc">넓은순</option></select></label>
+      </div>
+      <p class="rent-note">원룸·투룸은 자료에 방 개수가 없어서 면적으로 나눈 추정이에요(33㎡ 이하 원룸, 60㎡ 이하 투룸).</p>
+    </form>
+    <p class="rent-count" id="rentCount" aria-live="polite"></p>
+    <ul class="rent-list" id="rentList"></ul>
+    <div class="rent-more"><button type="button" class="btn btn--ghost" id="rentMore" hidden>더 보기</button></div>
+    <div class="rent-empty" id="rentEmpty" hidden>
+      <b>전월세 자료를 준비하고 있어요</b>
+      <p>국토교통부 전월세 실거래가(연립·다세대, 단독·다가구, 오피스텔)를 받아 오면 이곳에 보여 드려요.</p>
+    </div>
+  </div>
+</section>
+
