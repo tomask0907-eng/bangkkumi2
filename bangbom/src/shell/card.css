@@ -32,3 +32,16 @@ body.card-big #cardScrim{display:block}
 }
 /* 받지 못하는 지원 줄 안의 긴 설명은 줄바꿈한다(가로로 넘치지 않게) */
 #mh .lst .why-more{white-space:normal;text-align:left}
+/* 집 보기 로딩 표시 (house_view.js loadShow): iframe 자리 위에 겹친다 */
+#mh .hv-load{position:absolute;left:0;right:0;bottom:0;z-index:6;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:24px;background:var(--bg);text-align:center;animation:hvLoadIn .2s .15s both}
+#mh .hv-load[hidden]{display:none}
+@keyframes hvLoadIn{from{opacity:0}to{opacity:1}}
+#mh .hv-load__plan{width:min(360px,70vw);aspect-ratio:4/3;opacity:.85}
+#mh .hv-load__plan svg{width:100%;height:100%}
+#mh .hv-load__t{margin-top:8px;font-size:18px;font-weight:600;letter-spacing:-.03em}
+#mh .hv-load__s{font-size:14px;color:var(--sub)}
+#mh .hv-load__bar{width:min(280px,60vw);height:4px;margin-top:6px;border-radius:999px;background:var(--gray);overflow:hidden}
+#mh .hv-load__bar i{display:block;width:8%;height:100%;background:var(--green);transition:width .2s linear}
+#mh .hv-load__slow{margin-top:10px;display:flex;flex-direction:column;align-items:center;gap:8px;font-size:14px}
+#mh .hv-load__slow div{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+@media (prefers-reduced-motion:reduce){#mh .hv-load{animation:none}#mh .hv-load__bar i{transition:none}}

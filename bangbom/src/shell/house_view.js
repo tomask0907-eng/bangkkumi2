@@ -83,6 +83,33 @@ const House = {
     frame.hidden = !src;
     old.replaceWith(frame);
   },
+  /* 방꾸미 화면(iframe)이 그려지기 전까지 빈 화면 대신 고른 단지 평면 예시와 "집을 짓는 중이에요", 진행 표시를 보여 준다.
+     iframe 안 #root 에 내용이 생기면 닫는다. 15초가 넘으면 "다시 시도"와 "평면도만 먼저 보기"를 보여 준다 */
+  loadShow(c, L, r) {
+    let el = $("#hvLoad");
+    if (!el) { el = document.createElement("div"); el.id = "hvLoad"; el.className = "hv-load"; el.setAttribute("role", "status"); el.setAttribute("aria-live", "polite"); $("#houseView").appendChild(el); }
+    el.innerHTML = `<div class="hv-load__plan" aria-hidden="true">${planSVG(L)}</div><p class="hv-load__t">집을 짓는 중이에요</p><p class="hv-load__s">${esc(c.name.replace("(예시)", "").trim())} · ${esc(r.name)}</p><div class="hv-load__bar" aria-hidden="true"><i></i></div>
+      <div class="hv-load__slow" hidden><p>조금 오래 걸려요</p><div><button type="button" class="btn btn--sm" data-act="retry">다시 시도</button><button type="button" class="btn btn--ghost btn--sm" data-act="plan">평면도만 먼저 보기</button></div></div>`;
+    el.hidden = false; el.classList.remove("is-slow");
+    $('[data-act="retry"]', el).onclick = () => { const f = $("#kkumiFrame"), src = f.getAttribute("src"); if (src) { this.swap(src); this.loadWatch(); } };
+    $('[data-act="plan"]', el).onclick = () => { this.loadHide(); $("#hvPlan").click(); };
+    this.loadWatch();
+  },
+  loadWatch() {
+    const el = $("#hvLoad"); if (!el) return;
+    clearInterval(this.loadT); const t0 = performance.now(), bar = $(".hv-load__bar i", el), slow = $(".hv-load__slow", el);
+    el.hidden = false; el.classList.remove("is-slow"); slow.hidden = true;
+    this.loadT = setInterval(() => {
+      const f = $("#kkumiFrame"); let ok = false;
+      try { const d = f.contentDocument, root = d && d.querySelector("#root"); ok = !!d && d.readyState === "complete" && !!root && root.children.length > 0; } catch (e) { ok = true; }
+      const f0 = $("#kkumiFrame"); el.style.top = f0.offsetTop + "px";
+      if (ok) { this.loadHide(); return; }
+      const sec = (performance.now() - t0) / 1000;
+      bar.style.width = Math.min(92, 8 + sec / 15 * 84) + "%";
+      if (sec > 15 && slow.hidden) { slow.hidden = false; el.classList.add("is-slow"); }
+    }, 200);
+  },
+  loadHide() { clearInterval(this.loadT); const el = $("#hvLoad"); if (el) el.hidden = true; },
   showRoom(c, L, rooms, id) {
     const r = rooms.find(x => x.id === id), key = this.sb + "-" + r.id;
     /* 방 단추를 누른 초점이 사라지지 않게, 화면을 바꾼 뒤 그 방의 칩으로 옮긴다 */
@@ -100,12 +127,14 @@ const House = {
     this.loaded = key;
     const q = new URLSearchParams({ embed: "1", slot: key, w: String(Math.round(r.w * 100)), d: String(Math.round(r.d * 100)), kind: r.type === "living" ? "living" : r.name === "안방" ? "master" : "bed", name: `${c.name.replace("(샘플)", "")} ${r.name}`, op: this.openings(L, r) });
     if (eye) { q.set("view", "3d"); q.set("eye", eye); }
+    this.loadShow(c, L, r);
     this.swap("room.html?" + q.toString());
   },
   showOver(c, L, rooms) {
     const left = this.shown ? this.room : null;
     /* 방에서 나왔으면 방꾸미 화면을 닫는다. 닫으면서 기다리던 저장을 바로 하게 해서 방금 놓은 가구가 평면도에 보인다 */
     if (this.loaded) { this.loaded = null; this.swap(""); }
+    this.loadHide();
     this.shown = null;
     $("#hvOver").innerHTML = this.overHTML(c, L, rooms);
     this.mode(false); this.sync3d(L, rooms);
