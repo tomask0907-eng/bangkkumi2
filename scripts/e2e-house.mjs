@@ -29,8 +29,8 @@ let step = '시작'
 
 // 표준 구조의 방 (bangbom/src/modelhouse/house.js 의 ROOMS 와 같아야 한다). 그림에 놓인 순서대로, [방 id, 이름표]
 const LAYOUTS = {
-  '84㎡ A타입': { all: [['r3', '방 2 3.4 × 3.6m'], ['kit', '주방 4.0 × 3.6m'], ['bath', '욕실 3.0 × 2.0m'], ['hall', '현관 3.0 × 1.6m'], ['bath2', '욕실 2 1.6 × 1.8m'], ['dress', '드레스룸 1.8 × 1.8m'], ['r1', '방 3 3.4 × 3.2m'], ['liv', '거실 4.0 × 5.0m'], ['r2', '안방 3.0 × 5.0m']], deco: ['liv', 'r2', 'r3', 'r1'], living: [400, 500] },
-  '59㎡ A타입': { all: [['r3', '방 3 2.9 × 3.0m'], ['kit', '주방 3.0 × 3.0m'], ['bath', '욕실 2.5 × 1.9m'], ['hall', '현관 2.5 × 1.1m'], ['r1', '안방 2.9 × 4.4m'], ['liv', '거실 3.0 × 4.4m'], ['r2', '방 2 2.5 × 4.4m']], deco: ['liv', 'r1', 'r2', 'r3'], living: [300, 440] },
+  '84㎡ A타입': { all: [['r3', '방 3 3.0 × 3.0m'], ['kit', '주방 4.2 × 3.4m'], ['bath', '욕실 2.2 × 2.4m'], ['hall', '현관 1.8 × 1.6m'], ['bath2', '욕실 2 1.6 × 1.6m'], ['dress', '드레스룸 1.8 × 1.6m'], ['r1', '안방 3.4 × 4.2m'], ['liv', '거실 4.2 × 5.0m'], ['r2', '방 2 3.2 × 3.4m'], ['balc', '발코니 4.2 × 1.2m']], deco: ['liv', 'r1', 'r2', 'r3'], living: [420, 500] },
+  '59㎡ A타입': { all: [['r3', '방 3 2.8 × 2.8m'], ['kit', '주방 3.0 × 3.3m'], ['bath', '욕실 2.2 × 2.0m'], ['hall', '현관 1.6 × 1.4m'], ['r1', '안방 2.8 × 4.0m'], ['liv', '거실 3.0 × 4.0m'], ['r2', '방 2 2.6 × 3.3m'], ['balc', '발코니 3.0 × 1.0m']], deco: ['liv', 'r1', 'r2', 'r3'], living: [300, 400] },
 }
 const EMPTY = '아직 꾸미지 않았어요'
 
@@ -39,7 +39,7 @@ function seedProject(widthCm, depthCm) {
   const item = (id, name, category, w, d, x, y, rotation) => ({ id, name, category, widthCm: w, depthCm: d, heightCm: 75, xCm: x, yCm: y, rotation, color: '#d8c7a8', material: 'wood', owned: false, clearanceFrontCm: 60, hasSharpCorner: false, price: { estimatedKrw: 100000, manualKrw: null, source: 'catalog' }, locked: false })
   return { version: '2.0.0', activeRoomId: 'room_1', profile: { lifestyle: 'single', budgetKrw: 3000000 }, updatedAt: '2026-11-26T00:00:00.000Z', rooms: [{ id: 'room_1', name: '검사용 방', widthCm, depthCm, heightCm: 240, windowDirection: 'south', openings: [], style: { id: 'natural', name: '내추럴', wallColor: '#f5f1ea', floorColor: '#c9a77c', floorMaterial: 'oak_wood', accentColor: '#1f6b4f', description: '' }, activeVariantId: null, variants: [],
     // 둘째(책상 120x60)는 90도 돌려서 바닥을 60x120 으로 차지한다
-    furniture: [item('f1', '침대', 'bed', 150, 200, 10, 10, 0), item('f2', '책상', 'desk', 120, 60, 200, 300, 90), item('f3', '서랍장', 'drawer', 80, 45, 10, 380, 180)] }] }
+    furniture: [item('f1', '침대', 'bed', 150, 200, 10, 10, 0), item('f2', '책상', 'desk', 120, 60, 200, 260, 90), item('f3', '서랍장', 'drawer', 80, 45, 10, 340, 180)] }] }
 }
 
 class Cdp {
@@ -271,17 +271,17 @@ async function run(cdp) {
       // c06 은 74㎡ 인데 84㎡ 구조로 대신 보여 준다. 그 사실을 전체 구조에서도 적어야 한다
       await ev(`MH.openHouse('c06')`); const s6 = await waitOver()
       await ev('history.back()'); await waitFor(`location.hash === '#map'`, '#map', 4000)
-      // c02 안방(r1, 2.9 x 4.4m)에 가구 3개, 방 2(r2)에는 깨진 글자, 방 3(r3)에는 모양이 다른 자료를 넣어 둔다
-      await ev(`(() => { localStorage.setItem('bangkkumi2.project.c02-r1', ${J(J(seedProject(290, 440)))}); localStorage.setItem('bangkkumi2.project.c02-r2', '{broken'); localStorage.setItem('bangkkumi2.project.c02-r3', ${J(J({ version: '2.0.0', rooms: [{ widthCm: 'x', depthCm: 300, furniture: [{ xCm: 1 }, null, 7] }, null] }))}) })()`)
+      // c02 안방(r1, 2.8 x 4.0m)에 가구 3개, 방 2(r2)에는 깨진 글자, 방 3(r3)에는 모양이 다른 자료를 넣어 둔다
+      await ev(`(() => { localStorage.setItem('bangkkumi2.project.c02-r1', ${J(J(seedProject(280, 400)))}); localStorage.setItem('bangkkumi2.project.c02-r2', '{broken'); localStorage.setItem('bangkkumi2.project.c02-r3', ${J(J({ version: '2.0.0', rooms: [{ widthCm: 'x', depthCm: 300, furniture: [{ xCm: 1 }, null, 7] }, null] }))}) })()`)
       await ev(`MH.openHouse('c02')`); const b = await waitOver(); await shot(`${tag}-overview-59`)
-      const g = await ev(`(() => { const room = ${planBtn('r1')}.getBoundingClientRect(); const rs = [...document.querySelectorAll('#hvOver svg[data-fur="r1"] rect')].map(e => e.getBoundingClientRect()); return { n: rs.length, inside: rs.every(r => r.left >= room.left - 1 && r.right <= room.right + 1 && r.top >= room.top - 1 && r.bottom <= room.bottom + 1), turned: rs[1] ? [Math.round(rs[1].width * 10) / 10, Math.round(rs[1].height * 10) / 10] : null, flat: rs[0] ? [Math.round(rs[0].width * 10) / 10, Math.round(rs[0].height * 10) / 10] : null, scale: room.width / 290 } })()`)
+      const g = await ev(`(() => { const room = ${planBtn('r1')}.getBoundingClientRect(); const rs = [...document.querySelectorAll('#hvOver svg[data-fur="r1"] rect')].map(e => e.getBoundingClientRect()); return { n: rs.length, inside: rs.every(r => r.left >= room.left - 1 && r.right <= room.right + 1 && r.top >= room.top - 1 && r.bottom <= room.bottom + 1), turned: rs[1] ? [Math.round(rs[1].width * 10) / 10, Math.round(rs[1].height * 10) / 10] : null, flat: rs[0] ? [Math.round(rs[0].width * 10) / 10, Math.round(rs[0].height * 10) / 10] : null, scale: room.width / 280 } })()`)
       const turnedOk = !!g.turned && Math.abs(g.turned[0] - 60 * g.scale) < 2 && Math.abs(g.turned[1] - 120 * g.scale) < 2 && Math.abs(g.flat[0] - 150 * g.scale) < 2 && Math.abs(g.flat[1] - 200 * g.scale) < 2
       const txt59 = Object.fromEntries(b.list)
       const ok = a.type === '84㎡ A타입' && same(a.plan, LAYOUTS['84㎡ A타입'].all) && same(a.list.map((x) => x[0]), LAYOUTS['84㎡ A타입'].deco) && a.inside
         && b.type === '59㎡ A타입' && same(b.plan, LAYOUTS['59㎡ A타입'].all) && same(b.list.map((x) => x[0]), LAYOUTS['59㎡ A타입'].deco) && b.inside && b.over.docW <= w
         && /74㎡인데 84㎡ 구조로 대신/.test(s6.note) && !/대신/.test(a.note) && /실제와 다를 수 있어요/.test(a.note)
         && same(b.fur, { r1: 3 }) && txt59.r1.endsWith('가구 3개') && txt59.r2.endsWith(EMPTY) && txt59.r3.endsWith(EMPTY) && txt59.liv.endsWith(EMPTY) && g.inside && turnedOk
-      return { ok, evidence: `c01 "${a.type}" 방 ${a.plan.length}개=${J(a.plan.map((x) => x[1]))} / c02 "${b.type}" 방 ${b.plan.length}개=${J(b.plan.map((x) => x[1]))}, 목록=${J(b.list.map((x) => x[1]))}, 가구 자리=${J(b.fur)}, 방 안에 그려짐=${g.inside}, 그대로 둔 침대(150x200cm) ${J(g.flat)}px·90도 돌린 책상(120x60cm) ${J(g.turned)}px (1cm=${g.scale.toFixed(3)}px), 가로 ${b.over.docW}/${w}, c06 고지="${s6.note}"` }
+      return { ok, evidence: `[이름표 그림 안 84=${a.inside} 59=${b.inside}, 가구 방 안=${g.inside}, 돌린 가구=${turnedOk}, 59 목록=${same(b.list.map((x) => x[0]), LAYOUTS['59㎡ A타입'].deco)}] c01 "${a.type}" 방 ${a.plan.length}개=${J(a.plan.map((x) => x[1]))} / c02 "${b.type}" 방 ${b.plan.length}개=${J(b.plan.map((x) => x[1]))}, 목록=${J(b.list.map((x) => x[1]))}, 가구 자리=${J(b.fur)}, 방 안에 그려짐=${g.inside}, 그대로 둔 침대(150x200cm) ${J(g.flat)}px·90도 돌린 책상(120x60cm) ${J(g.turned)}px (1cm=${g.scale.toFixed(3)}px), 가로 ${b.over.docW}/${w}, c06 고지="${s6.note}"` }
     })
 
     await check(`${P} 8. 키보드: 목록에서 Enter, 평면도에서 Space 로 방 열기`, async () => {
@@ -293,7 +293,7 @@ async function run(cdp) {
       await ev(`${planBtn('r2')}.focus()`); await key('Space')
       await waitFor(`location.hash === '#house/r2'`, 'Space → #house/r2', 4000); const f2 = await waitRoom('c02-r2')
       await ev('history.back()'); const o = await waitOver()
-      const ok = +f1.w === 300 && +f1.d === 440 && f1.pressed === '거실' && focus1 === '거실' && focus2 === 'hvo-room:liv' && f2.pressed === '방 2' && +f2.w === 250 && +f2.d === 440 && Array.isArray(f2.fur) && o.on && o.fur.r1 === 3
+      const ok = +f1.w === 300 && +f1.d === 400 && f1.pressed === '거실' && focus1 === '거실' && focus2 === 'hvo-room:liv' && f2.pressed === '방 2' && +f2.w === 260 && +f2.d === 330 && Array.isArray(f2.fur) && o.on && o.fur.r1 === 3
       return { ok, evidence: `Enter → ${f1.slot}(${f1.w}x${f1.d}) 초점="${focus1}" 칩, 뒤로 → 초점=${focus2}, Space → ${f2.slot}(${f2.w}x${f2.d}) 깨진 저장 대신 새로 시작한 가구=${J(f2.fur)}, 다시 전체 구조: 가구 자리=${J(o.fur)}` }
     })
 

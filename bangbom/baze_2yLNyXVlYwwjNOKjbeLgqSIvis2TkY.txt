@@ -1,0 +1,7 @@
+baze_2yLNyXVlYwwjNOKjbeLgqSIvis2TkYhX0gTLpg
+
+
+Connect this coding agent to the BAZE API Gateway so it runs on BAZE-served models with my BAZE API key.
+Fetch and follow the setup instructions at
+https://docs.factchat.kr/agent-setup/prompt.md
+API key: baze_2yLNyXVlYwwjNOKjbeLgqSIvis2TkYhX0gTLpg

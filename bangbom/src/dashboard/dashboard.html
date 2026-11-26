@@ -278,7 +278,8 @@ td small,tbody th small{display:block;margin-top:2px;font-size:13px;font-weight:
   const won = (v) => {
     if (!has(v)) return DASH
     const n = Number(v)
-    return Math.abs(n) < 10000 ? num(Math.round(n)) + '원' : '약 ' + num(Math.round(n / 10000)) + '만 원'
+    // 사이트 전체가 원 단위라 여기서도 만 원으로 줄이지 않고 원까지 쓴다 (천 원 아래는 반올림)
+    return Math.abs(n) < 10000 ? num(Math.round(n)) + '원' : '약 ' + num(Math.round(n / 1000) * 1000) + '원'
   }
   // 서버가 괄호로 붙인 내부 이름 (on), (clicks), (match_logs) 는 화면에서 지워요
   const plain = (s) => String(s === null || s === undefined ? '' : s).replace(/\s*\([a-z][a-z0-9_./-]*\)/g, '').trim()

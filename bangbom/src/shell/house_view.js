@@ -286,8 +286,9 @@ const Whole3D = {
     this.L = L;
     if (this.root) { this.scene.remove(this.root); this.root.traverse(o => { if (o.geometry) o.geometry.dispose(); }); }
     const root = this.root = new T3.Group(); root.position.set(-L.W / 2, 0, -L.D / 2); this.scene.add(root);
-    const base = box(L.W + .5, .2, L.D + .5, mat("#e4e0d8")); base.position.set(L.W / 2, -.105, L.D / 2); root.add(base);
-    const floorC = r => r.type === "bath" ? "#dfe4e5" : r.type === "kitchen" ? "#ebe6dc" : r.type === "hall" || r.type === "dress" ? "#dcd7ce" : "#d4b48c";
+    /* 바닥판: 집 바깥선이 비정형이라 방마다 판을 깐다 */
+    L.rooms.forEach(r => { const base = box(r.w + .3, .2, r.d + .3, mat("#e4e0d8")); base.position.set(r.x + r.w / 2, -.105, r.z + r.d / 2); root.add(base); });
+    const floorC = r => r.type === "balcony" ? "#d8d6d0" : r.type === "bath" ? "#dfe4e5" : r.type === "kitchen" ? "#ebe6dc" : r.type === "hall" || r.type === "dress" ? "#dcd7ce" : "#d4b48c";
     L.rooms.forEach(r => { const f = new T3.Mesh(new T3.PlaneGeometry(r.w, r.d), mat(floorC(r), { roughness: .75 })); f.rotation.x = -Math.PI / 2; f.position.set(r.x + r.w / 2, .004, r.z + r.d / 2); f.receiveShadow = true; root.add(f); });
     this.walls = new T3.Group(); this.front = new T3.Group(); root.add(this.walls, this.front);
     const wm = mat("#f6f3ee"), glass = new T3.MeshStandardMaterial({ color: 0xcfe0dc, transparent: true, opacity: .28, depthWrite: false });

@@ -573,14 +573,23 @@ const MapView = {
   },
   buildCity() {
     /* 도심 격자 블록 (예시, 실제 건물 아님): 미분양 단지보다 낮고 무채색으로 */
-    const rnd = seeded("daegu-v5"), apt = [], low = [], field = [], CW = 2.0 * MAP_K / 1.5, CD = 1.7 * MAP_K / 1.5;
-    for (let gx = Math.floor(-22 * MAP_K / CW); gx < Math.ceil(68 * MAP_K / CW); gx++) for (let gz = Math.floor(-20.4 * MAP_K / CD); gz < Math.ceil(68 * MAP_K / CD); gz++) {
+    /* 구·군 어디에나 건물을 채운다: 도심은 촘촘하게(일반 아파트 단지 포함), 군 지역은 띄엄띄엄 마을과 작은 단지. 모두 정보 없는 배경 건물이다 */
+    const rnd = seeded("daegu-v6"), apt = [], low = [], field = [], tower = [], CW = 2.0 * MAP_K / 1.5, CD = 1.7 * MAP_K / 1.5;
+    for (let gx = Math.floor(-22 * MAP_K / CW); gx < Math.ceil(68 * MAP_K / CW); gx++) for (let gz = Math.floor(-80 * MAP_K / CD); gz < Math.ceil(68 * MAP_K / CD); gz++) {
       const cx = gx * CW + CW / 2, cz = gz * CD + CD / 2;
-      if (!inGeo(cx, cz, GEO.urban) || rnd() < .3 || rnd() < .5) continue;
-      const free = (x, z, pad) => !this.blocked(x, z, pad) && inGeo(x, z, GEO.urban);
-      const kind = rnd(), dense = Math.max(0, 1 - Math.hypot(cx - 18 * MAP_K, cz - 13 * MAP_K) / (22 * MAP_K));
-      if (kind < .36 + dense * .2) {
-        const rows = 2 + Math.floor(rnd() * 2), hgt = (.3 + rnd() * .28 + dense * .2) * .6;
+      const urban = inGeo(cx, cz, GEO.urban);
+      if (urban ? rnd() < .18 : !inGeo(cx, cz, GEO.outline) || rnd() > .07) continue;
+      const free = (x, z, pad) => !this.blocked(x, z, pad) && inGeo(x, z, GEO.outline);
+      const kind = rnd(), dense = urban ? Math.max(0, 1 - Math.hypot(cx - 18 * MAP_K, cz - 13 * MAP_K) / (22 * MAP_K)) : 0;
+      /* 일반 아파트 단지: 판정 단지보다 낮은 회색 판상형 3~5동 */
+      if (kind < (urban ? .16 + dense * .14 : .25)) {
+        const n = 3 + Math.floor(rnd() * 3), hgt = (urban ? 1.8 + rnd() * 1.2 + dense * 1.0 : 1.2 + rnd() * .8);
+        for (let k = 0; k < n; k++) { const x = cx - CW * .32 + (k % 3) * CW * .32, z = cz - CD * .2 + Math.floor(k / 3) * CD * .42; if (free(x, z, .15)) tower.push([x, z, .9, .42, hgt * (.85 + rnd() * .3)]); }
+        continue;
+      }
+      if (!urban) { for (let k = 0; k < 6; k++) { const x = cx + (rnd() - .5) * CW * .7, z = cz + (rnd() - .5) * CD * .7; if (free(x, z, .1)) low.push([x, z, .2 + rnd() * .16, .18 + rnd() * .14, .07 + rnd() * .06]); } continue; }
+      if (kind < .46 + dense * .2) {
+        const rows = 2 + Math.floor(rnd() * 2), hgt = (.3 + rnd() * .28 + dense * .2) * 1.5;
         for (let r = 0; r < rows; r++) { const z = cz - CD * .3 + r * (CD * .6 / Math.max(1, rows - 1)); for (const x of [cx - .45, cx + .45]) if (free(x, z, .15)) apt.push([x, z, .78, .24, hgt * (.85 + rnd() * .3)]); }
       } else if (kind < .9) {
         for (let k = 0; k < 7; k++) { const x = cx + (rnd() - .5) * CW * .8, z = cz + (rnd() - .5) * CD * .8; if (free(x, z, .1)) low.push([x, z, .22 + rnd() * .2, .2 + rnd() * .18, (.08 + rnd() * .1) * .7]); }
@@ -592,7 +601,7 @@ const MapView = {
       arr.forEach((b, i) => { m.compose(new T3.Vector3(b[0], 0, b[1]), q, new T3.Vector3(b[2], b[4], b[3])); im.setMatrixAt(i, m); });
       im.castShadow = true; im.receiveShadow = true; this.decor.add(im);
     };
-    inst(apt, "#eeeeec"); inst(low, "#ebeae7");
+    inst(apt, "#eeeeec"); inst(low, "#ebeae7"); inst(tower, "#e3e4e1");
     field.forEach(([x, z]) => { const f = rbox(1.0, .02, 1.1, .3, mat("#e2d9c8")); f.position.set(x, 0, z); f.castShadow = false; this.decor.add(f); });
   },
   buildLandmarks() {
@@ -665,7 +674,7 @@ const MapView = {
     this.uPos = pos;
     const hg = new T3.CylinderGeometry(.55, .55, 3, 8); hg.translate(0, 1.5, 0);
     this.uHits = UNSOLD_LIST.map((u, k) => {
-      const [x, z] = this.uPos[k], g = new T3.Group(); g.position.set(x, 0, z); g.rotation.y = (k * 0.7) % Math.PI; this.decor.add(g);
+      const [x, z] = this.uPos[k], g = new T3.Group(); g.position.set(x, 0, z); g.rotation.y = (k * 0.7) % Math.PI;  this.decor.add(g);
       const h = 1.1 + Math.min(u.total_units || 400, 1500) / 1500 * 1.6, bm = hasP(u) ? bandOn : bandOff;
       [[-.13, h], [.13, h * .82]].forEach(([dx, hh]) => {
         const b = new T3.Mesh(new T3.BoxGeometry(.2, hh, .4), [uWall, uWall, uRoof, uRoof, uWall, uWall]); b.position.set(dx, hh / 2, 0); b.castShadow = true; b.receiveShadow = true; g.add(b);
@@ -975,8 +984,9 @@ function planArt(L, extra = "", pad = .5) {
 <pattern id="${id}k" width="40" height="40" patternUnits="userSpaceOnUse"><rect width="40" height="40" fill="#f2eee6"/><path d="M0 39H40M39 0V40" stroke="#e3ddd1" stroke-width="2"/></pattern>
 <pattern id="${id}s" width="60" height="60" patternUnits="userSpaceOnUse"><rect width="60" height="60" fill="#e7e4dd"/><path d="M0 59H60M59 0V60" stroke="#d9d5cc" stroke-width="2"/></pattern>
 <filter id="${id}f" x="-10%" y="-10%" width="120%" height="120%"><feGaussianBlur stdDeviation="14"/></filter></defs>`;
-  const fill = r => `url(#${id}${r.type === "bath" ? "t" : r.type === "kitchen" ? "k" : r.type === "hall" || r.type === "dress" ? "s" : "w"})`;
-  const shadow = `<rect x="${P(0) + 10}" y="${P(0) + 18}" width="${len(L.W)}" height="${len(L.D)}" fill="#141714" opacity=".16" filter="url(#${id}f)"/>`;
+  const fill = r => `url(#${id}${r.type === "bath" ? "t" : r.type === "kitchen" ? "k" : r.type === "hall" || r.type === "dress" || r.type === "balcony" ? "s" : "w"})`;
+  /* 집 그림자: 바깥선이 비정형이라 방마다 같은 그림자를 깔아 집 모양을 따라가게 */
+  const shadow = `<g fill="#141714" opacity=".16" filter="url(#${id}f)">${L.rooms.map(r => `<rect x="${P(r.x) + 10}" y="${P(r.z) + 18}" width="${len(r.w)}" height="${len(r.d)}"/>`).join("")}</g>`;
   const floors = L.rooms.map(r => `<rect x="${P(r.x)}" y="${P(r.z)}" width="${len(r.w)}" height="${len(r.d)}" fill="${fill(r)}"/>`).join("");
   /* 벽 조각은 모서리에서 벽 두께 절반보다 조금 더 나와 있다. 집 테두리에서 잘라 모서리가 반듯하게 한다 */
   const cut = (p, v) => P(Math.max(-.07, Math.min((p.axis === "x" ? L.W : L.D) + .07, v)));
@@ -990,7 +1000,15 @@ function planArt(L, extra = "", pad = .5) {
     if (d.axis === "x") return `<path d="M${ax} ${c}V${c + dir * w}A${w} ${w} 0 0 ${dir > 0 ? 0 : 1} ${bx} ${c}"/>`;
     return `<path d="M${c} ${ax}H${c + dir * w}A${w} ${w} 0 0 ${dir > 0 ? 1 : 0} ${c} ${bx}"/>`;
   }).join("");
-  return defs + shadow + floors + extra
+  /* 붙박이 설비: 주방 조리대·냉장고(L.fixed), 욕실 욕조·변기·세면대. 가구는 그리지 않는다 */
+  const fx = (L.fixed || []).map(o => o.key === "tub"
+    ? `<rect x="${P(o.x0)}" y="${P(o.z0)}" width="${len(o.x1 - o.x0)}" height="${len(o.z1 - o.z0)}" rx="14" fill="#fff" stroke="#b9c3c6" stroke-width="3"/><rect x="${P(o.x0) + 8}" y="${P(o.z0) + 8}" width="${len(o.x1 - o.x0) - 16}" height="${len(o.z1 - o.z0) - 16}" rx="10" fill="#e6eff2"/>`
+    : `<rect x="${P(o.x0)}" y="${P(o.z0)}" width="${len(o.x1 - o.x0)}" height="${len(o.z1 - o.z0)}" rx="4" fill="${o.key === "fridge" ? "#eceeed" : "#c9c7c1"}" stroke="#a9a69f" stroke-width="2"/>`).join("")
+    + L.rooms.filter(r => r.type === "bath" && r.w > 1.4 && r.d > 1.4).map(r => {
+      const tx = r.x + r.w - .32, tz = r.z + r.d - .42, sx = r.x + r.w - .3, sz = r.z + .95;
+      return `<ellipse cx="${P(tx)}" cy="${P(tz)}" rx="17" ry="22" fill="#fff" stroke="#b9c3c6" stroke-width="3"/><rect x="${P(sx) - 20}" y="${P(sz) - 14}" width="40" height="28" rx="8" fill="#fff" stroke="#b9c3c6" stroke-width="3"/>`;
+    }).join("");
+  return defs + shadow + floors + fx + extra
     + `<g fill="none" stroke="#8b8f8a" stroke-width="3" stroke-dasharray="10 8">${doors}</g>`
     + `<g stroke="#2b302c" stroke-width="16" stroke-linecap="square">${walls}</g>`
     + `<g fill="#fff" stroke="#2b302c" stroke-width="3">${wins}</g><path d="${glassLine}" stroke="#2b302c" stroke-width="2" fill="none"/>`;
