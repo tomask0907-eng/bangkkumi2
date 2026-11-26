@@ -24,3 +24,11 @@
 #mh .form input[type=number]::-webkit-inner-spin-button,#mh .form input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
 #mh .link-btn{font-size:14px;color:var(--sub);text-decoration:underline;text-underline-offset:4px}
 #mh .link-btn:hover{color:var(--ink)}
+
+/* 판정 결과 보강: 청년월세 기준 설명, 0곳일 때 "이렇게 하면 열려요" (혜원 hyewon-main cf5d351) */
+#mh .why-more{display:block;margin-top:4px;font-size:13px;line-height:1.55;color:var(--sub)}
+#mh .why-more a{color:var(--green);text-decoration:underline;text-underline-offset:2px}
+#mh .jp-open{margin-top:12px;padding:12px 14px;border-radius:12px;background:#fbf1de;border:1px solid #efd9ad}
+#mh .jp-open b{display:block;font-size:14px;margin-bottom:6px}
+#mh .jp-open ul{margin:0;padding-left:18px;font-size:13px;line-height:1.6}
+#mh .jp-open p{margin-top:6px;font-size:13px;color:var(--sub)}

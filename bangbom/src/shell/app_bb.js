@@ -73,6 +73,25 @@ function setMode(m) { S.mode = m; MapView.applyMode(true); renderTop("map"); ren
 let jpOpen = false, plOpen = true;
 function syncPl() { const b = $("#plToggle"); /* 휴대폰에서는 한 줄 요약이라 접기 단추(−) 없이 늘 보여 준다 */ const vis = VIEW === "map" && (plOpen || isPhone()) && !document.body.classList.contains("card-open"); $("#panelL").hidden = !vis; b.hidden = VIEW !== "map"; b.textContent = plOpen ? "−" : "+"; b.setAttribute("aria-expanded", plOpen); b.setAttribute("aria-label", plOpen ? "패널 닫기" : "패널 열기"); }
 
+/* 청년월세 지원이 소득 때문에 미충족일 때 덧붙이는 설명. 판정은 engine.js 그대로이고 여기서는 기준을 풀어 쓸 뿐이다 (출처: 정책브리핑) */
+const RENT_SRC = "https://www.korea.kr/news/policyNewsView.do?newsId=148971987";
+const rentWhy = (id, status, reason) => id === "youth_monthly_rent" && status !== "eligible" && /소득/.test(reason || "")
+  ? `<span class="why-more">1인 가구 기준 중위소득 60%(월 1,540,000원) 이하가 기준이에요. 근로소득은 70%만 반영돼서 월 소득 약 2,200,000원까지 받을 수 있어요. <a href="${RENT_SRC}" target="_blank" rel="noopener" style="pointer-events:auto">정책브리핑</a></span>` : "";
+/* 결과가 0곳일 때 "이렇게 하면 열려요": engine 의 판정 함수(profileResult·evaluate)를 조건만 바꿔 다시 불러 계산한다. 숫자가 안 나오는 줄은 뺀다 */
+function openHints(P) {
+  const run = Q => { const pr = profileResult(Q); return COMPLEX.map(c => ({ c, e: evaluate(Q, c, pr) })); };
+  const now = run(P), out = [];
+  [10, 20].forEach(d => { const k = run(Object.assign({}, P, { monthly_budget: P.monthly_budget + d })).filter(x => x.e.light === "on").length; if (k) out.push(`월 예산을 ${wonFull(d)} 늘리면(${wonFull(P.monthly_budget + d)}) 요건 충족 단지가 <b>${k}곳</b>이 돼요.`); });
+  const pr = profileResult(P), elig = pr.loans.filter(l => l.status === "eligible");
+  elig.forEach(l => { const xs = now.filter(x => x.e.light !== "off" && x.e.chosen && x.e.chosen.used.includes(l.id)); if (xs.length) out.push(`요건 충족인 ${esc(l.name)}을 쓰면 들어갈 수 있는 단지: ${xs.map(x => esc(x.c.name.replace("(예시)", "").trim())).join(", ")} (확인 필요 포함)`); });
+  const lack = now.filter(x => x.e.shortfall > 0).sort((a, b) => a.e.shortfall - b.e.shortfall)[0];
+  if (lack) {
+    const Q = Object.assign({}, P, { assets: P.assets + lack.e.shortfall }), e = evaluate(Q, lack.c, profileResult(Q)), m = e.net_monthly != null ? e.net_monthly : e.net_monthly_best, nm = esc(lack.c.name.replace("(예시)", "").trim());
+    if (e.light !== "off") out.push(`모은 돈이 ${wonFull(lack.e.shortfall)} 더 있으면 ${nm}이 ${LIGHT_KO[e.light]}이 돼요.`);
+    else if (m != null) out.push(`모은 돈이 ${wonFull(lack.e.shortfall)} 더 있으면 ${nm}의 자기자금이 맞아요. 그때 월 부담은 약 ${wonFull(m)}이에요(지금 월 예산 ${wonFull(P.monthly_budget)}).`);
+  }
+  return out;
+}
 function renderPanels() {
   const v = VIEW || "map";
   const onMap = v === "map";
@@ -82,7 +101,7 @@ function renderPanels() {
   if (S.mode === "match" && S.pr) {
     const n = counts(), tot = n.on + n.dim + n.off || 1;
     const row = x => `<div class="jp-row" role="button" tabindex="0"><span class="ico ${x.status}">${ST_ICON[x.status]}</span><span class="nm">${esc(x.name)}</span><span class="st st--${x.status}">${ST_KO[x.status]}</span>
-      <span class="jp-more">${esc(x.reason)}${x.rate_label ? `<br>금리 ${esc(x.rate_label)}` : ""}${x.check_items && x.check_items.length ? `<br>직접 확인할 것: ${esc(x.check_items.join(", "))}` : ""}<br>최종 결정: ${esc(x.approval_by)}${x.source_url ? ` · <a href="${esc(x.source_url)}" target="_blank" rel="noopener" style="pointer-events:auto">출처</a>` : ""}${x.checked_at ? ` · 확인일 ${esc(x.checked_at)}` : " · 기준일 확인 전(시연용)"}</span></div>`;
+ $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
     $("#panelL").innerHTML = `<button class="x pl-x" aria-label="패널 닫기"><svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 3l10 10M13 3L3 13"/></svg></button><div class="jp${jpOpen ? " is-open" : ""}"><button class="jp-line m-only" id="jpLine" aria-expanded="${jpOpen}"><span>요건 충족 <b>${n.on}</b> · 확인 필요 <b>${n.dim}</b> · 미충족 <b>${n.off}</b></span><i>${jpOpen ? "접기" : "펼치기"}</i></button><span class="eyebrow-s">Your result</span><div class="jp-head"><h2>내 조건 판정</h2><button class="jp-fold" id="jpFold">${jpOpen ? "접기" : "대출·지원 보기"}</button></div>
       <div class="jp-list" ${jpOpen ? "" : "hidden"}>
         <p class="jp-date">기준 ${esc(RULES.version)} · 공고 확인값 + 가정치(시중금리 4.5% 등)</p>
@@ -91,6 +110,7 @@ function renderPanels() {
       </div>
       <div class="bar3" aria-hidden="true"><span style="width:${n.on / tot * 100}%;background:var(--teal)"></span><span style="width:${n.dim / tot * 100}%;background:var(--glow)"></span><span style="width:${n.off / tot * 100}%;background:#CFCAC1"></span></div>
       <p class="bar3-txt"><b style="color:var(--green)">●</b> 요건 충족 ${n.on} · ◐ 확인 필요 ${n.dim} · <span class="muted">○ 미충족 ${n.off}</span></p>
+      ${(() => { if (n.on) return ""; const hs = openHints(S.profile); return hs.length ? `<div class="jp-open"><b>이렇게 하면 열려요</b><ul>${hs.map(h => `<li>${h}</li>`).join("")}</ul><p>판정 규칙으로 조건만 바꿔 다시 계산한 값이에요.</p></div>` : ""; })()}
       <div class="jp-btns"><button class="btn btn--ghost btn--sm m-only" id="jpEdit">조건 바꾸기</button><button class="btn btn--ghost btn--sm m-only" id="jpBrowse">둘러보기 모드</button><button class="btn btn--sm" id="jpConsult">상담 이어가기 →</button></div></div>`;
     $$(".jp-row").forEach(r => { const t = () => r.classList.toggle("is-open"); r.addEventListener("click", t); r.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); t(); } }); });
     /* 패널을 새로 그려도 누른 단추에 초점이 남게 한다 (키보드로 쓸 때 초점이 사라지지 않게) */
@@ -150,7 +170,7 @@ function cardHTML(id) {
       <tr class="tot"><td>월 실부담 · ${esc(bd.financing)}</td><td>${wonFull(bd.total)}</td></tr></tbody></table>
       <p class="small muted" style="margin-top:6px">실부담 = 월세 + 관리비 + 보증금 대출이자 − 월세지원 − 이자지원 (이자지원은 금리에서 빼서 계산). 중개수수료 지원은 1회라 월 부담에 넣지 않고 배지로만 보여줘요.</p></details>`;
     body += `<details class="fold" data-pane="sup"><summary>적용 지원 · 빠진 지원</summary><ul class="lst">${al.applied.map(a => `<li><span>${esc(a.name)}</span><span class="st st--${a.status}">${ST_KO[a.status]}</span></li>`).join("") || "<li><span>대출·지원 없이 계산</span><span></span></li>"}
-      ${al.not_applied.map(a => `<li><span class="muted">${esc(a.name)}</span><span style="white-space:normal;text-align:right">${esc(a.reason)}</span></li>`).join("")}</ul></details>`;
+      ${al.not_applied.map(a => `<li><span class="muted">${esc(a.name)}</span><span style="white-space:normal;text-align:right">${esc(a.reason)}${rentWhy(a.id, "ineligible", a.reason) ? `<br>${rentWhy(a.id, "ineligible", a.reason)}` : ""}</span></li>`).join("")}</ul></details>`;
     body += `<details class="fold" data-pane="chk"><summary>계약 전 체크리스트</summary><ul class="chk">${RULES.fixed_checklist.concat(["등기부등본으로 소유자·근저당 확인", "전세보증보험 가입 가능 여부 확인"]).map((t, i) => `<li><label><input type="checkbox" data-ck="${c.id}-${i}"${S.chk[c.id + "-" + i] ? " checked" : ""}>${esc(t)}</label></li>`).join("")}</ul></details>`;
     const links = [...(APPLY_LINKS[c.supply_type] || []), ...al.applied.map(a => ({ label: a.name.replace("(시연용)", "") + " 안내", url: a.source_url }))];
     body += `<details class="fold" data-pane="link"><summary>신청·문의 링크</summary><div class="links">${links.map(l => l.url ? `<a href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.label)} ↗</a>` : `<span>${esc(l.label)} · 공고 확인 중</span>`).join("")}</div></details>`;
