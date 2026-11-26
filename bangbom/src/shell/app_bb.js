@@ -102,7 +102,7 @@ function renderPanels() {
     $("#pillsR").innerHTML = `<span class="pill-n">모은 돈 <b>${wonFull(S.profile.assets)}</b></span><span class="pill-n">월 예산 <b>${wonFull(S.profile.monthly_budget)}</b></span>${mn != null ? `<span class="pill-n">지원 반영 최저 <b>월 ${wonFull(mn)}</b></span>` : ""}`;
     $("#legend").innerHTML = "";
   } else {
-    $("#panelL").innerHTML = `<button class="x pl-x" aria-label="패널 닫기"><svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 3l10 10M13 3L3 13"/></svg></button><div class="jp jp--browse"><span class="eyebrow-s">Browse</span><h2>대구 미분양 ${COMPLEX.length}곳</h2><p class="muted small" style="margin-top:4px">${MapView.ok ? "단지를 누르면 주변 시설과 집 정보가 보여요" : "조건을 넣으면 대출·지원 판정은 볼 수 있어요"}</p><p class="muted small" style="margin-top:4px"><i style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#b8743a;margin-right:6px"></i>주황 핀 ${UNSOLD_LIST.filter(u => typeof UNSOLD_PRICE !== "undefined" && UNSOLD_PRICE[u.name]).length}곳: 공개 목록 중 최근 실거래가가 있는 단지<br><i style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#cdbfae;margin-right:6px"></i>베이지 핀 ${UNSOLD_LIST.filter(u => !(typeof UNSOLD_PRICE !== "undefined" && UNSOLD_PRICE[u.name])).length}곳: 실거래가 없음 · 핀을 누르면 가격과 출처가 보여요</p>
+    $("#panelL").innerHTML = `<button class="x pl-x" aria-label="패널 닫기"><svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 3l10 10M13 3L3 13"/></svg></button><div class="jp jp--browse"><span class="eyebrow-s">Browse</span><h2>대구 미분양 ${COMPLEX.length}곳</h2><p class="muted small" style="margin-top:4px">${MapView.ok ? "단지를 누르면 주변 시설과 집 정보가 보여요" : "조건을 넣으면 대출·지원 판정은 볼 수 있어요"}</p><p class="muted small" style="margin-top:4px"><i style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#b8743a;margin-right:6px"></i>작은 아파트(옥상 주황) ${UNSOLD_LIST.filter(u => typeof UNSOLD_PRICE !== "undefined" && UNSOLD_PRICE[u.name]).length}곳: 공개 목록 중 최근 실거래가가 있는 단지<br><i style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#cdbfae;margin-right:6px"></i>작은 아파트(옥상 베이지) ${UNSOLD_LIST.filter(u => !(typeof UNSOLD_PRICE !== "undefined" && UNSOLD_PRICE[u.name])).length}곳: 실거래가 없음 · 누르면 가격과 출처가 보여요</p>
       <div class="jp-btns"><button class="btn btn--sm" id="bMatch">${S.profile ? "내 조건으로 보기" : "내 조건 넣고 불 켜기"} →</button></div></div>`;
     $("#bMatch").onclick = () => S.profile ? setMode("match") : (location.hash = "#input");
     $("#panelL").dataset.mode = "browse";
@@ -144,8 +144,8 @@ function cardHTML(id) {
       ${ev.alts.length ? `<p class="small muted" style="margin-top:6px">다른 선택: ${ev.alts.slice(0, 2).map(a => `${esc(a.label)} 월 ${wonFull(a.net)}(${ST_KO[a.status]})`).join(" · ")}</p>` : ""}`;
     body += `<p class="why">${esc(ev.light_reason)}</p>${roomNoteM}</div>`;
     if (bd) body += `<details class="fold" data-pane="calc"><summary>계산 내역</summary><table class="calc"><tbody>
-      <tr><td>월세</td><td>${wonFull(bd.rent)}</td></tr><tr><td>관리비${c.mgmt_known ? "" : " (추정)"}</td><td>${wonFull(bd.mgmt)}</td></tr>
-      <tr><td>보증금 대출이자<br><span class="muted">${esc(bd.calc)}</span></td><td>${wonFull(bd.loan_interest)}</td></tr>
+      <tr><td>월세${bd.rent ? "" : `<br><span class="muted">전세 단지라 월세가 없어요 · 보증금 ${wonFull(c.deposit)}</span>`}</td><td>${wonFull(bd.rent)}</td></tr><tr><td>관리비${c.mgmt_known ? "" : " (추정)"}</td><td>${wonFull(bd.mgmt)}</td></tr>
+      <tr><td>보증금 대출이자<br><span class="muted">${bd.loan_needed ? esc(bd.calc) : `모은 돈이 보증금보다 많아 대출이 필요 없어요`}</span></td><td>${wonFull(bd.loan_interest)}</td></tr>
       <tr><td>월세 지원</td><td class="neg">−${wonFull(bd.rent_support)}</td></tr>
       <tr class="tot"><td>월 실부담 · ${esc(bd.financing)}</td><td>${wonFull(bd.total)}</td></tr></tbody></table>
       <p class="small muted" style="margin-top:6px">실부담 = 월세 + 관리비 + 보증금 대출이자 − 월세지원 − 이자지원 (이자지원은 금리에서 빼서 계산). 중개수수료 지원은 1회라 월 부담에 넣지 않고 배지로만 보여줘요.</p></details>`;
@@ -589,22 +589,31 @@ const MapView = {
     });
   },
   buildUnsold() {
-    /* 대구시 공개 미분양 목록: 작은 회색-주황 점. 판정 없음, 마우스 올림 라벨 없음(클릭만) */
-    /* 지도를 MAP_K배로 키운 만큼 핀도 키운다. 실거래가가 있는 곳은 진한 주황, 없는 곳은 연한 베이지 */
+    /* 대구시 공개 미분양 목록: 작은 아파트. 판정 없음, 마우스 올림 라벨 없음(클릭만) */
+    /* 공개 목록 단지: 판정 단지보다 작은 아파트 2동. 불은 켜지 않는다(판정 없음).
+       실거래가가 있는 곳은 옥상 띠가 주황, 없는 곳은 베이지. 서로 겹치지 않게 0.8 이상 벌린다 */
     const hasP = u => typeof UNSOLD_PRICE !== "undefined" && !!UNSOLD_PRICE[u.name];
-    const mOn = mat("#b8743a"), mOff = mat("#cdbfae"), mStem = mat("#8a7b6c");
-    const geo = new T3.CylinderGeometry(.85, .85, .32, 20); geo.translate(0, 2.2, 0);
-    const stem = new T3.CylinderGeometry(.09, .09, 2.2, 6); stem.translate(0, 1.1, 0);
-    const base = new T3.CylinderGeometry(.5, .5, .06, 16); base.translate(0, .03, 0);
-    const hg = new T3.CylinderGeometry(1.4, 1.4, 3, 8); hg.translate(0, 1.5, 0);
-    const same = {}; /* 동 중심 근사로 같은 자리에 겹친 점은 작은 원으로 벌려 각각 누를 수 있게 */
-    this.uPos = UNSOLD_LIST.map(u => { const key = u.lat + "," + u.lng, i = same[key] = (same[key] || 0) + 1, a = i * 2.4, r = i > 1 ? .75 * Math.sqrt(i - 1) : 0;
+    const uWall = new T3.MeshStandardMaterial({ color: new T3.Color("#f4efe6").convertSRGBToLinear(), map: windowTexture("unsold", 1, false), roughness: .9 });
+    const uRoof = new T3.MeshStandardMaterial({ color: new T3.Color("#fbf7ef").convertSRGBToLinear(), roughness: .9 });
+    const bandOn = mat("#b8743a"), bandOff = mat("#cdbfae");
+    const same = {}; /* 동 중심 근사로 같은 자리에 겹친 단지는 해바라기 모양으로 벌린다 */
+    const pos = UNSOLD_LIST.map(u => { const key = u.lat + "," + u.lng, i = same[key] = (same[key] || 0) + 1, a = i * 2.4, r = i > 1 ? 1.0 * Math.sqrt(i - 1) : 0;
       let x = PX(u.lng) + Math.cos(a) * r, z = PZ(u.lat) + Math.sin(a) * r;
-      const c = COMPLEX.find(c => Math.abs(x - c.map_x) < 2.2 && Math.abs(z - c.map_z) < 2.0); if (c) z = c.map_z + (z >= c.map_z ? 2.0 : -2.0); /* 판정 단지 건물에 가려지지 않게 */
+      const c = COMPLEX.find(c => Math.abs(x - c.map_x) < 2.2 && Math.abs(z - c.map_z) < 2.0); if (c) z = c.map_z + (z >= c.map_z ? 2.0 : -2.0); /* 판정 단지에 가려지지 않게 */
       return [x, z]; });
+    for (let it = 0; it < 20; it++) for (let i = 0; i < pos.length; i++) for (let j = i + 1; j < pos.length; j++) {
+      const dx = pos[j][0] - pos[i][0], dz = pos[j][1] - pos[i][1], d = Math.hypot(dx, dz) || .01;
+      if (d < .8) { const m = (.8 - d) / 2 / d; pos[i][0] -= dx * m; pos[i][1] -= dz * m; pos[j][0] += dx * m; pos[j][1] += dz * m; }
+    }
+    this.uPos = pos;
+    const hg = new T3.CylinderGeometry(.55, .55, 3, 8); hg.translate(0, 1.5, 0);
     this.uHits = UNSOLD_LIST.map((u, k) => {
-      const [x, z] = this.uPos[k], on = hasP(u);
-      [[geo, on ? mOn : mOff], [stem, mStem], [base, on ? mOn : mOff]].forEach(([g, mm]) => { const d = new T3.Mesh(g, mm); d.position.set(x, 0, z); d.castShadow = true; this.decor.add(d); });
+      const [x, z] = this.uPos[k], g = new T3.Group(); g.position.set(x, 0, z); g.rotation.y = (k * 0.7) % Math.PI; this.decor.add(g);
+      const h = 1.1 + Math.min(u.total_units || 400, 1500) / 1500 * 1.6, bm = hasP(u) ? bandOn : bandOff;
+      [[-.13, h], [.13, h * .82]].forEach(([dx, hh]) => {
+        const b = new T3.Mesh(new T3.BoxGeometry(.2, hh, .4), [uWall, uWall, uRoof, uRoof, uWall, uWall]); b.position.set(dx, hh / 2, 0); b.castShadow = true; b.receiveShadow = true; g.add(b);
+        const cap = new T3.Mesh(new T3.BoxGeometry(.21, .05, .41), bm); cap.position.set(dx, hh + .025, 0); g.add(cap);
+      });
       const hit = new T3.Mesh(hg, new T3.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false })); hit.position.set(x, 0, z); hit.userData.uk = k; this.scene.add(hit); return hit;
     });
   },
