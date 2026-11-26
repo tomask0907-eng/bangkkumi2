@@ -24,3 +24,28 @@ A(res[4500].c01.light === "off" && res[4500].c01.net_monthly_best === 63.4, "상
 A(res[4500].c02.net_monthly === 38.6 && res[4500].c06.light === "dim" && res[4500].c06.net_monthly_best === 55.9, "c02/c06");
 A(res[1000].c01.shortfall === 1220 && res[1000].c01.light === "off", "상인 1000 부족액 " + res[1000].c01.shortfall);
 console.log("\n점검 " + (process.exitCode ? "실패" : "통과"));
+
+// 금지어 검사: 화면에 나가는 원본(src/home, src/shell, src/modelhouse 의 .html·.js)에 쓰면 안 되는 표현이 있는지 본다. 하나라도 있으면 종료 코드 1
+// 기준: docs/인수인계_혜원.md 3번 "쓰면 안 되는 표현", bangbom/CLAUDE.md 데이터 규칙·디자인 시스템 금지 문구
+const path = require("path");
+const BANNED = [
+  ["안전매물", "확인할 것이 다 보이는 집"], ["안전 매물", "확인할 것이 다 보이는 집"], ["보증금 안전", "공급 주체·보증 안내 표시"],
+  ["전세 가능", "요건 충족 / 확인 필요 / 미충족"], ["대출 가능", "요건 충족 / 확인 필요 / 미충족"],
+  ["시세보다 확실히", "근거와 기준일을 같이 적은 비교"], ["소비의 도시", "근거가 오래돼서(2004년 기사) 뺌"],
+  ["유출을 막", "결정을 돕는다"], ["미분양을 줄", "결정을 돕는다"], ["미분양을 해소", "결정을 돕는다"],
+  ["직방", "\"일반 부동산 앱\" (경쟁사 이름은 발표 자료에만)"], ["혁신적인", "AI 문구 금지"], ["단순한 ", null]
+];
+const SRC = path.join(M, "..");
+const files = ["home", "shell", "modelhouse"].flatMap(d => fs.readdirSync(path.join(SRC, d)).filter(f => /\.(html|js)$/.test(f)).map(f => path.join(SRC, d, f)));
+let bad = 0;
+for (const f of files) {
+  fs.readFileSync(f, "utf8").split(/\r?\n/).forEach((line, i) => {
+    for (const [w, alt] of BANNED) {
+      if (w === "단순한 ") { if (!/단순한 [^\s]+[을를] 넘어/.test(line)) continue; }
+      else if (!line.includes(w)) continue;
+      bad++; console.log(`금지어 "${w.trim()}" ${path.relative(SRC, f)}:${i + 1}` + (alt ? ` → ${alt}` : ""));
+    }
+  });
+}
+console.log(bad ? `금지어 ${bad}곳` : `금지어 없음 (${files.length}개 파일)`);
+if (bad) process.exitCode = 1;
