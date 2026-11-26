@@ -235,7 +235,7 @@ function openUnsold(k) {
     <p class="small muted" style="margin-top:12px">${esc(u.source)} · ${esc(u.as_of)} 기준</p>
     <div class="links" style="margin-top:8px"><a href="${esc(UNSOLD_SRC_URL)}" target="_blank" rel="noopener">대구시 원자료 ↗</a></div>
     ${unsoldPriceHTML(u)}
-    ${u.approx ? `<p class="small muted" style="margin-top:8px">지도 위치는 동 중심 근사예요.</p>` : `<p class="small muted" style="margin-top:8px">지도 위치: OpenStreetMap 단지 위치</p>`}</div>`;
+    ${u.approx ? `<p class="small muted" style="margin-top:8px">지도 위치는 동 중심 근사예요.</p>` : `<p class="small muted" style="margin-top:8px">지도 위치: ${esc(u.geo_src || "OpenStreetMap 단지 위치")}</p>`}</div>`;
   p.classList.add("is-open"); p.scrollTop = 0;
   $("#ccX").onclick = () => { closeCard(); MapView.select(null); };
   document.body.classList.add("card-open"); syncPl();
